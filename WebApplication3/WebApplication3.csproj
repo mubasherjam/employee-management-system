@@ -123,6 +123,9 @@
     <Content Include="Content\Site.css" />
     <Content Include="Counter.aspx" />
     <Content Include="Dashboard.aspx" />
+    <Content Include="database\01_schema.sql" />
+    <Content Include="database\02_stored_procedures.sql" />
+    <Content Include="database\03_seed_data.sql" />
     <Content Include="Default.aspx" />
     <Content Include="EmployeeList.aspx" />
     <Content Include="EmployeeProfile.aspx" />
