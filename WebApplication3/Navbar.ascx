@@ -92,6 +92,64 @@
 .btn-add-dept { background: #fff; color: #1a2332; font-weight: 700; border: none; padding: 10px 20px; border-radius: 10px; font-size: 0.9rem; transition: all 0.15s ease; }
 .btn-add-dept:hover { background: #e9ecef; color: #1a2332; transform: translateY(-1px); }
 .dept-msg { font-size: 0.87rem; font-weight: 500; }
+
+
+.nav-dropdown{
+    position:relative;
+}
+
+.dropdown-toggle{
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.dropdown-icon{
+    font-size:11px;
+    transition:.25s ease;
+}
+
+.nav-dropdown:hover .dropdown-icon{
+    transform:rotate(180deg);
+}
+
+.dropdown-menu{
+    display:none;
+    position:absolute;
+    top:100%;
+    left:0;
+    min-width:220px;
+    background:#fff;
+    border-radius:12px;
+    padding:8px 0;
+    box-shadow:0 12px 30px rgba(0,0,0,.15);
+    border:1px solid #ececec;
+    z-index:999;
+}
+
+.nav-dropdown:hover .dropdown-menu{
+    display:block;
+}
+
+.dropdown-menu a{
+    display:flex;
+    align-items:center;
+    padding:12px 18px;
+    color:#374151;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:500;
+    transition:.2s;
+}
+
+.dropdown-menu a:hover{
+    background:#f3f4f6;
+    color:#2563eb;
+}
+
+.dropdown-menu a i{
+    width:18px;
+}
 </style>
 
 <section class="header-section">
@@ -108,14 +166,32 @@
 
         <div class="desktop-nav">
 
-    <a href="EmployeeList.aspx" class="nav-link" runat="server" id="lnkEmployeesDesktop">Employees</a>
+<div class="nav-dropdown">
+    <a href="#" class="nav-link dropdown-toggle">
+        Employees
+        <i class=""></i>
+    </a>
+
+    <div class="dropdown-menu">
+        <a href="EmployeeList.aspx" runat="server" id="lnkEmployeesDesktop">
+            <i class="bi bi-people me-2"></i>Employee List
+        </a>
+
+        <a href="EmployeeProfile.aspx" runat="server" id="lnkNewEntryDesktop">
+            <i class="bi bi-person-plus me-2"></i>New Entry
+        </a>
+
+        <a href="ManageUsers.aspx" runat="server" id="lnkManageUsersDesktop">
+            <i class="bi bi-person-gear me-2"></i>Manage Users
+        </a>
+    </div>
+</div>
+
 
     <button type="button" class="nav-link" runat="server" id="btnEditDeptDesktop" onclick="showDeptModal()">
         <i class="bi bi-building-add me-1"></i>Edit Department
     </button>
             <!-- role based addition -->
-    <a href="EmployeeProfile.aspx" class="nav-link" runat="server" id="lnkNewEntryDesktop">New Entry</a>
-    <a href="ManageUsers.aspx" class="nav-link" runat="server" id="lnkManageUsersDesktop">Manage Users</a>
     <a href="MyProfile.aspx" class="nav-link" runat="server" id="lnkMyProfileDesktop">My Profile</a>
     <a href="Dashboard.aspx" class="nav-link" runat="server" id="lnkDashboardDesktop">Dashboard</a>
     <asp:Literal ID="litUserBadgeDesktop" runat="server" />
