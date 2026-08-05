@@ -14,6 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 
+
     <style>
         * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
 
@@ -174,6 +175,25 @@
 }
 
 
+        /* toggle icons in the chart tree*/
+.tree ul.org-children-hidden{
+    display:none !important;
+}
+
+.tree ul.org-children-visible{
+    display:flex !important;
+}
+.org-toggle-icon {
+    margin-top: 8px;
+    color: rgba(255,255,255,0.85);
+    font-size: 0.9rem;
+    transition: transform 0.2s ease;
+}
+.org-toggle-icon.rotated { transform: rotate(180deg); }
+
+.org-card { position: relative; }
+.org-card:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(20,30,60,0.18); }
+
     </style>
 </head>
 <body>
@@ -297,6 +317,55 @@
         </div>
 
         <asp:Literal ID="ltrChartScript" runat="server" />
+
+
+        <!-- javascript function -->
+
+
+        
+<script>
+    function toggleOrgNode(nodeId) {
+        var childrenList = document.getElementById(nodeId + '-children');
+        var card = document.getElementById(nodeId);
+        var icon = card.querySelector('.org-toggle-icon i');
+
+        if (!childrenList) return;
+
+        var isHidden = childrenList.classList.contains('org-children-hidden');
+
+        if (isHidden) {
+            childrenList.classList.remove('org-children-hidden');
+            childrenList.classList.add('org-children-visible');
+            icon.classList.remove('bi-chevron-down');
+            icon.classList.add('bi-chevron-up');
+        } else {
+            childrenList.classList.remove('org-children-visible');
+            childrenList.classList.add('org-children-hidden');
+            icon.classList.remove('bi-chevron-up');
+            icon.classList.add('bi-chevron-down');
+
+            // Also collapse any expanded grandchildren, so re-expanding starts fresh
+            var nestedLists = childrenList.querySelectorAll('ul');
+            nestedLists.forEach(function (ul) {
+                ul.classList.remove('org-children-visible');
+                ul.classList.add('org-children-hidden');
+            });
+            var nestedIcons = childrenList.querySelectorAll('.bi-chevron-up');
+            nestedIcons.forEach(function (icon) {
+                icon.classList.remove('bi-chevron-up');
+                icon.classList.add('bi-chevron-down');
+            });
+        }
+    }
+
+    // Auto-expand the CEO's direct reports on page load, so the chart isn't just one lonely box
+    document.addEventListener('DOMContentLoaded', function () {
+        var rootCard = document.querySelector('.org-root');
+        if (rootCard) {
+            toggleOrgNode(rootCard.id);
+        }
+    });
+</script>
     </form>
 </body>
 </html>

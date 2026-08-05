@@ -204,10 +204,13 @@ namespace HRMSApp
 
             string initials = string.IsNullOrEmpty(node.EmpName) ? "?" : GetInitials(node.EmpName);
             string personName = string.IsNullOrEmpty(node.EmpName) ? "<span class='org-vacant'>Vacant</span>" : node.EmpName;
+            string nodeId = "orgnode-" + node.OrgRoleID;
+            bool hasChildren = node.Children.Any();
 
             StringBuilder sb = new StringBuilder();
             sb.Append("<li>");
-            sb.Append("<div class='org-card " + tierClass + "'>");
+            sb.Append("<div class='org-card " + tierClass + "' id='" + nodeId + "' " +
+                       (hasChildren ? "onclick=\"toggleOrgNode('" + nodeId + "')\" style='cursor:pointer;'" : "") + ">");
 
             if (node.EmpID.HasValue)
             {
@@ -226,11 +229,17 @@ namespace HRMSApp
 
             sb.Append("<div class='org-person'>" + personName + "</div>");
             sb.Append("<div class='org-title'>" + node.RoleTitle + "</div>");
+
+            if (hasChildren)
+            {
+                sb.Append("<div class='org-toggle-icon'><i class='bi bi-chevron-down'></i></div>");
+            }
+
             sb.Append("</div>");
 
-            if (node.Children.Any())
+            if (hasChildren)
             {
-                sb.Append("<ul>");
+                sb.Append("<ul class='org-children-hidden' id='" + nodeId + "-children'>");
                 foreach (var child in node.Children)
                     sb.Append(RenderNode(child, depth + 1));
                 sb.Append("</ul>");

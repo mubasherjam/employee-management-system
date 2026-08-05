@@ -106,18 +106,10 @@
         <span class="brand-name">HRMS Portal</span>
       </a>
 
-<%--      <div class="desktop-nav">
-        <a href="EmployeeList.aspx" class="nav-link" runat="server" id="lnkEmployeesDesktop">Employees</a>
-        <button type="button" class="nav-link" onclick="showDeptModal()">
-            <i class="bi bi-building-add me-1"></i>Edit Department
-        </button>
-        <a href="EmployeeProfile.aspx" class="nav-link" runat="server" id="lnkNewEntryDesktop">New Entry</a>
-        <a href="Dashboard.aspx" class="nav-link" runat="server" id="lnkDashboardDesktop">Dashboard</a>
-        <asp:Literal ID="litUserBadgeDesktop" runat="server" />
-        <a class="cta-button" runat="server" id="lnkAuthDesktop">Login</a>
-      </div>--%>
         <div class="desktop-nav">
+
     <a href="EmployeeList.aspx" class="nav-link" runat="server" id="lnkEmployeesDesktop">Employees</a>
+
     <button type="button" class="nav-link" runat="server" id="btnEditDeptDesktop" onclick="showDeptModal()">
         <i class="bi bi-building-add me-1"></i>Edit Department
     </button>
