@@ -34,6 +34,8 @@ namespace HRMSApp
                 lnkNewEntryMobile.Visible = isAdmin;
                 btnEditDeptDesktop.Visible = isAdmin;
                 btnEditDeptMobile.Visible = isAdmin;
+                lnkManageUsersDesktop.Visible = isAdmin;
+                lnkManageUsersMobile.Visible = isAdmin;
 
                 // Everyone logged in sees My Profile
                 lnkMyProfileDesktop.Visible = true;
@@ -49,6 +51,8 @@ namespace HRMSApp
                 btnEditDeptMobile.Visible = false;
                 lnkMyProfileDesktop.Visible = false;
                 lnkMyProfileMobile.Visible = false;
+                lnkManageUsersDesktop.Visible = false;
+                lnkManageUsersMobile.Visible = false;
 
                 lnkAuthDesktop.InnerText = "Login";
                 lnkAuthDesktop.HRef = "Login.aspx";

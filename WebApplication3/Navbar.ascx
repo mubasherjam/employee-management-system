@@ -123,6 +123,7 @@
     </button>
             <!-- role based addition -->
     <a href="EmployeeProfile.aspx" class="nav-link" runat="server" id="lnkNewEntryDesktop">New Entry</a>
+    <a href="ManageUsers.aspx" class="nav-link" runat="server" id="lnkManageUsersDesktop">Manage Users</a>
     <a href="MyProfile.aspx" class="nav-link" runat="server" id="lnkMyProfileDesktop">My Profile</a>
     <a href="Dashboard.aspx" class="nav-link" runat="server" id="lnkDashboardDesktop">Dashboard</a>
     <asp:Literal ID="litUserBadgeDesktop" runat="server" />
@@ -146,6 +147,7 @@
 </button>
 
         <a href="EmployeeProfile.aspx" class="nav-link" runat="server" id="lnkNewEntryMobile">New Entry</a>
+        <a href="ManageUsers.aspx" class="nav-link" runat="server" id="lnkManageUsersMobile">Manage Users</a>
         <a href="Dashboard.aspx" class="nav-link" runat="server" id="lnkDashboardMobile">Dashboard</a>
         <a class="cta-button" runat="server" id="lnkAuthMobile">Login</a>
           <!-- role based addition -->

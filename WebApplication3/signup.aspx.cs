@@ -2,6 +2,8 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace HRMSApp
 {
@@ -19,18 +21,19 @@ namespace HRMSApp
 
         protected void btnSignup_Click(object sender, EventArgs e)
         {
-            if (!Page.IsValid) return; // client-side validators already checked required fields/match
+            if (!Page.IsValid) return;
 
             string username = txtUsername.Text.Trim();
             string email = txtEmail.Text.Trim();
             string password = txtPassword.Text;
 
-            // Server-side re-check, never trust client-side alone
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
                 ShowError("All fields are required.");
                 return;
             }
+
+            byte[] passwordHash = ComputeSha256(password);
 
             using (SqlConnection con = new SqlConnection(conStr))
             using (SqlCommand cmd = new SqlCommand("sp_User_Signup", con))
@@ -38,18 +41,19 @@ namespace HRMSApp
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@Username", username);
                 cmd.Parameters.AddWithValue("@Email", email);
-                cmd.Parameters.AddWithValue("@Password", password);
+
+                SqlParameter hashParam = new SqlParameter("@PasswordHash", SqlDbType.VarBinary, 64);
+                hashParam.Value = passwordHash;
+                cmd.Parameters.Add(hashParam);
 
                 con.Open();
-                object result = cmd.ExecuteScalar(); // stored proc returns single Result column
-
+                object result = cmd.ExecuteScalar();
                 int resultCode = Convert.ToInt32(result);
 
                 switch (resultCode)
                 {
                     case 1:
                         ShowSuccess("Account created successfully! Redirecting to login...");
-                        // simple client-side redirect after a short delay
                         ClientScript.RegisterStartupScript(this.GetType(), "redirect",
                             "setTimeout(function(){ window.location = 'Login.aspx'; }, 1800);", true);
                         break;
@@ -63,6 +67,15 @@ namespace HRMSApp
                         ShowError("Something went wrong. Please try again.");
                         break;
                 }
+            }
+        }
+
+        // Same method as Login.aspx.cs - identical encoding, so hashes always match
+        private byte[] ComputeSha256(string input)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                return sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
             }
         }
 

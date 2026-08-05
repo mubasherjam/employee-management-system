@@ -270,9 +270,9 @@
             <asp:Button ID="btnLogin" runat="server" Text="Sign In" 
                 CssClass="btn btn-login mt-3" OnClick="btnLogin_Click" />
 
-            <div class="form-sub-footer">
-                HRMS Learning Project &middot; Internal Use Only
-            </div>
+<div class="form-sub-footer">
+    Are you new to the website? &middot; <a href="signup.aspx">Create an account</a>
+</div>
 
         </div>
 

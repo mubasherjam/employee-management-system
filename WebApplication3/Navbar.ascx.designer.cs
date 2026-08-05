@@ -42,6 +42,15 @@ namespace HRMSApp
         protected global::System.Web.UI.HtmlControls.HtmlAnchor lnkNewEntryDesktop;
 
         /// <summary>
+        /// lnkManageUsersDesktop control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor lnkManageUsersDesktop;
+
+        /// <summary>
         /// lnkMyProfileDesktop control.
         /// </summary>
         /// <remarks>
@@ -103,6 +112,15 @@ namespace HRMSApp
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.HtmlControls.HtmlAnchor lnkNewEntryMobile;
+
+        /// <summary>
+        /// lnkManageUsersMobile control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlAnchor lnkManageUsersMobile;
 
         /// <summary>
         /// lnkDashboardMobile control.

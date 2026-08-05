@@ -5,7 +5,6 @@ using System.Data.SqlClient;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
-using System.Web.Security;
 
 namespace HRMSApp
 {
@@ -22,8 +21,6 @@ namespace HRMSApp
                     Response.Redirect("EmployeeList.aspx");
                     return;
                 }
-
-                // Check for a valid "Remember Me" cookie before showing the login form
                 TryAutoLoginFromCookie();
             }
         }
@@ -39,12 +36,17 @@ namespace HRMSApp
                 return;
             }
 
+            byte[] passwordHash = ComputeSha256(password);
+
             using (SqlConnection con = new SqlConnection(conStr))
             using (SqlCommand cmd = new SqlCommand("sp_User_Login", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@UsernameOrEmail", usernameOrEmail);
-                cmd.Parameters.AddWithValue("@Password", password);
+
+                SqlParameter hashParam = new SqlParameter("@PasswordHash", SqlDbType.VarBinary, 64);
+                hashParam.Value = passwordHash;
+                cmd.Parameters.Add(hashParam);
 
                 con.Open();
                 SqlDataReader dr = cmd.ExecuteReader();
@@ -66,12 +68,8 @@ namespace HRMSApp
                     {
                         SetRememberMeCookie(userId);
                     }
-                    // Route based on role
-                    if (role == "Admin")
-                        Response.Redirect("EmployeeList.aspx");
-                    else
-                        Response.Redirect("MyProfile.aspx");
-                   // Response.Redirect("EmployeeList.aspx");
+
+                    Response.Redirect(role == "Admin" ? "EmployeeList.aspx" : "MyProfile.aspx");
                 }
                 else
                 {
@@ -80,10 +78,10 @@ namespace HRMSApp
             }
         }
 
-        // ---------------- Remember Me: create token, hash it, store hash+expiry in DB, plain token in cookie ----------------
+        // ---------------- Remember Me (unchanged logic, still uses its own SHA256 token hash) ----------------
         private void SetRememberMeCookie(int userId)
         {
-            string rawToken = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N"); // 64-char random token
+            string rawToken = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N");
             byte[] tokenHash = ComputeSha256(rawToken);
             DateTime expiry = DateTime.Now.AddDays(2);
 
@@ -98,16 +96,14 @@ namespace HRMSApp
                 cmd.ExecuteNonQuery();
             }
 
-            // Cookie holds UserID + the PLAIN token (never the password, never a reusable secret on its own without DB match)
             HttpCookie cookie = new HttpCookie("HRMSRememberMe");
             cookie.Values["uid"] = userId.ToString();
             cookie.Values["token"] = rawToken;
             cookie.Expires = expiry;
-            cookie.HttpOnly = true; // JavaScript can't read this cookie - blocks XSS theft
+            cookie.HttpOnly = true;
             Response.Cookies.Add(cookie);
         }
 
-        // ---------------- Auto-login check when returning within 2 days ----------------
         private void TryAutoLoginFromCookie()
         {
             HttpCookie cookie = Request.Cookies["HRMSRememberMe"];
@@ -141,12 +137,10 @@ namespace HRMSApp
                     Session["Role"] = dr["Role"].ToString();
                     Session["EmpID"] = dr["EmpID"] == DBNull.Value ? (int?)null : Convert.ToInt32(dr["EmpID"]);
                     dr.Close();
-
                     Response.Redirect(Session["Role"].ToString() == "Admin" ? "EmployeeList.aspx" : "MyProfile.aspx");
                 }
                 else
                 {
-                    // Token invalid or expired - clear the stale cookie
                     HttpCookie expired = new HttpCookie("HRMSRememberMe");
                     expired.Expires = DateTime.Now.AddDays(-1);
                     Response.Cookies.Add(expired);
@@ -154,6 +148,7 @@ namespace HRMSApp
             }
         }
 
+        // ---------------- The core encryption method, now living in C# ----------------
         private byte[] ComputeSha256(string input)
         {
             using (SHA256 sha256 = SHA256.Create())
