@@ -3,6 +3,9 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
+using System.Collections.Generic;
+using System.Linq;
+
 
 namespace HRMSApp
 {
@@ -21,6 +24,7 @@ namespace HRMSApp
             if (!IsPostBack)
             {
                 LoadDashboardData();
+                RenderOrgChart();
             }
         }
 
@@ -140,6 +144,100 @@ namespace HRMSApp
             string[] parts = fullName.Trim().Split(' ');
             if (parts.Length == 1) return parts[0].Substring(0, 1).ToUpper();
             return (parts[0].Substring(0, 1) + parts[parts.Length - 1].Substring(0, 1)).ToUpper();
+        }
+
+        // organizational chartview
+        private void RenderOrgChart()
+        {
+            DataTable dt = new DataTable();
+            using (SqlConnection con = new SqlConnection(conStr))
+            using (SqlCommand cmd = new SqlCommand("sp_OrgChart_GetAll", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(dt);
+            }
+
+            Dictionary<int, OrgNode> nodes = new Dictionary<int, OrgNode>();
+            Dictionary<int, int?> parentMap = new Dictionary<int, int?>();
+            List<int> rootIds = new List<int>();
+
+            foreach (DataRow row in dt.Rows)
+            {
+                int roleId = Convert.ToInt32(row["OrgRoleID"]);
+                if (!nodes.ContainsKey(roleId))
+                {
+                    nodes[roleId] = new OrgNode
+                    {
+                        OrgRoleID = roleId,
+                        RoleTitle = row["RoleTitle"].ToString(),
+                        EmpID = row["EmpID"] == DBNull.Value ? (int?)null : Convert.ToInt32(row["EmpID"]),
+                        EmpName = row["EmpName"] == DBNull.Value ? null : row["EmpName"].ToString(),
+                        Designation = row["Designation"] == DBNull.Value ? null : row["Designation"].ToString()
+                    };
+                    parentMap[roleId] = row["ParentOrgRoleID"] == DBNull.Value ? (int?)null : Convert.ToInt32(row["ParentOrgRoleID"]);
+                }
+            }
+
+            foreach (var kvp in parentMap)
+            {
+                if (kvp.Value == null) rootIds.Add(kvp.Key);
+                else nodes[kvp.Value.Value].Children.Add(nodes[kvp.Key]);
+            }
+
+            StringBuilder html = new StringBuilder();
+            html.Append("<div class='tree'><ul>");
+            foreach (int rootId in rootIds)
+            {
+                html.Append(RenderNode(nodes[rootId], 0));
+            }
+            html.Append("</ul></div>");
+
+            litOrgChart.Text = html.ToString();
+        }
+        private string RenderNode(OrgNode node, int depth)
+        {
+            string tierClass = depth == 0 ? "org-root"
+                              : depth == 1 ? "org-manager"
+                              : depth == 2 ? "org-staff"
+                              : "org-intern";
+
+            string initials = string.IsNullOrEmpty(node.EmpName) ? "?" : GetInitials(node.EmpName);
+            string personName = string.IsNullOrEmpty(node.EmpName) ? "<span class='org-vacant'>Vacant</span>" : node.EmpName;
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("<li>");
+            sb.Append("<div class='org-card " + tierClass + "'>");
+
+            if (node.EmpID.HasValue)
+            {
+                sb.Append("<div class='org-avatar-photo-wrap'>");
+                sb.Append("<img class='org-avatar-photo' src='ShowImage.ashx?EmpID=" + node.EmpID.Value + "' " +
+                          "onerror=\"this.style.display='none'; this.nextElementSibling.style.display='flex';\" />");
+                sb.Append("<div class='org-avatar' style='display:none;'>" + initials + "</div>");
+                sb.Append("</div>");
+            }
+            else
+            {
+                sb.Append("<div class='org-avatar-photo-wrap'>");
+                sb.Append("<div class='org-avatar'>" + initials + "</div>");
+                sb.Append("</div>");
+            }
+
+            sb.Append("<div class='org-person'>" + personName + "</div>");
+            sb.Append("<div class='org-title'>" + node.RoleTitle + "</div>");
+            sb.Append("</div>");
+
+            if (node.Children.Any())
+            {
+                sb.Append("<ul>");
+                foreach (var child in node.Children)
+                    sb.Append(RenderNode(child, depth + 1));
+                sb.Append("</ul>");
+            }
+
+            sb.Append("</li>");
+            return sb.ToString();
         }
     }
 }

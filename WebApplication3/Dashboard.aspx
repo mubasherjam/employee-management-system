@@ -93,6 +93,87 @@
         }
 
         .chart-wrap { position: relative; height: 260px; }
+
+
+        /* ---- Org Chart (appended, new section) ---- */
+        .tree { padding: 20px 0; overflow-x: auto; }
+        .tree ul {
+            padding-top: 30px; position: relative;
+            display: flex; justify-content: center;
+        }
+        .tree li {
+            display: flex; flex-direction: column; align-items: center;
+            list-style-type: none;
+            position: relative;
+            padding: 30px 12px 0 12px;
+        }
+        .tree li::before, .tree li::after {
+            content: '';
+            position: absolute; top: 0; right: 50%;
+            border-top: 2px solid #d7dde5;
+            width: 50%; height: 30px;
+        }
+        .tree li::after {
+            right: auto; left: 50%;
+            border-left: 2px solid #d7dde5;
+        }
+        .tree li:only-child::after, .tree li:only-child::before { display: none; }
+        .tree li:only-child { padding-top: 0; }
+        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
+        .tree li:last-child::before { border-right: 2px solid #d7dde5; border-radius: 0 6px 0 0; }
+        .tree li:first-child::after { border-radius: 6px 0 0 0; }
+        .tree ul ul::before {
+            content: '';
+            position: absolute; top: 0; left: 50%;
+            border-left: 2px solid #d7dde5;
+            width: 0; height: 30px;
+        }
+
+        .org-card {
+            display: inline-flex; flex-direction: column; align-items: center;
+            border-radius: 12px;
+            padding: 14px 18px;
+            min-width: 165px;
+            box-shadow: 0 4px 14px rgba(20,30,60,0.1);
+            transition: transform 0.15s ease;
+        }
+        .org-card:hover { transform: translateY(-3px); }
+
+
+        .org-avatar-photo-wrap { margin-bottom: 8px; position: relative; }
+
+.org-avatar-photo {
+    width: 46px; height: 46px; border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.5);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.org-avatar {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    color: #fff; font-weight: 800; font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid rgba(255,255,255,0.5);
+}
+
+        .org-person { color: #fff; font-weight: 700; font-size: 0.88rem; text-align: center; }
+        .org-title { color: rgba(255,255,255,0.85); font-size: 0.75rem; margin-top: 2px; text-align: center; }
+        .org-vacant { font-style: italic; opacity: 0.75; }
+
+        .org-root    { background: linear-gradient(135deg, #16a34a, #15803d); }
+        .org-manager { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        .org-staff   { background: linear-gradient(135deg, #7c5cff, #6a4ce0); }
+        .org-intern  { background: linear-gradient(135deg, #e0448a, #c22e73); }
+
+
+
+        .legend-dot {
+    display: inline-block; width: 10px; height: 10px;
+    border-radius: 50%; margin-right: 5px;
+}
+
+
     </style>
 </head>
 <body>
@@ -179,12 +260,36 @@
                         <div class="card-header-custom">
                             <span style="font-weight:700;">Department Breakdown</span>
                         </div>
+
                         <div class="card-body p-4">
                             <div class="chart-wrap">
                                 <canvas id="deptChart"></canvas>
                             </div>
                             <asp:Label ID="lblNoDepts" runat="server" CssClass="empty-state" Text="No departments yet." Visible="false" />
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- org chart !-->
+                        <!-- ============================= -->
+            <!-- ORG CHART SECTION (new, appended below existing dashboard content) -->
+            <!-- ============================= -->
+            <div class="mt-4">
+                <div class="card shadow">
+                    <div class="card-header-custom">
+                        <span style="font-weight:700;">Organization Chart</span>
+                    </div>
+                    <div class="card-body pb-0 pt-3">
+    <div class="d-flex gap-3 flex-wrap" style="font-size:0.8rem;">
+        <span><span class="legend-dot" style="background:#16a34a;"></span> Executive</span>
+        <span><span class="legend-dot" style="background:#2563eb;"></span> Manager</span>
+        <span><span class="legend-dot" style="background:#7c5cff;"></span> Staff</span>
+        <span><span class="legend-dot" style="background:#e0448a;"></span> Intern</span>
+    </div>
+</div>
+                    <div class="card-body p-4" style="overflow-x:auto;">
+                        <asp:Literal ID="litOrgChart" runat="server" />
                     </div>
                 </div>
             </div>
