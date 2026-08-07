@@ -147,6 +147,7 @@ namespace HRMSApp
         }
 
         // organizational chartview
+
         private void RenderOrgChart()
         {
             DataTable dt = new DataTable();
@@ -186,12 +187,10 @@ namespace HRMSApp
                 else nodes[kvp.Value.Value].Children.Add(nodes[kvp.Key]);
             }
 
-            // True depth from the real root, so tier colors (green/blue/purple/pink)
-            // stay correct even when a non-admin's own node is displayed as the top.
             foreach (int rootId in trueRootIds)
                 ComputeDepth(nodes[rootId], 0, depthMap);
 
-            // ---- NEW: figure out what this logged-in user is allowed to see ----
+            // ---- who's logged in? ----
             bool isAdmin = false;
             int? myOrgRoleId = null;
 
@@ -214,15 +213,48 @@ namespace HRMSApp
                 }
             }
 
-            List<int> displayRootIds;
+            // ---- decide what to display, and what to auto-expand ----
+            List<OrgNode> displayRoots = new List<OrgNode>();
+            HashSet<int> autoExpandIds = new HashSet<int>();
 
             if (isAdmin)
             {
-                displayRootIds = trueRootIds; // full hierarchy
+                foreach (int rootId in trueRootIds)
+                {
+                    displayRoots.Add(nodes[rootId]);
+                    autoExpandIds.Add(rootId); // same as before: only top level auto-opens
+                }
             }
             else if (myOrgRoleId.HasValue && nodes.ContainsKey(myOrgRoleId.Value))
             {
-                displayRootIds = new List<int> { myOrgRoleId.Value }; // self + descendants only
+                OrgNode myNode = nodes[myOrgRoleId.Value];
+                int? parentId = parentMap[myOrgRoleId.Value];
+
+                if (parentId.HasValue && nodes.ContainsKey(parentId.Value))
+                {
+                    OrgNode mgr = nodes[parentId.Value];
+
+                    // Synthetic "view" of the manager showing ONLY you as a child -
+                    // hides your siblings, doesn't touch the real nodes dictionary.
+                    OrgNode mgrView = new OrgNode
+                    {
+                        OrgRoleID = mgr.OrgRoleID,
+                        RoleTitle = mgr.RoleTitle,
+                        EmpID = mgr.EmpID,
+                        EmpName = mgr.EmpName,
+                        Designation = mgr.Designation,
+                        Children = new List<OrgNode> { myNode }
+                    };
+
+                    displayRoots.Add(mgrView);
+                    autoExpandIds.Add(mgr.OrgRoleID);       // reveal "you" under your manager
+                    autoExpandIds.Add(myOrgRoleId.Value);   // reveal your own direct reports
+                }
+                else
+                {
+                    displayRoots.Add(myNode); // you're already at the very top (e.g. CEO)
+                    autoExpandIds.Add(myOrgRoleId.Value);
+                }
             }
             else
             {
@@ -232,21 +264,22 @@ namespace HRMSApp
 
             StringBuilder html = new StringBuilder();
             html.Append("<div class='tree'><ul>");
-            foreach (int rootId in displayRootIds)
-                html.Append(RenderNode(nodes[rootId], depthMap[rootId])); // true depth = correct tier color
+            foreach (OrgNode root in displayRoots)
+                html.Append(RenderNode(root, depthMap[root.OrgRoleID], autoExpandIds));
             html.Append("</ul></div>");
 
             litOrgChart.Text = html.ToString();
         }
 
-        // NEW helper
         private void ComputeDepth(OrgNode node, int depth, Dictionary<int, int> depthMap)
         {
             depthMap[node.OrgRoleID] = depth;
             foreach (var child in node.Children)
                 ComputeDepth(child, depth + 1, depthMap);
         }
-        private string RenderNode(OrgNode node, int depth)
+
+
+        private string RenderNode(OrgNode node, int depth, HashSet<int> autoExpandIds)
         {
             string tierClass = depth == 0 ? "org-root"
                               : depth == 1 ? "org-manager"
@@ -257,6 +290,7 @@ namespace HRMSApp
             string personName = string.IsNullOrEmpty(node.EmpName) ? "<span class='org-vacant'>Vacant</span>" : node.EmpName;
             string nodeId = "orgnode-" + node.OrgRoleID;
             bool hasChildren = node.Children.Any();
+            bool expand = autoExpandIds.Contains(node.OrgRoleID);
 
             StringBuilder sb = new StringBuilder();
             sb.Append("<li>");
@@ -283,16 +317,18 @@ namespace HRMSApp
 
             if (hasChildren)
             {
-                sb.Append("<div class='org-toggle-icon'><i class='bi bi-chevron-down'></i></div>");
+                string icon = expand ? "bi-chevron-up" : "bi-chevron-down";
+                sb.Append("<div class='org-toggle-icon" + (expand ? " rotated" : "") + "'><i class='bi " + icon + "'></i></div>");
             }
 
             sb.Append("</div>");
 
             if (hasChildren)
             {
-                sb.Append("<ul class='org-children-hidden' id='" + nodeId + "-children'>");
+                string childClass = expand ? "org-children-visible" : "org-children-hidden";
+                sb.Append("<ul class='" + childClass + "' id='" + nodeId + "-children'>");
                 foreach (var child in node.Children)
-                    sb.Append(RenderNode(child, depth + 1));
+                    sb.Append(RenderNode(child, depth + 1, autoExpandIds));
                 sb.Append("</ul>");
             }
 
