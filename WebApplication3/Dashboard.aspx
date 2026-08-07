@@ -360,11 +360,12 @@
 
     // Auto-expand the CEO's direct reports on page load, so the chart isn't just one lonely box
     document.addEventListener('DOMContentLoaded', function () {
-        var rootCard = document.querySelector('.org-root');
-        if (rootCard) {
-            toggleOrgNode(rootCard.id);
-        }
+        var topCards = document.querySelectorAll('.tree > ul > li > .org-card');
+        topCards.forEach(function (card) {
+            toggleOrgNode(card.id);
+        });
     });
+    
 </script>
     </form>
 </body>

@@ -160,7 +160,8 @@ namespace HRMSApp
 
             Dictionary<int, OrgNode> nodes = new Dictionary<int, OrgNode>();
             Dictionary<int, int?> parentMap = new Dictionary<int, int?>();
-            List<int> rootIds = new List<int>();
+            Dictionary<int, int> depthMap = new Dictionary<int, int>();
+            List<int> trueRootIds = new List<int>();
 
             foreach (DataRow row in dt.Rows)
             {
@@ -181,19 +182,69 @@ namespace HRMSApp
 
             foreach (var kvp in parentMap)
             {
-                if (kvp.Value == null) rootIds.Add(kvp.Key);
+                if (kvp.Value == null) trueRootIds.Add(kvp.Key);
                 else nodes[kvp.Value.Value].Children.Add(nodes[kvp.Key]);
+            }
+
+            // True depth from the real root, so tier colors (green/blue/purple/pink)
+            // stay correct even when a non-admin's own node is displayed as the top.
+            foreach (int rootId in trueRootIds)
+                ComputeDepth(nodes[rootId], 0, depthMap);
+
+            // ---- NEW: figure out what this logged-in user is allowed to see ----
+            bool isAdmin = false;
+            int? myOrgRoleId = null;
+
+            using (SqlConnection con = new SqlConnection(conStr))
+            using (SqlCommand cmd = new SqlCommand(
+                @"SELECT u.Role, e.OrgRoleID
+          FROM Users u
+          LEFT JOIN Employee e ON u.EmpID = e.EmpID
+          WHERE u.UserID = @UserID", con))
+            {
+                cmd.Parameters.AddWithValue("@UserID", Convert.ToInt32(Session["UserID"]));
+                con.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    if (dr.Read())
+                    {
+                        isAdmin = dr["Role"] != DBNull.Value && dr["Role"].ToString() == "Admin";
+                        myOrgRoleId = dr["OrgRoleID"] == DBNull.Value ? (int?)null : Convert.ToInt32(dr["OrgRoleID"]);
+                    }
+                }
+            }
+
+            List<int> displayRootIds;
+
+            if (isAdmin)
+            {
+                displayRootIds = trueRootIds; // full hierarchy
+            }
+            else if (myOrgRoleId.HasValue && nodes.ContainsKey(myOrgRoleId.Value))
+            {
+                displayRootIds = new List<int> { myOrgRoleId.Value }; // self + descendants only
+            }
+            else
+            {
+                litOrgChart.Text = "<div class='empty-state'>Your account isn't linked to an organizational role yet. Contact an admin.</div>";
+                return;
             }
 
             StringBuilder html = new StringBuilder();
             html.Append("<div class='tree'><ul>");
-            foreach (int rootId in rootIds)
-            {
-                html.Append(RenderNode(nodes[rootId], 0));
-            }
+            foreach (int rootId in displayRootIds)
+                html.Append(RenderNode(nodes[rootId], depthMap[rootId])); // true depth = correct tier color
             html.Append("</ul></div>");
 
             litOrgChart.Text = html.ToString();
+        }
+
+        // NEW helper
+        private void ComputeDepth(OrgNode node, int depth, Dictionary<int, int> depthMap)
+        {
+            depthMap[node.OrgRoleID] = depth;
+            foreach (var child in node.Children)
+                ComputeDepth(child, depth + 1, depthMap);
         }
         private string RenderNode(OrgNode node, int depth)
         {
