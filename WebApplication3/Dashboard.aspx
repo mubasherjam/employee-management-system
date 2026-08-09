@@ -360,7 +360,7 @@
 
     // Auto-expand the CEO's direct reports on page load, so the chart isn't just one lonely box
 
-    });
+    
     
 </script>
     </form>
