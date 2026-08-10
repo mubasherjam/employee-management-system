@@ -78,6 +78,15 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Literal litTotalPayroll;
 
         /// <summary>
+        /// litRecentCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litRecentCount;
+
+        /// <summary>
         /// rptRecent control.
         /// </summary>
         /// <remarks>
@@ -87,6 +96,15 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Repeater rptRecent;
 
         /// <summary>
+        /// divNoRecentWrap control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divNoRecentWrap;
+
+        /// <summary>
         /// lblNoRecent control.
         /// </summary>
         /// <remarks>
@@ -94,6 +112,15 @@ namespace HRMSApp
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblNoRecent;
+
+        /// <summary>
+        /// litDeptChartCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litDeptChartCount;
 
         /// <summary>
         /// lblNoDepts control.

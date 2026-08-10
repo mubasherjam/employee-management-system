@@ -40,6 +40,17 @@
             border: none;
         }
 
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .section-header-title { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+        .section-header-title i { font-size: 1.1rem; opacity: 0.9; }
+        .section-count-badge {
+            background: rgba(255,255,255,0.15);
+            padding: 4px 12px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 600;
+        }
+
         /* ---- Stat cards ---- */
         .stat-card {
             background: #fff;
@@ -67,33 +78,67 @@
         .stat-label { color: #8892a0; font-size: 0.8rem; font-weight: 600; margin-top: 2px; }
 
         /* ---- Recent employees list ---- */
+       /* ---- Recent employees list ---- */
         .recent-item {
             display: flex; align-items: center; gap: 14px;
-            padding: 14px 0;
-            border-bottom: 1px solid #f0f2f6;
+            padding: 14px 12px;
+            border-radius: 12px;
+            transition: background-color 0.15s ease, transform 0.15s ease;
         }
-        .recent-item:last-child { border-bottom: none; }
+        .recent-item:hover {
+            background-color: #f8f7ff;
+            transform: translateX(2px);
+        }
+        .recent-item:not(:last-child) { margin-bottom: 4px; }
 
         .avatar-circle {
-            width: 42px; height: 42px;
+            width: 44px; height: 44px;
             border-radius: 50%;
             background: linear-gradient(135deg, #7c5cff, #6a4ce0);
             color: #fff; font-weight: 700; font-size: 0.85rem;
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(124,92,255,0.3);
+            border: 2px solid #fff;
+        }
+
+        .recent-rank {
+            width: 22px; height: 22px;
+            border-radius: 6px;
+            background: #eef0f4;
+            color: #a3abba;
+            font-size: 0.7rem;
+            font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
         }
 
         .recent-name { font-weight: 700; color: #1a2332; font-size: 0.92rem; }
-        .recent-meta { color: #8892a0; font-size: 0.78rem; }
+        .recent-meta {
+            color: #8892a0; font-size: 0.78rem;
+            display: flex; align-items: center; gap: 5px; margin-top: 2px;
+        }
+        .recent-meta .dept-chip {
+            background: #eef3ff; color: #3366ff;
+            padding: 2px 9px; border-radius: 20px;
+            font-weight: 600; font-size: 0.72rem;
+        }
 
         .empty-state {
             text-align: center;
             color: #adb5bd;
-            padding: 30px 10px;
+            padding: 40px 10px;
             font-size: 0.9rem;
         }
+        .empty-state i { font-size: 1.8rem; display: block; margin-bottom: 10px; color: #d7dbe4; }
 
-        .chart-wrap { position: relative; height: 260px; }
+        .chart-wrap {
+            position: relative;
+            height: 260px;
+            background: #fafbfc;
+            border-radius: 14px;
+            padding: 18px 14px 6px 6px;
+        }
 
 
         /* ---- Org Chart (appended, new section) ---- */
@@ -250,37 +295,42 @@
 
             <!-- Recent employees + Department breakdown -->
             <div class="row g-3">
-                <div class="col-lg-6">
+<div class="col-lg-6">
                     <div class="card shadow">
-                        <div class="card-header-custom">
-                            <span style="font-weight:700;">Recently Added</span>
+                        <div class="card-header-custom section-header">
+                            <span class="section-header-title"><i class="bi bi-clock-history"></i> Recently Added</span>
+                            <span class="section-count-badge"><i class="bi bi-people-fill me-1"></i><asp:Literal ID="litRecentCount" runat="server" Text="0" /></span>
                         </div>
-                        <div class="card-body p-4">
+                        <div class="card-body p-3">
                             <asp:Repeater ID="rptRecent" runat="server">
                                 <ItemTemplate>
                                     <div class="recent-item">
+                                        <div class="recent-rank"><%# Container.ItemIndex + 1 %></div>
                                         <div class="avatar-circle"><%# GetInitials(Eval("EmpName").ToString()) %></div>
                                         <div>
                                             <div class="recent-name"><%# Eval("EmpName") %></div>
                                             <div class="recent-meta">
-                                                <%# Eval("DeptName") %>
-                                                <%# string.IsNullOrEmpty(Eval("Designation").ToString()) ? "" : " &middot; " + Eval("Designation") %>
+                                                <span class="dept-chip"><%# Eval("DeptName") %></span>
+                                                <%# string.IsNullOrEmpty(Eval("Designation").ToString()) ? "" : "&middot; " + Eval("Designation") %>
                                             </div>
                                         </div>
                                     </div>
                                 </ItemTemplate>
                             </asp:Repeater>
-                            <asp:Label ID="lblNoRecent" runat="server" CssClass="empty-state" Text="No employees yet." Visible="false" />
+                            <div class="empty-state" runat="server" id="divNoRecentWrap" visible="false">
+                                <i class="bi bi-inbox"></i>
+                                <asp:Label ID="lblNoRecent" runat="server" Text="No employees yet." Visible="false" />
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-6">
+               <div class="col-lg-6">
                     <div class="card shadow">
-                        <div class="card-header-custom">
-                            <span style="font-weight:700;">Department Breakdown</span>
+                        <div class="card-header-custom section-header">
+                            <span class="section-header-title"><i class="bi bi-bar-chart-fill"></i> Department Breakdown</span>
+                            <span class="section-count-badge"><i class="bi bi-building me-1"></i><asp:Literal ID="litDeptChartCount" runat="server" Text="0" /> Depts</span>
                         </div>
-
                         <div class="card-body p-4">
                             <div class="chart-wrap">
                                 <canvas id="deptChart"></canvas>

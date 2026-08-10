@@ -58,6 +58,7 @@ namespace HRMSApp
                     {
                         rptRecent.DataSource = dtRecent;
                         rptRecent.DataBind();
+                        litRecentCount.Text = dtRecent.Rows.Count.ToString();
                     }
                     else
                     {
@@ -90,13 +91,16 @@ namespace HRMSApp
                 con.Open();
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
+                    int deptCount = 0;
                     while (dr.Read())
                     {
+                        deptCount++;
                         hasData = true;
                         if (labels.Length > 0) { labels.Append(","); counts.Append(","); }
                         labels.Append("'").Append(dr["DeptName"].ToString().Replace("'", "\\'")).Append("'");
                         counts.Append(Convert.ToInt32(dr["EmpCount"]));
                     }
+                    litDeptChartCount.Text = deptCount.ToString();
                 }
             }
 
