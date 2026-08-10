@@ -16,6 +16,42 @@
 
 
     <style>
+
+        /* ---- Leave summary list ---- */
+        .leave-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 12px 10px;
+            border-radius: 12px;
+            transition: background-color 0.15s ease;
+        }
+        .leave-item:hover { background-color: #f8f7ff; }
+        .leave-item:not(:last-child) { margin-bottom: 4px; }
+
+        .leave-icon {
+            width: 42px; height: 42px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.05rem; color: #fff; flex-shrink: 0;
+        }
+        .leave-icon.purple { background: linear-gradient(135deg, #8b7bb8, #5f4b8b); }
+        .leave-icon.red    { background: linear-gradient(135deg, #ff6b6b, #e03131); }
+        .leave-icon.blue   { background: linear-gradient(135deg, #3f6fc4, #1e3a5f); }
+        .leave-icon.pink   { background: linear-gradient(135deg, #e0448a, #c22e73); }
+
+        .leave-row-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+        .leave-name { font-weight: 700; color: #1a2332; font-size: 0.88rem; }
+        .leave-remaining { font-size: 0.76rem; color: #8892a0; font-weight: 600; white-space: nowrap; }
+
+        .leave-progress-track {
+            background: #eef0f4; height: 8px; border-radius: 6px; overflow: hidden;
+        }
+        .leave-progress-fill {
+            height: 100%; border-radius: 6px;
+            background: linear-gradient(90deg, #7c5cff, #6a4ce0);
+            transition: width 0.4s ease;
+        }
+
+        /* leave summary ends here */
+
         * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
 
         body { background: #f0f2f6; min-height: 100vh; }
@@ -392,6 +428,25 @@
                 </div>
             </div>
 
+
+             <!-- ============================= -->
+            <!-- LEAVE SUMMARY SECTION (new) -->
+            <!-- ============================= -->
+          <!-- ============================= -->
+            <!-- LEAVE SUMMARY SECTION -->
+            <!-- ============================= -->
+            <div class="mt-4">
+                <div class="card shadow">
+                    <div class="card-header-custom section-header">
+                        <span class="section-header-title"><i class="bi bi-calendar2-week-fill"></i> Leave Summary</span>
+                        <span class="section-count-badge"><i class="bi bi-list-check me-1"></i><asp:Literal ID="litLeaveTypeCount" runat="server" Text="0" /> Types</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <asp:Literal ID="litLeaveList" runat="server" />
+                        <asp:Label ID="lblNoLeave" runat="server" CssClass="empty-state" Text="No leave data yet." Visible="false" />
+                    </div>
+                </div>
+            </div>
             <!-- org chart !-->
                         <!-- ============================= -->
             <!-- ORG CHART SECTION (new, appended below existing dashboard content) -->

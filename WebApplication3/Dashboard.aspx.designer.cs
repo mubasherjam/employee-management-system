@@ -132,6 +132,33 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Label lblNoDepts;
 
         /// <summary>
+        /// litLeaveTypeCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litLeaveTypeCount;
+
+        /// <summary>
+        /// litLeaveList control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litLeaveList;
+
+        /// <summary>
+        /// lblNoLeave control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblNoLeave;
+
+        /// <summary>
         /// litOrgChart control.
         /// </summary>
         /// <remarks>

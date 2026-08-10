@@ -24,6 +24,7 @@ namespace HRMSApp
             if (!IsPostBack)
             {
                 LoadDashboardData();
+                BindLeaveSummary();
                 RenderOrgChart();
             }
         }
@@ -72,6 +73,95 @@ namespace HRMSApp
             // is a fresh lightweight call for the chart data.
             BindDepartmentChart();
         }
+
+
+        // leave summary method
+
+        private void BindLeaveSummary()
+        {
+            List<LeaveSummaryItem> items = new List<LeaveSummaryItem>();
+
+            using (SqlConnection con = new SqlConnection(conStr))
+            using (SqlCommand cmd = new SqlCommand(
+                "SELECT Leave_Type, Leave_Quota, Quota_Availed FROM Web_Leave_Summary ORDER BY Leave_Quota DESC", con))
+            {
+                con.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        items.Add(new LeaveSummaryItem
+                        {
+                            LeaveType = dr["Leave_Type"].ToString(),
+                            Quota = Convert.ToInt32(dr["Leave_Quota"]),
+                            Availed = Convert.ToInt32(dr["Quota_Availed"])
+                        });
+                    }
+                }
+            }
+
+            if (items.Count == 0)
+            {
+                lblNoLeave.Visible = true;
+                return;
+            }
+
+            litLeaveTypeCount.Text = items.Count.ToString();
+
+            StringBuilder listHtml = new StringBuilder();
+            foreach (var item in items)
+            {
+                int remaining = item.Quota - item.Availed;
+                int percentUsed = item.Quota == 0 ? 0 : (int)Math.Round(item.Availed * 100.0 / item.Quota);
+
+                listHtml.Append("<div class='leave-item'>");
+                listHtml.Append("<div class='leave-icon " + GetLeaveColorClass(item.LeaveType) + "'><i class='bi " + GetLeaveIconClass(item.LeaveType) + "'></i></div>");
+                listHtml.Append("<div style='flex:1;'>");
+                listHtml.Append("<div class='leave-row-top'>");
+                listHtml.Append("<span class='leave-name'>" + item.LeaveType + "</span>");
+                listHtml.Append("<span class='leave-remaining'>" + remaining + " / " + item.Quota + " left</span>");
+                listHtml.Append("</div>");
+                listHtml.Append("<div class='leave-progress-track'><div class='leave-progress-fill' style='width:" + percentUsed + "%;'></div></div>");
+                listHtml.Append("</div></div>");
+            }
+            litLeaveList.Text = listHtml.ToString();
+
+            // Chart.js block removed - no longer needed
+        }
+
+        private string GetLeaveIconClass(string leaveType)
+        {
+            switch (leaveType.Trim().ToLower())
+            {
+                case "annual leave": return "bi-calendar2-check-fill";
+                case "sick leave": return "bi-thermometer-half";
+                case "casual leave": return "bi-cup-hot-fill";
+                case "emergency leave": return "bi-exclamation-triangle-fill";
+                default: return "bi-calendar2-week-fill";
+            }
+        }
+
+        private string GetLeaveColorClass(string leaveType)
+        {
+            switch (leaveType.Trim().ToLower())
+            {
+                case "annual leave": return "purple";
+                case "sick leave": return "red";
+                case "casual leave": return "blue";
+                case "emergency leave": return "pink";
+                default: return "purple";
+            }
+        }
+
+        // small helper class, add at the bottom of the Dashboard class or as its own file
+        private class LeaveSummaryItem
+        {
+            public string LeaveType { get; set; }
+            public int Quota { get; set; }
+            public int Availed { get; set; }
+        }
+
+        // leave summary ends here
 
         private void BindDepartmentChart()
         {
