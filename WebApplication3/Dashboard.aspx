@@ -52,30 +52,81 @@
         }
 
         /* ---- Stat cards ---- */
-        .stat-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 22px 24px;
-            box-shadow: 0 10px 40px rgba(20, 30, 60, 0.08);
+.stat-card {
+            position: relative;
+            border-radius: 18px;
+            padding: 24px 22px;
             display: flex;
             align-items: center;
             gap: 16px;
             height: 100%;
+            overflow: hidden;
+            color: #fff;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: default;
         }
-        .stat-icon {
-            width: 50px; height: 50px;
-            border-radius: 12px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.3rem;
-            flex-shrink: 0;
+        .stat-card:hover {
+            transform: translateY(-4px);
         }
-        .stat-icon.purple { background: rgba(124,92,255,0.12); color: #7c5cff; }
-        .stat-icon.green  { background: rgba(74,222,128,0.15); color: #16a34a; }
-        .stat-icon.red    { background: rgba(214,51,108,0.12); color: #d6336c; }
-        .stat-icon.blue   { background: rgba(37,99,235,0.12); color: #2563eb; }
 
-        .stat-value { font-size: 1.55rem; font-weight: 800; color: #1a2332; line-height: 1.1; }
-        .stat-label { color: #8892a0; font-size: 0.8rem; font-weight: 600; margin-top: 2px; }
+        /* Decorative background blobs */
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            width: 110px; height: 110px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            top: -40px; right: -30px;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            bottom: -25px; right: 30px;
+        }
+
+.stat-card.purple {
+    background: linear-gradient(135deg, #8b7bb8 0%, #5f4b8b 100%);
+    box-shadow: 0 12px 28px rgba(95, 75, 139, 0.3);
+}
+.stat-card.green {
+    background: linear-gradient(135deg, #54876b 0%, #3b624d 100%);
+    box-shadow: 0 12px 28px rgba(84, 135, 107, 0.3);
+}
+.stat-card.red {
+    background: linear-gradient(135deg, #ff6b6b 0%, #e03131 100%);
+    box-shadow: 0 12px 28px rgba(224, 49, 49, 0.3);
+}
+.stat-card.blue {
+    background: linear-gradient(135deg, #3f6fc4 0%, #1e3a5f 100%);
+    box-shadow: 0 12px 28px rgba(30, 58, 95, 0.3);
+}
+        .stat-card:hover.purple { box-shadow: 0 18px 36px rgba(124,92,255,0.45); }
+        .stat-card:hover.green  { box-shadow: 0 18px 36px rgba(22,163,74,0.4); }
+        .stat-card:hover.red    { box-shadow: 0 18px 36px rgba(214,51,108,0.4); }
+        .stat-card:hover.blue   { box-shadow: 0 18px 36px rgba(37,99,235,0.4); }
+
+        .stat-icon {
+            position: relative; z-index: 2;
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.35rem;
+            flex-shrink: 0;
+            backdrop-filter: blur(4px);
+        }
+
+        .stat-value {
+            position: relative; z-index: 2;
+            font-size: 1.7rem; font-weight: 800; color: #fff; line-height: 1.1;
+        }
+        .stat-label {
+            position: relative; z-index: 2;
+            color: rgba(255,255,255,0.85); font-size: 0.8rem; font-weight: 600; margin-top: 3px;
+        }
 
         /* ---- Recent employees list ---- */
        /* ---- Recent employees list ---- */
@@ -255,42 +306,42 @@
 
             <!-- Stat cards -->
             <div class="row g-3 mb-4">
-                <div class="col-6 col-lg-3">
-                    <div class="stat-card">
-                        <div class="stat-icon purple"><i class="bi bi-people-fill"></i></div>
-                        <div>
-                            <div class="stat-value"><asp:Literal ID="litActiveCount" runat="server" Text="0" /></div>
-                            <div class="stat-label">Active Employees</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stat-card">
-                        <div class="stat-icon red"><i class="bi bi-person-dash-fill"></i></div>
-                        <div>
-                            <div class="stat-value"><asp:Literal ID="litInactiveCount" runat="server" Text="0" /></div>
-                            <div class="stat-label">Inactive Employees</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stat-card">
-                        <div class="stat-icon blue"><i class="bi bi-building"></i></div>
-                        <div>
-                            <div class="stat-value"><asp:Literal ID="litDeptCount" runat="server" Text="0" /></div>
-                            <div class="stat-label">Departments</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-6 col-lg-3">
-                    <div class="stat-card">
-                        <div class="stat-icon green"><i class="bi bi-cash-stack"></i></div>
-                        <div>
-                            <div class="stat-value"><asp:Literal ID="litTotalPayroll" runat="server" Text="0" /></div>
-                            <div class="stat-label">Monthly Payroll</div>
-                        </div>
-                    </div>
-                </div>
+               <div class="col-6 col-lg-3">
+    <div class="stat-card purple">
+        <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+        <div>
+            <div class="stat-value"><asp:Literal ID="litActiveCount" runat="server" Text="0" /></div>
+            <div class="stat-label">Active Employees</div>
+        </div>
+    </div>
+</div>
+<div class="col-6 col-lg-3">
+    <div class="stat-card red">
+        <div class="stat-icon"><i class="bi bi-person-dash-fill"></i></div>
+        <div>
+            <div class="stat-value"><asp:Literal ID="litInactiveCount" runat="server" Text="0" /></div>
+            <div class="stat-label">Inactive Employees</div>
+        </div>
+    </div>
+</div>
+<div class="col-6 col-lg-3">
+    <div class="stat-card blue">
+        <div class="stat-icon"><i class="bi bi-building"></i></div>
+        <div>
+            <div class="stat-value"><asp:Literal ID="litDeptCount" runat="server" Text="0" /></div>
+            <div class="stat-label">Departments</div>
+        </div>
+    </div>
+</div>
+<div class="col-6 col-lg-3">
+    <div class="stat-card green">
+        <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+        <div>
+            <div class="stat-value"><asp:Literal ID="litTotalPayroll" runat="server" Text="0" /></div>
+            <div class="stat-label">Monthly Payroll</div>
+        </div>
+    </div>
+</div>
             </div>
 
             <!-- Recent employees + Department breakdown -->
