@@ -18,38 +18,89 @@
     <style>
 
         /* ---- Leave summary list ---- */
-        .leave-item {
-            display: flex; align-items: center; gap: 14px;
-            padding: 12px 10px;
-            border-radius: 12px;
-            transition: background-color 0.15s ease;
+/* ---- Leave summary header (distinct gradient, not navy) ---- */
+        .card-header-leave {
+            background: linear-gradient(135deg, #6a4ce0 0%, #4b2fb0 55%, #7c5cff 100%);
+            color: #fff;
+            padding: 20px 28px;
+            border: none;
+            position: relative;
+            overflow: hidden;
         }
-        .leave-item:hover { background-color: #f8f7ff; }
-        .leave-item:not(:last-child) { margin-bottom: 4px; }
+        .card-header-leave::before {
+            content: '';
+            position: absolute;
+            width: 160px; height: 160px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            top: -70px; right: -30px;
+        }
+        .card-header-leave .section-header-title,
+        .card-header-leave .section-count-badge { position: relative; z-index: 2; }
+
+        /* ---- Leave summary rows ---- */
+        .leave-item {
+            display: flex; align-items: center; gap: 16px;
+            padding: 16px 18px;
+            border-radius: 14px;
+            border: 1px solid #eef0f4;
+            background: #fff;
+            transition: all 0.2s ease;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: leaveRowIn 0.4s ease forwards;
+        }
+        .leave-item:nth-child(1) { animation-delay: 0.05s; }
+        .leave-item:nth-child(2) { animation-delay: 0.12s; }
+        .leave-item:nth-child(3) { animation-delay: 0.19s; }
+        .leave-item:nth-child(4) { animation-delay: 0.26s; }
+        .leave-item:nth-child(5) { animation-delay: 0.33s; }
+
+        @keyframes leaveRowIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .leave-item:hover {
+            border-color: transparent;
+            box-shadow: 0 10px 26px rgba(20,30,60,0.12);
+            transform: translateY(-2px);
+        }
+        .leave-item:not(:last-child) { margin-bottom: 12px; }
 
         .leave-icon {
-            width: 42px; height: 42px; border-radius: 12px;
+            width: 46px; height: 46px; border-radius: 13px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.05rem; color: #fff; flex-shrink: 0;
+            font-size: 1.1rem; color: #fff; flex-shrink: 0;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.15);
         }
         .leave-icon.purple { background: linear-gradient(135deg, #8b7bb8, #5f4b8b); }
         .leave-icon.red    { background: linear-gradient(135deg, #ff6b6b, #e03131); }
         .leave-icon.blue   { background: linear-gradient(135deg, #3f6fc4, #1e3a5f); }
         .leave-icon.pink   { background: linear-gradient(135deg, #e0448a, #c22e73); }
 
-        .leave-row-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
-        .leave-name { font-weight: 700; color: #1a2332; font-size: 0.88rem; }
-        .leave-remaining { font-size: 0.76rem; color: #8892a0; font-weight: 600; white-space: nowrap; }
+        .leave-row-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+        .leave-name { font-weight: 700; color: #1a2332; font-size: 0.9rem; }
+
+        .leave-remaining {
+            font-size: 0.75rem; font-weight: 700; white-space: nowrap;
+            padding: 3px 10px; border-radius: 20px;
+        }
+        .leave-remaining.purple { background: rgba(124,92,255,0.12); color: #6a4ce0; }
+        .leave-remaining.red    { background: rgba(224,49,49,0.1); color: #e03131; }
+        .leave-remaining.blue   { background: rgba(37,99,235,0.1); color: #1e3a5f; }
+        .leave-remaining.pink   { background: rgba(224,68,138,0.12); color: #c22e73; }
 
         .leave-progress-track {
-            background: #eef0f4; height: 8px; border-radius: 6px; overflow: hidden;
+            background: #eef0f4; height: 9px; border-radius: 6px; overflow: hidden;
         }
         .leave-progress-fill {
             height: 100%; border-radius: 6px;
-            background: linear-gradient(90deg, #7c5cff, #6a4ce0);
-            transition: width 0.4s ease;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
+        .leave-progress-fill.purple { background: linear-gradient(90deg, #8b7bb8, #5f4b8b); }
+        .leave-progress-fill.red    { background: linear-gradient(90deg, #ff6b6b, #e03131); }
+        .leave-progress-fill.blue   { background: linear-gradient(90deg, #3f6fc4, #1e3a5f); }
+        .leave-progress-fill.pink   { background: linear-gradient(90deg, #e0448a, #c22e73); }
         /* leave summary ends here */
 
         * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
@@ -435,9 +486,12 @@
           <!-- ============================= -->
             <!-- LEAVE SUMMARY SECTION -->
             <!-- ============================= -->
+<!-- ============================= -->
+            <!-- LEAVE SUMMARY SECTION -->
+            <!-- ============================= -->
             <div class="mt-4">
                 <div class="card shadow">
-                    <div class="card-header-custom section-header">
+                    <div class="card-header-leave section-header">
                         <span class="section-header-title"><i class="bi bi-calendar2-week-fill"></i> Leave Summary</span>
                         <span class="section-count-badge"><i class="bi bi-list-check me-1"></i><asp:Literal ID="litLeaveTypeCount" runat="server" Text="0" /> Types</span>
                     </div>
