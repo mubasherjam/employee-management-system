@@ -105,24 +105,38 @@
 .leave-bar-icon {
             width: 46px; height: 46px; border-radius: 13px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; color: #fff; flex-shrink: 0;
+            font-size: 1.15rem; color: #fff; flex-shrink: 0;
             position: relative;
+            background: linear-gradient(160deg, #2c3350 0%, #12162a 100%);
+            box-shadow: 0 6px 16px rgba(10,14,30,0.35);
+            border: 1px solid rgba(255,255,255,0.08);
         }
-        .leave-bar-icon.purple { background: linear-gradient(145deg, #a08ff0, #6a3fd0); box-shadow: 0 6px 16px rgba(106,63,208,0.5); }
-        .leave-bar-icon.red    { background: linear-gradient(145deg, #ff9270, #e0392b); box-shadow: 0 6px 16px rgba(224,57,43,0.5); }
-        .leave-bar-icon.blue   { background: linear-gradient(145deg, #6a9bf0, #2255c9); box-shadow: 0 6px 16px rgba(34,85,201,0.5); }
-        .leave-bar-icon.pink   { background: linear-gradient(145deg, #f56cab, #c22e73); box-shadow: 0 6px 16px rgba(194,46,115,0.5); }
-
-        /* subtle inner glow ring, gives depth instead of flat gradient */
         .leave-bar-icon::before {
             content: '';
             position: absolute; inset: 0;
             border-radius: inherit;
-            background: linear-gradient(145deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%);
+            background: linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0) 55%);
             pointer-events: none;
         }
         .leave-bar-icon i { position: relative; z-index: 1; }
 
+        /* small color-coded dot, corner accent that ties back to the leave type */
+        .leave-bar-icon-dot {
+            position: absolute; bottom: -3px; right: -3px;
+            width: 15px; height: 15px; border-radius: 50%;
+            border: 2.5px solid #fff;
+            z-index: 2;
+        }
+        .leave-bar-icon-dot.purple { background: #7c5cff; }
+        .leave-bar-icon-dot.red    { background: #e0392b; }
+        .leave-bar-icon-dot.blue   { background: #2a5cc4; }
+        .leave-bar-icon-dot.pink   { background: #c22e73; }
+
+        .leave-bar-name {
+            font-weight: 800; font-size: 0.96rem; letter-spacing: -0.01em;
+            color: #1a2332;
+            white-space: nowrap;
+        }
         .leave-bar-name {
             font-weight: 800; font-size: 0.96rem; letter-spacing: -0.01em;
             color: #1a2332;

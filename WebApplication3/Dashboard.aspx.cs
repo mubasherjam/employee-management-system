@@ -118,9 +118,9 @@ namespace HRMSApp
                 listHtml.Append("<div class='leave-bar-fill " + colorClass + "' data-target-width='" + percentUsed + "'></div>");
                 listHtml.Append("<div class='leave-bar-inner'>");
                 listHtml.Append("<div class='leave-bar-chip'>");
-                listHtml.Append("<div class='leave-bar-icon " + colorClass + "'><i class='bi " + GetLeaveIconClass(item.LeaveType) + "'></i></div>");
+                listHtml.Append("<div class='leave-bar-icon'><i class='bi " + GetLeaveIconClass(item.LeaveType) + "'></i><span class='leave-bar-icon-dot " + colorClass + "'></span></div>");
                 listHtml.Append("<span class='leave-bar-name'>" + item.LeaveType + "</span>");
-                listHtml.Append("</div>"); // .leave-bar-chip
+                listHtml.Append("</div>");
                 listHtml.Append("<div class='leave-bar-badge " + colorClass + "'>" + remaining + " / " + item.Quota + " left</div>");
                 listHtml.Append("</div></div>");
             }
@@ -132,10 +132,10 @@ namespace HRMSApp
         {
             switch (leaveType.Trim().ToLower())
             {
-                case "annual leave": return "bi-calendar2-check-fill";
-                case "sick leave": return "bi-thermometer-half";
+                case "annual leave": return "bi-airplane-fill";
+                case "sick leave": return "bi-heart-pulse-fill";
                 case "casual leave": return "bi-cup-hot-fill";
-                case "emergency leave": return "bi-exclamation-triangle-fill";
+                case "emergency leave": return "bi-exclamation-octagon-fill";
                 default: return "bi-calendar2-week-fill";
             }
         }
