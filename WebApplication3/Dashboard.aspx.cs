@@ -114,18 +114,17 @@ namespace HRMSApp
                 int percentUsed = item.Quota == 0 ? 0 : (int)Math.Round(item.Availed * 100.0 / item.Quota);
                 string colorClass = GetLeaveColorClass(item.LeaveType);
 
-                listHtml.Append("<div class='leave-item'>");
-                listHtml.Append("<div class='leave-icon " + colorClass + "'><i class='bi " + GetLeaveIconClass(item.LeaveType) + "'></i></div>");
-                listHtml.Append("<div style='flex:1;'>");
-                listHtml.Append("<div class='leave-row-top'>");
-                listHtml.Append("<span class='leave-name'>" + item.LeaveType + "</span>");
-                listHtml.Append("<span class='leave-remaining " + colorClass + "'>" + remaining + " / " + item.Quota + " left</span>");
-                listHtml.Append("</div>");
-                listHtml.Append("<div class='leave-progress-track'><div class='leave-progress-fill " + colorClass + "' style='width:" + percentUsed + "%;'></div></div>");
+                listHtml.Append("<div class='leave-bar-item'>");
+                listHtml.Append("<div class='leave-bar-fill " + colorClass + "' data-target-width='" + percentUsed + "'></div>");
+                listHtml.Append("<div class='leave-bar-inner'>");
+                listHtml.Append("<div class='leave-bar-chip'>");
+                listHtml.Append("<div class='leave-bar-icon " + colorClass + "'><i class='bi " + GetLeaveIconClass(item.LeaveType) + "'></i></div>");
+                listHtml.Append("<span class='leave-bar-name'>" + item.LeaveType + "</span>");
+                listHtml.Append("</div>"); // .leave-bar-chip
+                listHtml.Append("<div class='leave-bar-badge " + colorClass + "'>" + remaining + " / " + item.Quota + " left</div>");
                 listHtml.Append("</div></div>");
             }
             litLeaveList.Text = listHtml.ToString();
-
             // Chart.js block removed - no longer needed
         }
 

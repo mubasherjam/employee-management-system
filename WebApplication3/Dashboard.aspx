@@ -39,68 +39,108 @@
         .card-header-leave .section-count-badge { position: relative; z-index: 2; }
 
         /* ---- Leave summary rows ---- */
-        .leave-item {
-            display: flex; align-items: center; gap: 16px;
-            padding: 16px 18px;
-            border-radius: 14px;
-            border: 1px solid #eef0f4;
-            background: #fff;
-            transition: all 0.2s ease;
+        /* ---- Leave summary rows: bold, professional aesthetic ---- */
+       /* ---- Leave summary: whole row IS the progress bar ---- */
+        .leave-bar-item {
+            position: relative;
+            height: 76px;
+            border-radius: 18px;
+            overflow: hidden;
+            background: #eef0f4;
+            border: 1px solid #e5e7ee;
             opacity: 0;
             transform: translateY(10px);
-            animation: leaveRowIn 0.4s ease forwards;
+            animation: leaveRowIn 0.45s ease forwards;
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
         }
-        .leave-item:nth-child(1) { animation-delay: 0.05s; }
-        .leave-item:nth-child(2) { animation-delay: 0.12s; }
-        .leave-item:nth-child(3) { animation-delay: 0.19s; }
-        .leave-item:nth-child(4) { animation-delay: 0.26s; }
-        .leave-item:nth-child(5) { animation-delay: 0.33s; }
+        .leave-bar-item:nth-child(1) { animation-delay: 0.05s; }
+        .leave-bar-item:nth-child(2) { animation-delay: 0.13s; }
+        .leave-bar-item:nth-child(3) { animation-delay: 0.21s; }
+        .leave-bar-item:nth-child(4) { animation-delay: 0.29s; }
+        .leave-bar-item:nth-child(5) { animation-delay: 0.37s; }
 
         @keyframes leaveRowIn {
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .leave-item:hover {
-            border-color: transparent;
-            box-shadow: 0 10px 26px rgba(20,30,60,0.12);
-            transform: translateY(-2px);
+        .leave-bar-item:not(:last-child) { margin-bottom: 14px; }
+        .leave-bar-item:hover {
+            box-shadow: 0 14px 32px rgba(20,30,60,0.14);
+            transform: translateY(-3px);
         }
-        .leave-item:not(:last-child) { margin-bottom: 12px; }
 
-        .leave-icon {
+        /* the fill sweeps across as the row's own background */
+        .leave-bar-fill {
+            position: absolute; top: 0; left: 0; bottom: 0;
+            width: 0%;
+            z-index: 1;
+            transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .leave-bar-fill.purple { background: linear-gradient(90deg, #7c5cff, #5f3fc4); }
+        .leave-bar-fill.red    { background: linear-gradient(90deg, #ff6b4a, #e0392b); }
+        .leave-bar-fill.blue   { background: linear-gradient(90deg, #4a80e0, #2a5cc4); }
+        .leave-bar-fill.pink   { background: linear-gradient(90deg, #ee5fa0, #c22e73); }
+        .leave-bar-fill::after {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 45%;
+            background: linear-gradient(rgba(255,255,255,0.25), rgba(255,255,255,0));
+        }
+
+                .leave-bar-inner {
+            position: relative; z-index: 2;
+            height: 100%;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 14px;
+        }
+
+                 /* Opaque chip holding icon + name - always readable, independent of fill color */
+                         .leave-bar-chip {
+            display: flex; align-items: center; gap: 12px;
+            
+            border-radius: 14px;
+            padding: 8px 18px 8px 8px;
+        }
+
+
+.leave-bar-icon {
             width: 46px; height: 46px; border-radius: 13px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; color: #fff; flex-shrink: 0;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+            font-size: 1.2rem; color: #fff; flex-shrink: 0;
+            position: relative;
         }
-        .leave-icon.purple { background: linear-gradient(135deg, #8b7bb8, #5f4b8b); }
-        .leave-icon.red    { background: linear-gradient(135deg, #ff6b6b, #e03131); }
-        .leave-icon.blue   { background: linear-gradient(135deg, #3f6fc4, #1e3a5f); }
-        .leave-icon.pink   { background: linear-gradient(135deg, #e0448a, #c22e73); }
+        .leave-bar-icon.purple { background: linear-gradient(145deg, #a08ff0, #6a3fd0); box-shadow: 0 6px 16px rgba(106,63,208,0.5); }
+        .leave-bar-icon.red    { background: linear-gradient(145deg, #ff9270, #e0392b); box-shadow: 0 6px 16px rgba(224,57,43,0.5); }
+        .leave-bar-icon.blue   { background: linear-gradient(145deg, #6a9bf0, #2255c9); box-shadow: 0 6px 16px rgba(34,85,201,0.5); }
+        .leave-bar-icon.pink   { background: linear-gradient(145deg, #f56cab, #c22e73); box-shadow: 0 6px 16px rgba(194,46,115,0.5); }
 
-        .leave-row-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
-        .leave-name { font-weight: 700; color: #1a2332; font-size: 0.9rem; }
+        /* subtle inner glow ring, gives depth instead of flat gradient */
+        .leave-bar-icon::before {
+            content: '';
+            position: absolute; inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(145deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%);
+            pointer-events: none;
+        }
+        .leave-bar-icon i { position: relative; z-index: 1; }
 
-        .leave-remaining {
-            font-size: 0.75rem; font-weight: 700; white-space: nowrap;
-            padding: 3px 10px; border-radius: 20px;
+        .leave-bar-name {
+            font-weight: 800; font-size: 0.96rem; letter-spacing: -0.01em;
+            color: #1a2332;
+            white-space: nowrap;
         }
-        .leave-remaining.purple { background: rgba(124,92,255,0.12); color: #6a4ce0; }
-        .leave-remaining.red    { background: rgba(224,49,49,0.1); color: #e03131; }
-        .leave-remaining.blue   { background: rgba(37,99,235,0.1); color: #1e3a5f; }
-        .leave-remaining.pink   { background: rgba(224,68,138,0.12); color: #c22e73; }
 
-        .leave-progress-track {
-            background: #eef0f4; height: 9px; border-radius: 6px; overflow: hidden;
+        .leave-bar-badge {
+            font-size: 0.78rem; font-weight: 800; white-space: nowrap;
+            padding: 8px 16px; border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 4px 14px rgba(20,30,60,0.15);
+            flex-shrink: 0;
         }
-        .leave-progress-fill {
-            height: 100%; border-radius: 6px;
-            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .leave-progress-fill.purple { background: linear-gradient(90deg, #8b7bb8, #5f4b8b); }
-        .leave-progress-fill.red    { background: linear-gradient(90deg, #ff6b6b, #e03131); }
-        .leave-progress-fill.blue   { background: linear-gradient(90deg, #3f6fc4, #1e3a5f); }
-        .leave-progress-fill.pink   { background: linear-gradient(90deg, #e0448a, #c22e73); }
+        .leave-bar-badge.purple { color: #5f3fc4; }
+        .leave-bar-badge.red    { color: #e0392b; }
+        .leave-bar-badge.blue   { color: #2a5cc4; }
+        .leave-bar-badge.pink   { color: #c22e73; }
+
         /* leave summary ends here */
 
         * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
@@ -569,10 +609,21 @@
     }
 
     // Auto-expand the CEO's direct reports on page load, so the chart isn't just one lonely box
-
-    
+  
+    // Animate leave progress bars from 0 to their real width on load
+    window.addEventListener('load', function () {
+        var fills = document.querySelectorAll('.leave-bar-fill');
+        fills.forEach(function (fill, i) {
+            var target = fill.getAttribute('data-target-width');
+            setTimeout(function () {
+                fill.style.width = target + '%';
+            }, 150 + (i * 100));
+        });
+    });
+  
     
 </script>
+ 
     </form>
 </body>
 </html>
