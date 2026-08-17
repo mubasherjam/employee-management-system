@@ -168,6 +168,51 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Literal litOrgChart;
 
         /// <summary>
+        /// litInTimeCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litInTimeCount;
+
+        /// <summary>
+        /// litLateCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litLateCount;
+
+        /// <summary>
+        /// litNotArrivedCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litNotArrivedCount;
+
+        /// <summary>
+        /// lblNoAttendance control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblNoAttendance;
+
+        /// <summary>
+        /// ltrAttendanceChartScript control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ltrAttendanceChartScript;
+
+        /// <summary>
         /// ltrChartScript control.
         /// </summary>
         /// <remarks>

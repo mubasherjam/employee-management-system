@@ -431,6 +431,33 @@
 .org-card { position: relative; }
 .org-card:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(20,30,60,0.18); }
 
+
+
+        /* ---- Attendance Chart (new section) ---- */
+        .attendance-stats-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .attendance-stat-chip {
+            display: flex; align-items: center; gap: 7px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .attendance-stat-chip .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+        }
+        .chip-intime { background: #ecfdf3; color: #16a34a; }
+        .chip-intime .dot { background: #16a34a; }
+        .chip-late { background: #fffbeb; color: #b45309; }
+        .chip-late .dot { background: #f59e0b; }
+        .chip-notarrived { background: #f1f5f9; color: #64748b; }
+        .chip-notarrived .dot { background: #94a3b8; }
+        /* attendance chart ends here*/
+
+
     </style>
 </head>
 <body>
@@ -575,11 +602,45 @@
                     <div class="card-body p-4" style="overflow-x:auto;">
                         <asp:Literal ID="litOrgChart" runat="server" />
                     </div>
+
+                    <!-- ============================= -->
+<!-- ATTENDANCE CHART SECTION (new, appended below Organization Chart) -->
+<!-- ============================= -->
+<div class="mt-4">
+    <div class="card shadow">
+        <div class="card-header-custom section-header">
+            <span class="section-header-title"><i class="bi bi-calendar-check-fill"></i> Attendance Overview</span>
+            <span class="section-count-badge"><i class="bi bi-clock-history me-1"></i>Last 12 Days</span>
+        </div>
+
+        <div class="card-body pb-0 pt-3">
+            <div class="attendance-stats-row">
+                <span class="attendance-stat-chip chip-intime">
+                    <span class="dot"></span> In Time: <asp:Literal ID="litInTimeCount" runat="server" Text="0" />
+                </span>
+                <span class="attendance-stat-chip chip-late">
+                    <span class="dot"></span> Late: <asp:Literal ID="litLateCount" runat="server" Text="0" />
+                </span>
+                <span class="attendance-stat-chip chip-notarrived">
+                    <span class="dot"></span> Not Arrived: <asp:Literal ID="litNotArrivedCount" runat="server" Text="0" />
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="chart-wrap">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+            <asp:Label ID="lblNoAttendance" runat="server" CssClass="empty-state" Text="No attendance records yet." Visible="false" />
+        </div>
+    </div>
+</div>
+
                 </div>
             </div>
 
         </div>
-
+        <asp:Literal ID="ltrAttendanceChartScript" runat="server" />
         <asp:Literal ID="ltrChartScript" runat="server" />
 
 

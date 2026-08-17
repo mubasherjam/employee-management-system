@@ -26,6 +26,7 @@ namespace HRMSApp
                 LoadDashboardData();
                 BindLeaveSummary();
                 RenderOrgChart();
+                BindAttendanceChart();
             }
         }
 
@@ -428,5 +429,100 @@ namespace HRMSApp
             sb.Append("</li>");
             return sb.ToString();
         }
+
+
+        // attendace chart starts here
+
+        private void BindAttendanceChart()
+        {
+            StringBuilder labels = new StringBuilder();
+            StringBuilder hours = new StringBuilder();
+            StringBuilder barColors = new StringBuilder();
+            bool hasData = false;
+
+            int inTimeCount = 0, lateCount = 0, notArrivedCount = 0;
+
+            using (SqlConnection con = new SqlConnection(conStr))
+            using (SqlCommand cmd = new SqlCommand("sp_Attendance_GetChartData", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                con.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        hasData = true;
+                        string status = dr["Status"].ToString();
+                        decimal hoursWorked = Convert.ToDecimal(dr["HoursWorked"]);
+                        string dateLabel = dr["DateLabel"].ToString();
+
+                        if (labels.Length > 0) { labels.Append(","); hours.Append(","); barColors.Append(","); }
+
+                        labels.Append("'").Append(dateLabel).Append("'");
+                        hours.Append(hoursWorked.ToString("0.00"));
+
+                        string color;
+                        switch (status)
+                        {
+                            case "In time":
+                                color = "'#16a34a'";
+                                inTimeCount++;
+                                break;
+                            case "Late":
+                                color = "'#f59e0b'";
+                                lateCount++;
+                                break;
+                            default: // Not Arrived
+                                color = "'#94a3b8'";
+                                notArrivedCount++;
+                                break;
+                        }
+                        barColors.Append(color);
+                    }
+                }
+            }
+
+            litInTimeCount.Text = inTimeCount.ToString();
+            litLateCount.Text = lateCount.ToString();
+            litNotArrivedCount.Text = notArrivedCount.ToString();
+
+            if (!hasData)
+            {
+                lblNoAttendance.Visible = true;
+                return;
+            }
+
+            string script = @"
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var ctx = document.getElementById('attendanceChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: [" + labels + @"],
+                        datasets: [{
+                            label: 'Hours Worked',
+                            data: [" + hours + @"],
+                            backgroundColor: [" + barColors + @"],
+                            borderRadius: 8,
+                            maxBarThickness: 32
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, max: 10, ticks: { stepSize: 2 } }
+                        }
+                    }
+                });
+            });
+        </script>";
+
+            ltrAttendanceChartScript.Text = script;
+        }
+
+        // attendance chart ends here
     }
 }
