@@ -653,40 +653,69 @@ namespace HRMSApp
             }
 
             int total = onTimeNames.Count + lateNames.Count + absentNames.Count;
-
             litStatusTotalCount.Text = total.ToString();
 
-            litOnTimeCount.Text = onTimeNames.Count.ToString();
-            litLateStatusCount.Text = lateNames.Count.ToString();
-            litAbsentStatusCount.Text = absentNames.Count.ToString();
-
-            // Widths for the stacked bar segments (avoid divide-by-zero)
-            if (total > 0)
+            if (total == 0)
             {
-                litOnTimeWidth.Text = Math.Round((onTimeNames.Count * 100.0) / total, 1).ToString();
-                litLateWidth.Text = Math.Round((lateNames.Count * 100.0) / total, 1).ToString();
-                litAbsentWidth.Text = Math.Round((absentNames.Count * 100.0) / total, 1).ToString();
-            }
-            else
-            {
-                litOnTimeWidth.Text = "0";
-                litLateWidth.Text = "0";
-                litAbsentWidth.Text = "0";
+                lblNoStatus.Visible = true;
+                return;
             }
 
-            litOnTimeNamesList.Text = onTimeNames.Count > 0 ? string.Join(", ", onTimeNames) : "None";
-            litLateNamesList.Text = lateNames.Count > 0 ? string.Join(", ", lateNames) : "None";
-            litAbsentNamesList.Text = absentNames.Count > 0 ? string.Join(", ", absentNames) : "None";
+            string onTimeNamesJs = BuildJsNameArray(onTimeNames);
+            string lateNamesJs = BuildJsNameArray(lateNames);
+            string absentNamesJs = BuildJsNameArray(absentNames);
 
-            litLegendOnTime.Text = onTimeNames.Count.ToString();
-litLegendLate.Text = lateNames.Count.ToString();
-litLegendAbsent.Text = absentNames.Count.ToString();
+            string script = @"
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var namesByCategory = [" + onTimeNamesJs + ", " + lateNamesJs + ", " + absentNamesJs + @"];
+
+                var ctx = document.getElementById('statusChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['On Time', 'Late', 'Absent'],
+                        datasets: [{
+                            label: 'Employees',
+                            data: [" + onTimeNames.Count + ", " + lateNames.Count + ", " + absentNames.Count + @"],
+                            backgroundColor: ['#16a34a', '#f59e0b', '#dc2626'],
+                            borderRadius: 8,
+                            maxBarThickness: 60
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    title: function (items) {
+                                        return items[0].label + ' (' + items[0].raw + ')';
+                                    },
+                                    label: function (context) {
+                                        var names = namesByCategory[context.dataIndex];
+                                        return (names && names.length > 0) ? names.join(', ') : 'None';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                        }
+                    }
+                });
+            });
+        </script>";
+
+            ltrStatusChartScript.Text = script;
         }
 
-
-
-
-
-
+        private string BuildJsNameArray(List<string> names)
+        {
+            if (names.Count == 0) return "[]";
+            var escaped = names.Select(n => "'" + n.Replace("'", "\\'") + "'");
+            return "[" + string.Join(",", escaped) + "]";
+        }
     }
 }

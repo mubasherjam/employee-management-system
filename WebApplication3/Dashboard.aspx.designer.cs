@@ -267,31 +267,13 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Literal litStatusTotalCount;
 
         /// <summary>
-        /// litOnTimeWidth control.
+        /// lblNoStatus control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litOnTimeWidth;
-
-        /// <summary>
-        /// litOnTimeCount control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litOnTimeCount;
-
-        /// <summary>
-        /// litOnTimeNamesList control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litOnTimeNamesList;
+        protected global::System.Web.UI.WebControls.Label lblNoStatus;
 
         /// <summary>
         /// litLateWidth control.
@@ -348,33 +330,6 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Literal litAbsentNamesList;
 
         /// <summary>
-        /// litLegendOnTime control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litLegendOnTime;
-
-        /// <summary>
-        /// litLegendLate control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litLegendLate;
-
-        /// <summary>
-        /// litLegendAbsent control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litLegendAbsent;
-
-        /// <summary>
         /// ltrTeamAttendanceScript control.
         /// </summary>
         /// <remarks>
@@ -382,6 +337,15 @@ namespace HRMSApp
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal ltrTeamAttendanceScript;
+
+        /// <summary>
+        /// ltrStatusChartScript control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ltrStatusChartScript;
 
         /// <summary>
         /// ltrAttendanceChartScript control.
