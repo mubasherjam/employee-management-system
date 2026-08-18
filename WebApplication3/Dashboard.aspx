@@ -777,6 +777,15 @@
             padding: 12px !important;
         }
 
+
+
+        .l7-compact .l7-mini-icon {
+            font-size: 0.72rem;
+            margin-right: 7px;
+            opacity: 0.85;
+            vertical-align: middle;
+        }
+
     </style>
 </head>
 <body>
@@ -1024,33 +1033,25 @@
             </span>
 
             <div class="l7-card-body">
-
 <div class="l7-tile tile-checkin" style="animation-delay:0.05s;">
-    <div class="l7-text-group">
-        <div class="l7-value"><asp:Literal ID="litL7AvgCheckIn" runat="server" Text="--:--" /></div>
-        <div class="l7-label">Avg Check-In</div>
-    </div>
+    <div class="l7-value"><i class="bi bi-box-arrow-in-right l7-mini-icon"></i><asp:Literal ID="litL7AvgCheckIn" runat="server" Text="--:--" /></div>
+    <div class="l7-label">Avg Check-In</div>
 </div>
 
 <div class="l7-tile tile-checkout" style="animation-delay:0.12s;">
-    <div class="l7-text-group">
-        <div class="l7-value"><asp:Literal ID="litL7AvgCheckOut" runat="server" Text="--:--" /></div>
-        <div class="l7-label">Avg Check-Out</div>
-    </div>
+    <div class="l7-value"><i class="bi bi-box-arrow-right l7-mini-icon"></i><asp:Literal ID="litL7AvgCheckOut" runat="server" Text="--:--" /></div>
+    <div class="l7-label">Avg Check-Out</div>
 </div>
 
 <div class="l7-tile tile-hours" style="animation-delay:0.19s;">
-    <div class="l7-text-group">
-        <div class="l7-value"><asp:Literal ID="litL7AvgHours" runat="server" Text="0.0" /> hrs</div>
-        <div class="l7-label">Avg Time Spent</div>
-    </div>
+    <div class="l7-value"><i class="bi bi-hourglass-split l7-mini-icon"></i><asp:Literal ID="litL7AvgHours" runat="server" Text="0.0" /> hrs</div>
+    <div class="l7-label">Avg Time Spent</div>
 </div>
 
 <div class="l7-tile tile-absent" style="animation-delay:0.26s;">
-    <div class="l7-text-group">
-        <div class="l7-value"><asp:Literal ID="litL7TotalAbsents" runat="server" Text="0" /></div>
-        <div class="l7-label">Total Absents</div>
-    </div>
+    <div class="l7-value"><i class="bi bi-person-x-fill l7-mini-icon"></i><asp:Literal ID="litL7TotalAbsents" runat="server" Text="0" /></div>
+    <div class="l7-label">Total Absents</div>
+</div>
 </div>
 
             </div>

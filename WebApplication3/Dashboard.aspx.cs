@@ -682,5 +682,11 @@ namespace HRMSApp
 litLegendLate.Text = lateNames.Count.ToString();
 litLegendAbsent.Text = absentNames.Count.ToString();
         }
+
+
+
+
+
+
     }
 }
