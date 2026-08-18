@@ -457,6 +457,61 @@
         .chip-notarrived .dot { background: #94a3b8; }
         /* attendance chart ends here*/
 
+        /* team attendance starts here*/
+
+        /* ---- Team Attendance (new section) ---- */
+        .team-member-row {
+            display: flex; align-items: center; gap: 16px;
+            padding: 16px 4px;
+            border-bottom: 1px solid #f0f2f6;
+        }
+        .team-member-row:last-child { border-bottom: none; }
+
+        .team-avatar-wrap { flex-shrink: 0; }
+        .team-avatar-photo {
+            width: 48px; height: 48px; border-radius: 50%;
+            object-fit: cover; border: 2px solid #eef0f4;
+        }
+        .team-avatar-fallback {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: linear-gradient(135deg, #7c5cff, #6a4ce0);
+            color: #fff; font-weight: 700; font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .team-member-info { flex: 1; min-width: 160px; }
+        .team-member-name { font-weight: 700; color: #1a2332; font-size: 0.93rem; }
+        .team-member-times {
+            display: flex; gap: 14px; margin-top: 4px;
+            font-size: 0.76rem; color: #8892a0;
+        }
+        .team-member-times span { display: flex; align-items: center; gap: 4px; }
+        .team-member-times i { font-size: 0.85rem; }
+
+        .team-rate-wrap { width: 160px; flex-shrink: 0; }
+        .team-rate-bar-bg {
+            height: 8px; border-radius: 6px; background: #eef0f4;
+            overflow: hidden; margin-bottom: 4px;
+        }
+        .team-rate-bar-fill {
+            height: 100%; border-radius: 6px;
+            background: linear-gradient(90deg, #16a34a, #22c55e);
+        }
+        .team-rate-label { font-size: 0.72rem; font-weight: 700; color: #16a34a; text-align: right; }
+
+        .team-status-pills { display: flex; gap: 6px; flex-shrink: 0; }
+        .status-pill {
+            font-size: 0.7rem; font-weight: 700;
+            padding: 3px 9px; border-radius: 20px;
+        }
+        .pill-intime { background: #ecfdf3; color: #16a34a; }
+        .pill-late { background: #fffbeb; color: #b45309; }
+        .pill-absent { background: #f1f5f9; color: #64748b; }
+
+        @media (max-width: 767px) {
+            .team-member-row { flex-wrap: wrap; }
+            .team-rate-wrap { width: 100%; order: 3; }
+        }
 
     </style>
 </head>
@@ -635,6 +690,65 @@
         </div>
     </div>
 </div>
+
+                    <!-- ============================= -->
+<!-- TEAM ATTENDANCE SECTION (new, appended below Attendance Overview) -->
+<!-- ============================= -->
+<div class="mt-4">
+    <div class="card shadow">
+        <div class="card-header-custom section-header">
+            <span class="section-header-title"><i class="bi bi-people-fill"></i> Team Attendance Summary</span>
+            <span class="section-count-badge"><i class="bi bi-person-check me-1"></i>5 Members</span>
+        </div>
+
+        <!-- Per-member list with avg check-in/out + attendance rate -->
+        <div class="card-body p-4 pb-2">
+            <asp:Repeater ID="rptTeamAttendance" runat="server">
+                <ItemTemplate>
+                    <div class="team-member-row">
+                        <div class="team-avatar-wrap">
+                            <img class="team-avatar-photo" src='<%# "ShowImage.ashx?EmpID=" + Eval("EmpID") %>' 
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="team-avatar-fallback" style="display:none;"><%# GetInitials(Eval("EmpName").ToString()) %></div>
+                        </div>
+
+                        <div class="team-member-info">
+                            <div class="team-member-name"><%# Eval("EmpName") %></div>
+                            <div class="team-member-times">
+                                <span><i class="bi bi-box-arrow-in-right"></i> In: <%# Eval("AvgCheckIn") %></span>
+                                <span><i class="bi bi-box-arrow-right"></i> Out: <%# Eval("AvgCheckOut") %></span>
+                                <span><i class="bi bi-hourglass-split"></i> <%# Eval("AvgHours") %> hrs/day</span>
+                            </div>
+                        </div>
+
+                        <div class="team-status-pills">
+                            <span class="status-pill pill-intime"><%# Eval("InTimeCount") %> On-time</span>
+                            <span class="status-pill pill-late"><%# Eval("LateCount") %> Late</span>
+                            <span class="status-pill pill-absent"><%# Eval("NotArrivedCount") %> Absent</span>
+                        </div>
+
+                        <div class="team-rate-wrap">
+                            <div class="team-rate-bar-bg">
+                                <div class="team-rate-bar-fill" style='width:<%# GetAttendanceRate(Eval("InTimeCount"), Eval("TotalDays")) %>%;'></div>
+                            </div>
+                            <div class="team-rate-label"><%# GetAttendanceRate(Eval("InTimeCount"), Eval("TotalDays")) %>% on-time</div>
+                        </div>
+                    </div>
+                </ItemTemplate>
+            </asp:Repeater>
+            <asp:Label ID="lblNoTeamAttendance" runat="server" CssClass="empty-state" Text="No team attendance data yet." Visible="false" />
+        </div>
+
+        <!-- Stacked bar chart: team pattern at a glance -->
+        <div class="card-body p-4 pt-2">
+            <div class="chart-wrap" style="height:280px;">
+                <canvas id="teamAttendanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<asp:Literal ID="ltrTeamAttendanceScript" runat="server" />
 
                 </div>
             </div>

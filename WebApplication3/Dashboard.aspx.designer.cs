@@ -204,6 +204,33 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Label lblNoAttendance;
 
         /// <summary>
+        /// rptTeamAttendance control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Repeater rptTeamAttendance;
+
+        /// <summary>
+        /// lblNoTeamAttendance control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblNoTeamAttendance;
+
+        /// <summary>
+        /// ltrTeamAttendanceScript control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ltrTeamAttendanceScript;
+
+        /// <summary>
         /// ltrAttendanceChartScript control.
         /// </summary>
         /// <remarks>

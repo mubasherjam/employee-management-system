@@ -27,6 +27,7 @@ namespace HRMSApp
                 BindLeaveSummary();
                 RenderOrgChart();
                 BindAttendanceChart();
+                BindTeamAttendance();
             }
         }
 
@@ -524,5 +525,80 @@ namespace HRMSApp
         }
 
         // attendance chart ends here
+
+        // team attendance starts here
+        protected string GetAttendanceRate(object inTimeObj, object totalObj)
+        {
+            int inTime = Convert.ToInt32(inTimeObj);
+            int total = Convert.ToInt32(totalObj);
+            if (total == 0) return "0";
+            return Math.Round((inTime * 100.0) / total).ToString();
+        }
+
+        private void BindTeamAttendance()
+        {
+            DataTable dt = new DataTable();
+            using (SqlConnection con = new SqlConnection(conStr))
+            using (SqlCommand cmd = new SqlCommand("sp_TeamAttendance_GetSummary", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(dt);
+            }
+
+            if (dt.Rows.Count == 0)
+            {
+                lblNoTeamAttendance.Visible = true;
+                return;
+            }
+
+            rptTeamAttendance.DataSource = dt;
+            rptTeamAttendance.DataBind();
+
+            StringBuilder labels = new StringBuilder();
+            StringBuilder inTimeData = new StringBuilder();
+            StringBuilder lateData = new StringBuilder();
+            StringBuilder notArrivedData = new StringBuilder();
+
+            foreach (DataRow row in dt.Rows)
+            {
+                if (labels.Length > 0) { labels.Append(","); inTimeData.Append(","); lateData.Append(","); notArrivedData.Append(","); }
+                labels.Append("'").Append(row["EmpName"].ToString().Replace("'", "\\'")).Append("'");
+                inTimeData.Append(row["InTimeCount"]);
+                lateData.Append(row["LateCount"]);
+                notArrivedData.Append(row["NotArrivedCount"]);
+            }
+
+            string script = @"
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var ctx = document.getElementById('teamAttendanceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [" + labels + @"],
+                    datasets: [
+                        { label: 'In Time', data: [" + inTimeData + @"], backgroundColor: '#16a34a', borderRadius: 6, maxBarThickness: 38 },
+                        { label: 'Late', data: [" + lateData + @"], backgroundColor: '#f59e0b', borderRadius: 6, maxBarThickness: 38 },
+                        { label: 'Not Arrived', data: [" + notArrivedData + @"], backgroundColor: '#94a3b8', borderRadius: 6, maxBarThickness: 38 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#64748b', usePointStyle: true, padding: 16, font: { size: 11 } } }
+                    },
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+        });
+        </script>";
+
+            ltrTeamAttendanceScript.Text = script;
+        }
     }
 }
