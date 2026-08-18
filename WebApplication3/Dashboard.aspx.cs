@@ -28,6 +28,8 @@ namespace HRMSApp
                 RenderOrgChart();
                 BindAttendanceChart();
                 BindTeamAttendance();
+                BindLast7DaysSummary();
+                BindStatusBreakdown();
             }
         }
 
@@ -599,6 +601,86 @@ namespace HRMSApp
         </script>";
 
             ltrTeamAttendanceScript.Text = script;
+        }
+
+        // last 7 days checkin card
+        private void BindLast7DaysSummary()
+        {
+            using (SqlConnection con = new SqlConnection(conStr))
+            using (SqlCommand cmd = new SqlCommand("sp_TeamAttendance_Last7Days", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                con.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    if (dr.Read())
+                    {
+                        litL7AvgCheckIn.Text = dr["AvgCheckIn"] == DBNull.Value ? "--:--" : dr["AvgCheckIn"].ToString();
+                        litL7AvgCheckOut.Text = dr["AvgCheckOut"] == DBNull.Value ? "--:--" : dr["AvgCheckOut"].ToString();
+                        litL7AvgHours.Text = dr["AvgHoursSpent"] == DBNull.Value ? "0.0" : Convert.ToDecimal(dr["AvgHoursSpent"]).ToString("0.0");
+                        litL7TotalAbsents.Text = dr["TotalAbsents"].ToString();
+                    }
+                }
+            }
+        }
+
+
+
+        //team attendance graph card
+        private void BindStatusBreakdown()
+        {
+            List<string> onTimeNames = new List<string>();
+            List<string> lateNames = new List<string>();
+            List<string> absentNames = new List<string>();
+
+            using (SqlConnection con = new SqlConnection(conStr))
+            using (SqlCommand cmd = new SqlCommand("sp_TeamAttendance_StatusBreakdown", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                con.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        string status = dr["Status"].ToString();
+                        string name = dr["EmpName"].ToString();
+
+                        if (status == "In time") onTimeNames.Add(name);
+                        else if (status == "Late") lateNames.Add(name);
+                        else absentNames.Add(name);
+                    }
+                }
+            }
+
+            int total = onTimeNames.Count + lateNames.Count + absentNames.Count;
+
+            litStatusTotalCount.Text = total.ToString();
+
+            litOnTimeCount.Text = onTimeNames.Count.ToString();
+            litLateStatusCount.Text = lateNames.Count.ToString();
+            litAbsentStatusCount.Text = absentNames.Count.ToString();
+
+            // Widths for the stacked bar segments (avoid divide-by-zero)
+            if (total > 0)
+            {
+                litOnTimeWidth.Text = Math.Round((onTimeNames.Count * 100.0) / total, 1).ToString();
+                litLateWidth.Text = Math.Round((lateNames.Count * 100.0) / total, 1).ToString();
+                litAbsentWidth.Text = Math.Round((absentNames.Count * 100.0) / total, 1).ToString();
+            }
+            else
+            {
+                litOnTimeWidth.Text = "0";
+                litLateWidth.Text = "0";
+                litAbsentWidth.Text = "0";
+            }
+
+            litOnTimeNamesList.Text = onTimeNames.Count > 0 ? string.Join(", ", onTimeNames) : "None";
+            litLateNamesList.Text = lateNames.Count > 0 ? string.Join(", ", lateNames) : "None";
+            litAbsentNamesList.Text = absentNames.Count > 0 ? string.Join(", ", absentNames) : "None";
+
+            litLegendOnTime.Text = onTimeNames.Count.ToString();
+litLegendLate.Text = lateNames.Count.ToString();
+litLegendAbsent.Text = absentNames.Count.ToString();
         }
     }
 }

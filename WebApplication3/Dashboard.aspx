@@ -513,6 +513,270 @@
             .team-rate-wrap { width: 100%; order: 3; }
         }
 
+
+        /* ---- Last 7 Days Summary Card ---- */
+       /* ---- Last 7 Days Summary Card (v2 - richer visuals) ---- */
+        .l7-card-body {
+            padding: 4px 2px 2px 2px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .l7-tile {
+            position: relative;
+            border-radius: 18px;
+            padding: 20px 18px;
+            overflow: hidden;
+            color: #fff;
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+            opacity: 0;
+            transform: translateY(14px);
+            animation: l7RiseIn 0.55s ease forwards;
+            isolation: isolate;
+        }
+        .l7-tile:hover { transform: translateY(-5px) scale(1.015); }
+        @keyframes l7RiseIn { to { opacity: 1; transform: translateY(0); } }
+
+        /* Layered decorative glow + mesh texture per tile */
+        .l7-tile::before {
+            content: '';
+            position: absolute;
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.16);
+            top: -35px; right: -25px;
+            z-index: -1;
+            filter: blur(1px);
+        }
+        .l7-tile::after {
+            content: '';
+            position: absolute;
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.09);
+            bottom: -20px; left: -15px;
+            z-index: -1;
+        }
+
+        .l7-tile.tile-checkin {
+            background: linear-gradient(140deg, #3b7ff5 0%, #2c5fd6 55%, #1e46b8 100%);
+            box-shadow: 0 12px 26px rgba(30,70,184,0.32), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .l7-tile.tile-checkout {
+            background: linear-gradient(140deg, #9b7bff 0%, #7c5cff 55%, #6032e0 100%);
+            box-shadow: 0 12px 26px rgba(96,50,224,0.32), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .l7-tile.tile-hours {
+            background: linear-gradient(140deg, #34d399 0%, #16a34a 55%, #0d7a37 100%);
+            box-shadow: 0 12px 26px rgba(13,122,55,0.32), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .l7-tile.tile-absent {
+            background: linear-gradient(140deg, #f472b6 0%, #e0448a 55%, #b91c63 100%);
+            box-shadow: 0 12px 26px rgba(185,28,99,0.32), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+
+        .l7-tile:hover.tile-checkin  { box-shadow: 0 20px 40px rgba(30,70,184,0.45), inset 0 1px 0 rgba(255,255,255,0.2); }
+        .l7-tile:hover.tile-checkout { box-shadow: 0 20px 40px rgba(96,50,224,0.45), inset 0 1px 0 rgba(255,255,255,0.2); }
+        .l7-tile:hover.tile-hours    { box-shadow: 0 20px 40px rgba(13,122,55,0.45), inset 0 1px 0 rgba(255,255,255,0.2); }
+        .l7-tile:hover.tile-absent   { box-shadow: 0 20px 40px rgba(185,28,99,0.45), inset 0 1px 0 rgba(255,255,255,0.2); }
+
+        .l7-icon {
+            position: relative; z-index: 2;
+            width: 38px; height: 38px;
+            border-radius: 11px;
+            background: rgba(255,255,255,0.22);
+            border: 1px solid rgba(255,255,255,0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            transition: transform 0.25s ease;
+        }
+        .l7-tile:hover .l7-icon { transform: rotate(-6deg) scale(1.08); }
+
+        .l7-value {
+            position: relative; z-index: 2;
+            font-size: 1.5rem; font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .l7-label {
+            position: relative; z-index: 2;
+            font-size: 0.73rem;
+            color: rgba(255,255,255,0.88);
+            font-weight: 700;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .l7-period-badge {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: linear-gradient(135deg, #eef1f8, #e4e9f5);
+            color: #4a5568;
+            font-size: 0.73rem; font-weight: 700;
+            padding: 6px 14px; border-radius: 20px;
+            margin-bottom: 16px;
+            border: 1px solid #e2e7f0;
+        }
+        .l7-period-badge i { color: #7c5cff; }
+
+
+        /* ---- Status Breakdown Card (candle bar with hover tooltip) ---- */
+        .status-count-hero {
+            display: flex; align-items: baseline; gap: 8px;
+            margin-bottom: 22px;
+        }
+        .status-count-hero .big-num {
+            font-size: 2.4rem; font-weight: 800; color: #1a2332; line-height: 1;
+        }
+        .status-count-hero .big-label {
+            color: #8892a0; font-size: 0.85rem; font-weight: 600;
+        }
+
+        .candle-bar-track {
+            display: flex;
+            width: 100%;
+            height: 46px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 0 0 1px #eef0f4;
+        }
+
+        .candle-segment {
+            position: relative;
+            height: 100%;
+            transition: flex-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1), filter 0.15s ease;
+            cursor: pointer;
+            min-width: 4px;
+        }
+        .candle-segment:hover { filter: brightness(1.1); }
+
+        .seg-ontime { background: linear-gradient(180deg, #4ade80, #16a34a); }
+        .seg-late   { background: linear-gradient(180deg, #fbbf24, #d97706); }
+        .seg-absent { background: linear-gradient(180deg, #f87171, #dc2626); }
+
+        .candle-tooltip {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) translateY(6px);
+            background: #1a2332;
+            color: #fff;
+            font-size: 0.76rem;
+            padding: 10px 14px;
+            border-radius: 10px;
+            white-space: normal;
+            width: max-content;
+            max-width: 220px;
+            line-height: 1.5;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.18s ease, transform 0.18s ease;
+            z-index: 10;
+        }
+        .candle-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%; left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #1a2332;
+        }
+        .candle-tooltip .tooltip-title {
+            font-weight: 800;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .candle-segment:hover .candle-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .candle-legend-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 18px;
+        }
+        .candle-legend-item {
+            text-align: center;
+            flex: 1;
+        }
+        .candle-legend-item .legend-dot-lg {
+            width: 10px; height: 10px; border-radius: 50%;
+            display: inline-block; margin-right: 5px;
+        }
+        .dot-ontime { background: #16a34a; }
+        .dot-late   { background: #d97706; }
+        .dot-absent { background: #dc2626; }
+
+        .candle-legend-item .legend-count {
+            font-size: 1.1rem; font-weight: 800; color: #1a2332; display: block; margin-top: 4px;
+        }
+        .candle-legend-item .legend-text {
+            font-size: 0.74rem; color: #8892a0; font-weight: 600;
+        }
+
+
+        /* ---- Status Snapshot Card (matches Department Breakdown style) ---- */
+        .status-chart-wrap {
+            position: relative;
+            height: 260px;
+            background: #fafbfc;
+            border-radius: 14px;
+            padding: 18px 14px 6px 6px;
+        }
+
+/* ---- Compact PILL variant of Last 7 Days tiles (smaller) ---- */
+        .l7-compact .l7-card-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .l7-compact .l7-tile {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8px 10px;
+            border-radius: 12px;
+            min-height: unset;
+        }
+
+        .l7-compact .l7-tile::before {
+            width: 36px; height: 36px;
+            top: -12px; right: -8px;
+        }
+        .l7-compact .l7-tile::after {
+            width: 22px; height: 22px;
+            bottom: -8px; left: 10px;
+        }
+
+        .l7-compact .l7-value {
+            font-size: 0.85rem;
+            line-height: 1.1;
+        }
+
+        .l7-compact .l7-label {
+            font-size: 0.56rem;
+            margin-top: 1px;
+            letter-spacing: 0.01em;
+        }
+
+        .l7-compact .l7-period-badge {
+            font-size: 0.62rem;
+            padding: 3px 9px;
+            margin-bottom: 8px;
+        }
+
+        .l7-compact .card-body.p-3 {
+            padding: 12px !important;
+        }
+
     </style>
 </head>
 <body>
@@ -745,8 +1009,116 @@
                 <canvas id="teamAttendanceChart"></canvas>
             </div>
         </div>
+
+        <!-- last 7 days checkin -->
+
+        <div class="col-md-4">
+    <div class="card shadow h-100">
+        <div class="card-header-custom">
+            <span style="font-weight:700;"><i class="bi bi-calendar-week me-2"></i>Last 7 Days Overview</span>
+        </div>
+        <div class="card-body p-4">
+
+            <span class="l7-period-badge">
+                <i class="bi bi-clock-history"></i> Rolling 7-Day Window
+            </span>
+
+            <div class="l7-card-body">
+
+<div class="l7-tile tile-checkin" style="animation-delay:0.05s;">
+    <div class="l7-text-group">
+        <div class="l7-value"><asp:Literal ID="litL7AvgCheckIn" runat="server" Text="--:--" /></div>
+        <div class="l7-label">Avg Check-In</div>
     </div>
 </div>
+
+<div class="l7-tile tile-checkout" style="animation-delay:0.12s;">
+    <div class="l7-text-group">
+        <div class="l7-value"><asp:Literal ID="litL7AvgCheckOut" runat="server" Text="--:--" /></div>
+        <div class="l7-label">Avg Check-Out</div>
+    </div>
+</div>
+
+<div class="l7-tile tile-hours" style="animation-delay:0.19s;">
+    <div class="l7-text-group">
+        <div class="l7-value"><asp:Literal ID="litL7AvgHours" runat="server" Text="0.0" /> hrs</div>
+        <div class="l7-label">Avg Time Spent</div>
+    </div>
+</div>
+
+<div class="l7-tile tile-absent" style="animation-delay:0.26s;">
+    <div class="l7-text-group">
+        <div class="l7-value"><asp:Literal ID="litL7TotalAbsents" runat="server" Text="0" /></div>
+        <div class="l7-label">Total Absents</div>
+    </div>
+</div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="col-md-4">
+    <div class="card shadow h-100 status-compact">
+        <div class="card-header-custom">
+            <span style="font-weight:700;"><i class="bi bi-bar-chart-steps me-2"></i>Today's Status Snapshot</span>
+        </div>
+        <div class="card-body p-3">
+            <div class="status-count-hero">
+                <span class="big-num"><asp:Literal ID="litStatusTotalCount" runat="server" Text="0" /></span>
+                <span class="big-label">Total Employees Tracked</span>
+            </div>
+            <div class="candle-bar-track">
+                <div class="candle-segment seg-ontime" 
+                     style="flex-grow: <asp:Literal ID="litOnTimeWidth" runat="server" Text="0" />;">
+                    <div class="candle-tooltip">
+                        <span class="tooltip-title">On Time (<asp:Literal ID="litOnTimeCount" runat="server" Text="0" />)</span>
+                        <asp:Literal ID="litOnTimeNamesList" runat="server" Text="None" />
+                    </div>
+                </div>
+                <div class="candle-segment seg-late" 
+                     style="flex-grow: <asp:Literal ID="litLateWidth" runat="server" Text="0" />;">
+                    <div class="candle-tooltip">
+                        <span class="tooltip-title">Late (<asp:Literal ID="litLateStatusCount" runat="server" Text="0" />)</span>
+                        <asp:Literal ID="litLateNamesList" runat="server" Text="None" />
+                    </div>
+                </div>
+                <div class="candle-segment seg-absent" 
+                     style="flex-grow: <asp:Literal ID="litAbsentWidth" runat="server" Text="0" />;">
+                    <div class="candle-tooltip">
+                        <span class="tooltip-title">Absent (<asp:Literal ID="litAbsentStatusCount" runat="server" Text="0" />)</span>
+                        <asp:Literal ID="litAbsentNamesList" runat="server" Text="None" />
+                    </div>
+                </div>
+            </div>
+            <div class="candle-legend-row">
+                <div class="candle-legend-item">
+                    <span class="legend-dot-lg dot-ontime"></span><span class="legend-text">On-Time</span>
+                    <span class="legend-count"><asp:Literal ID="litLegendOnTime" runat="server" Text="0" /></span>
+                </div>
+                <div class="candle-legend-item">
+                    <span class="legend-dot-lg dot-late"></span><span class="legend-text">Late</span>
+                    <span class="legend-count"><asp:Literal ID="litLegendLate" runat="server" Text="0" /></span>
+                </div>
+                <div class="candle-legend-item">
+                    <span class="legend-dot-lg dot-absent"></span><span class="legend-text">Absent</span>
+                    <span class="legend-count"><asp:Literal ID="litLegendAbsent" runat="server" Text="0" /></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+    </div>
+</div>
+
+
 
 <asp:Literal ID="ltrTeamAttendanceScript" runat="server" />
 
