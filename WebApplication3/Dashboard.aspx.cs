@@ -629,12 +629,14 @@ namespace HRMSApp
         //team attendance graph card
         private void BindStatusBreakdown()
         {
-            List<string> onTimeNames = new List<string>();
-            List<string> lateNames = new List<string>();
-            List<string> absentNames = new List<string>();
+            // date -> status -> list of names
+            var dateStatusNames = new Dictionary<string, Dictionary<string, List<string>>>();
+            var orderedDates = new List<string>();
+
+            int totalOnTime = 0, totalLate = 0, totalAbsent = 0;
 
             using (SqlConnection con = new SqlConnection(conStr))
-            using (SqlCommand cmd = new SqlCommand("sp_TeamAttendance_StatusBreakdown", con))
+            using (SqlCommand cmd = new SqlCommand("sp_TeamAttendance_TodayStatus", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
                 con.Open();
@@ -642,17 +644,37 @@ namespace HRMSApp
                 {
                     while (dr.Read())
                     {
+                        string dateLabel = dr["DateLabel"].ToString();
                         string status = dr["Status"].ToString();
                         string name = dr["EmpName"].ToString();
 
-                        if (status == "In time") onTimeNames.Add(name);
-                        else if (status == "Late") lateNames.Add(name);
-                        else absentNames.Add(name);
+                        // Normalize any unexpected status value into "Not Arrived" instead of crashing
+                        if (status != "In time" && status != "Late")
+                        {
+                            status = "Not Arrived";
+                        }
+
+                        if (!dateStatusNames.ContainsKey(dateLabel))
+                        {
+                            dateStatusNames[dateLabel] = new Dictionary<string, List<string>>
+        {
+            { "In time", new List<string>() },
+            { "Late", new List<string>() },
+            { "Not Arrived", new List<string>() }
+        };
+                            orderedDates.Add(dateLabel);
+                        }
+
+                        dateStatusNames[dateLabel][status].Add(name);
+
+                        if (status == "In time") totalOnTime++;
+                        else if (status == "Late") totalLate++;
+                        else totalAbsent++;
                     }
                 }
             }
 
-            int total = onTimeNames.Count + lateNames.Count + absentNames.Count;
+            int total = totalOnTime + totalLate + totalAbsent;
             litStatusTotalCount.Text = total.ToString();
 
             if (total == 0)
@@ -661,47 +683,78 @@ namespace HRMSApp
                 return;
             }
 
-            string onTimeNamesJs = BuildJsNameArray(onTimeNames);
-            string lateNamesJs = BuildJsNameArray(lateNames);
-            string absentNamesJs = BuildJsNameArray(absentNames);
+            // Build labels + per-status count arrays, aligned to orderedDates
+            StringBuilder labels = new StringBuilder();
+            StringBuilder onTimeCounts = new StringBuilder();
+            StringBuilder lateCounts = new StringBuilder();
+            StringBuilder absentCounts = new StringBuilder();
+
+            // Nested JS structure: namesByDateAndStatus[dateIndex] = { onTime: [...], late: [...], absent: [...] }
+            StringBuilder namesJs = new StringBuilder("[");
+
+            for (int i = 0; i < orderedDates.Count; i++)
+            {
+                string date = orderedDates[i];
+                var statusMap = dateStatusNames[date];
+
+                if (labels.Length > 0) { labels.Append(","); onTimeCounts.Append(","); lateCounts.Append(","); absentCounts.Append(","); namesJs.Append(","); }
+
+                labels.Append("'").Append(date).Append("'");
+                onTimeCounts.Append(statusMap["In time"].Count);
+                lateCounts.Append(statusMap["Late"].Count);
+                absentCounts.Append(statusMap["Not Arrived"].Count);
+
+                namesJs.Append("{ onTime:").Append(BuildJsNameArray(statusMap["In time"]))
+                       .Append(", late:").Append(BuildJsNameArray(statusMap["Late"]))
+                       .Append(", absent:").Append(BuildJsNameArray(statusMap["Not Arrived"]))
+                       .Append(" }");
+            }
+            namesJs.Append("]");
 
             string script = @"
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                var namesByCategory = [" + onTimeNamesJs + ", " + lateNamesJs + ", " + absentNamesJs + @"];
+                var namesByDate = " + namesJs + @";
 
                 var ctx = document.getElementById('statusChart').getContext('2d');
                 new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: ['On Time', 'Late', 'Absent'],
-                        datasets: [{
-                            label: 'Employees',
-                            data: [" + onTimeNames.Count + ", " + lateNames.Count + ", " + absentNames.Count + @"],
-                            backgroundColor: ['#16a34a', '#f59e0b', '#dc2626'],
-                            borderRadius: 8,
-                            maxBarThickness: 60
-                        }]
+                        labels: [" + labels + @"],
+                        datasets: [
+                            { label: 'On Time', data: [" + onTimeCounts + @"], backgroundColor: '#16a34a', borderRadius: 5, maxBarThickness: 20 },
+                            { label: 'Late', data: [" + lateCounts + @"], backgroundColor: '#f59e0b', borderRadius: 5, maxBarThickness: 20 },
+                            { label: 'Absent', data: [" + absentCounts + @"], backgroundColor: '#dc2626', borderRadius: 5, maxBarThickness: 20 }
+                        ]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { display: false },
+                            legend: { position: 'bottom', labels: { usePointStyle: true, padding: 14, font: { size: 10 } } },
                             tooltip: {
+                                backgroundColor: '#1a2332',
+                                padding: 10,
+                                cornerRadius: 8,
+                                titleFont: { size: 12, weight: '700' },
+                                bodyFont: { size: 11 },
+                                displayColors: false,
                                 callbacks: {
                                     title: function (items) {
-                                        return items[0].label + ' (' + items[0].raw + ')';
+                                        return items[0].label + ' - ' + items[0].dataset.label + ' (' + items[0].raw + ')';
                                     },
                                     label: function (context) {
-                                        var names = namesByCategory[context.dataIndex];
+                                        var dayNames = namesByDate[context.dataIndex];
+                                        var key = context.datasetIndex === 0 ? 'onTime' : (context.datasetIndex === 1 ? 'late' : 'absent');
+                                        var names = dayNames[key];
                                         return (names && names.length > 0) ? names.join(', ') : 'None';
                                     }
                                 }
                             }
                         },
                         scales: {
-                            y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                            x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                            y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } } }
                         }
                     }
                 });

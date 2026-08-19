@@ -931,9 +931,8 @@
                     </div>
                 </div>
             </div>
-            <!-- org chart !-->
-                        <!-- ============================= -->
-            <!-- ORG CHART SECTION (new, appended below existing dashboard content) -->
+<!-- ============================= -->
+            <!-- ORG CHART SECTION -->
             <!-- ============================= -->
             <div class="mt-4">
                 <div class="card shadow">
@@ -941,197 +940,162 @@
                         <span style="font-weight:700;">Organization Chart</span>
                     </div>
                     <div class="card-body pb-0 pt-3">
-    <div class="d-flex gap-3 flex-wrap" style="font-size:0.8rem;">
-        <span><span class="legend-dot" style="background:#16a34a;"></span> Executive</span>
-        <span><span class="legend-dot" style="background:#2563eb;"></span> Manager</span>
-        <span><span class="legend-dot" style="background:#7c5cff;"></span> Staff</span>
-        <span><span class="legend-dot" style="background:#e0448a;"></span> Intern</span>
-    </div>
-</div>
+                        <div class="d-flex gap-3 flex-wrap" style="font-size:0.8rem;">
+                            <span><span class="legend-dot" style="background:#16a34a;"></span> Executive</span>
+                            <span><span class="legend-dot" style="background:#2563eb;"></span> Manager</span>
+                            <span><span class="legend-dot" style="background:#7c5cff;"></span> Staff</span>
+                            <span><span class="legend-dot" style="background:#e0448a;"></span> Intern</span>
+                        </div>
+                    </div>
                     <div class="card-body p-4" style="overflow-x:auto;">
                         <asp:Literal ID="litOrgChart" runat="server" />
                     </div>
-
-                    <!-- ============================= -->
-<!-- ATTENDANCE CHART SECTION (new, appended below Organization Chart) -->
-<!-- ============================= -->
-<div class="mt-4">
-    <div class="card shadow">
-        <div class="card-header-custom section-header">
-            <span class="section-header-title"><i class="bi bi-calendar-check-fill"></i> Attendance Overview</span>
-            <span class="section-count-badge"><i class="bi bi-clock-history me-1"></i>Last 12 Days</span>
-        </div>
-
-        <div class="card-body pb-0 pt-3">
-            <div class="attendance-stats-row">
-                <span class="attendance-stat-chip chip-intime">
-                    <span class="dot"></span> In Time: <asp:Literal ID="litInTimeCount" runat="server" Text="0" />
-                </span>
-                <span class="attendance-stat-chip chip-late">
-                    <span class="dot"></span> Late: <asp:Literal ID="litLateCount" runat="server" Text="0" />
-                </span>
-                <span class="attendance-stat-chip chip-notarrived">
-                    <span class="dot"></span> Not Arrived: <asp:Literal ID="litNotArrivedCount" runat="server" Text="0" />
-                </span>
+                </div>
             </div>
-        </div>
 
-        <div class="card-body p-4">
-            <div class="chart-wrap">
-                <canvas id="attendanceChart"></canvas>
-            </div>
-            <asp:Label ID="lblNoAttendance" runat="server" CssClass="empty-state" Text="No attendance records yet." Visible="false" />
-        </div>
-    </div>
-</div>
-
-                    <!-- ============================= -->
-<!-- TEAM ATTENDANCE SECTION (new, appended below Attendance Overview) -->
-<!-- ============================= -->
-<div class="mt-4">
-    <div class="card shadow">
-        <div class="card-header-custom section-header">
-            <span class="section-header-title"><i class="bi bi-people-fill"></i> Team Attendance Summary</span>
-            <span class="section-count-badge"><i class="bi bi-person-check me-1"></i>5 Members</span>
-        </div>
-
-        <!-- Per-member list with avg check-in/out + attendance rate -->
-        <div class="card-body p-4 pb-2">
-            <asp:Repeater ID="rptTeamAttendance" runat="server">
-                <ItemTemplate>
-                    <div class="team-member-row">
-                        <div class="team-avatar-wrap">
-                            <img class="team-avatar-photo" src='<%# "ShowImage.ashx?EmpID=" + Eval("EmpID") %>' 
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                            <div class="team-avatar-fallback" style="display:none;"><%# GetInitials(Eval("EmpName").ToString()) %></div>
+            <!-- ============================= -->
+            <!-- ATTENDANCE CHART SECTION -->
+            <!-- ============================= -->
+            <div class="mt-4">
+                <div class="card shadow">
+                    <div class="card-header-custom section-header">
+                        <span class="section-header-title"><i class="bi bi-calendar-check-fill"></i> Attendance Overview</span>
+                        <span class="section-count-badge"><i class="bi bi-clock-history me-1"></i>Last 12 Days</span>
+                    </div>
+                    <div class="card-body pb-0 pt-3">
+                        <div class="attendance-stats-row">
+                            <span class="attendance-stat-chip chip-intime">
+                                <span class="dot"></span> In Time: <asp:Literal ID="litInTimeCount" runat="server" Text="0" />
+                            </span>
+                            <span class="attendance-stat-chip chip-late">
+                                <span class="dot"></span> Late: <asp:Literal ID="litLateCount" runat="server" Text="0" />
+                            </span>
+                            <span class="attendance-stat-chip chip-notarrived">
+                                <span class="dot"></span> Not Arrived: <asp:Literal ID="litNotArrivedCount" runat="server" Text="0" />
+                            </span>
                         </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="chart-wrap">
+                            <canvas id="attendanceChart"></canvas>
+                        </div>
+                        <asp:Label ID="lblNoAttendance" runat="server" CssClass="empty-state" Text="No attendance records yet." Visible="false" />
+                    </div>
+                </div>
+            </div>
 
-                        <div class="team-member-info">
-                            <div class="team-member-name"><%# Eval("EmpName") %></div>
-                            <div class="team-member-times">
-                                <span><i class="bi bi-box-arrow-in-right"></i> In: <%# Eval("AvgCheckIn") %></span>
-                                <span><i class="bi bi-box-arrow-right"></i> Out: <%# Eval("AvgCheckOut") %></span>
-                                <span><i class="bi bi-hourglass-split"></i> <%# Eval("AvgHours") %> hrs/day</span>
+            <!-- ============================= -->
+            <!-- TEAM ATTENDANCE SECTION -->
+            <!-- ============================= -->
+            <div class="mt-4">
+                <div class="card shadow">
+                    <div class="card-header-custom section-header">
+                        <span class="section-header-title"><i class="bi bi-people-fill"></i> Team Attendance Summary</span>
+                        <span class="section-count-badge"><i class="bi bi-person-check me-1"></i>5 Members</span>
+                    </div>
+
+                    <div class="card-body p-4 pb-2">
+                        <asp:Repeater ID="rptTeamAttendance" runat="server">
+                            <ItemTemplate>
+                                <div class="team-member-row">
+                                    <div class="team-avatar-wrap">
+                                        <img class="team-avatar-photo" src='<%# "ShowImage.ashx?EmpID=" + Eval("EmpID") %>' 
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                        <div class="team-avatar-fallback" style="display:none;"><%# GetInitials(Eval("EmpName").ToString()) %></div>
+                                    </div>
+                                    <div class="team-member-info">
+                                        <div class="team-member-name"><%# Eval("EmpName") %></div>
+                                        <div class="team-member-times">
+                                            <span><i class="bi bi-box-arrow-in-right"></i> In: <%# Eval("AvgCheckIn") %></span>
+                                            <span><i class="bi bi-box-arrow-right"></i> Out: <%# Eval("AvgCheckOut") %></span>
+                                            <span><i class="bi bi-hourglass-split"></i> <%# Eval("AvgHours") %> hrs/day</span>
+                                        </div>
+                                    </div>
+                                    <div class="team-status-pills">
+                                        <span class="status-pill pill-intime"><%# Eval("InTimeCount") %> On-time</span>
+                                        <span class="status-pill pill-late"><%# Eval("LateCount") %> Late</span>
+                                        <span class="status-pill pill-absent"><%# Eval("NotArrivedCount") %> Absent</span>
+                                    </div>
+                                    <div class="team-rate-wrap">
+                                        <div class="team-rate-bar-bg">
+                                            <div class="team-rate-bar-fill" style='width:<%# GetAttendanceRate(Eval("InTimeCount"), Eval("TotalDays")) %>%;'></div>
+                                        </div>
+                                        <div class="team-rate-label"><%# GetAttendanceRate(Eval("InTimeCount"), Eval("TotalDays")) %>% on-time</div>
+                                    </div>
+                                </div>
+                            </ItemTemplate>
+                        </asp:Repeater>
+                        <asp:Label ID="lblNoTeamAttendance" runat="server" CssClass="empty-state" Text="No team attendance data yet." Visible="false" />
+                    </div>
+
+                    <div class="card-body p-4 pt-2">
+                        <div class="chart-wrap" style="height:280px;">
+                            <canvas id="teamAttendanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================= -->
+            <!-- LAST 7 DAYS + STATUS SNAPSHOT ROW -->
+            <!-- ============================= -->
+            <div class="row g-3 mt-1">
+
+                <div class="col-md-4">
+                    <div class="card shadow h-100 l7-compact">
+                        <div class="card-header-custom">
+                            <span style="font-weight:700;"><i class="bi bi-calendar-week me-2"></i>Last 7 Days Overview</span>
+                        </div>
+                        <div class="card-body p-3">
+                            <span class="l7-period-badge">
+                                <i class="bi bi-clock-history"></i> Rolling 7-Day Window
+                            </span>
+                            <div class="l7-card-body">
+                                <div class="l7-tile tile-checkin" style="animation-delay:0.05s;">
+                                    <div class="l7-value"><i class="bi bi-box-arrow-in-right l7-mini-icon"></i><asp:Literal ID="litL7AvgCheckIn" runat="server" Text="--:--" /></div>
+                                    <div class="l7-label">Avg Check-In</div>
+                                </div>
+                                <div class="l7-tile tile-checkout" style="animation-delay:0.12s;">
+                                    <div class="l7-value"><i class="bi bi-box-arrow-right l7-mini-icon"></i><asp:Literal ID="litL7AvgCheckOut" runat="server" Text="--:--" /></div>
+                                    <div class="l7-label">Avg Check-Out</div>
+                                </div>
+                                <div class="l7-tile tile-hours" style="animation-delay:0.19s;">
+                                    <div class="l7-value"><i class="bi bi-hourglass-split l7-mini-icon"></i><asp:Literal ID="litL7AvgHours" runat="server" Text="0.0" /> hrs</div>
+                                    <div class="l7-label">Avg Time Spent</div>
+                                </div>
+                                <div class="l7-tile tile-absent" style="animation-delay:0.26s;">
+                                    <div class="l7-value"><i class="bi bi-person-x-fill l7-mini-icon"></i><asp:Literal ID="litL7TotalAbsents" runat="server" Text="0" /></div>
+                                    <div class="l7-label">Total Absents</div>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="team-status-pills">
-                            <span class="status-pill pill-intime"><%# Eval("InTimeCount") %> On-time</span>
-                            <span class="status-pill pill-late"><%# Eval("LateCount") %> Late</span>
-                            <span class="status-pill pill-absent"><%# Eval("NotArrivedCount") %> Absent</span>
-                        </div>
-
-                        <div class="team-rate-wrap">
-                            <div class="team-rate-bar-bg">
-                                <div class="team-rate-bar-fill" style='width:<%# GetAttendanceRate(Eval("InTimeCount"), Eval("TotalDays")) %>%;'></div>
-                            </div>
-                            <div class="team-rate-label"><%# GetAttendanceRate(Eval("InTimeCount"), Eval("TotalDays")) %>% on-time</div>
-                        </div>
-                    </div>
-                </ItemTemplate>
-            </asp:Repeater>
-            <asp:Label ID="lblNoTeamAttendance" runat="server" CssClass="empty-state" Text="No team attendance data yet." Visible="false" />
-        </div>
-
-        <!-- Stacked bar chart: team pattern at a glance -->
-        <div class="card-body p-4 pt-2">
-            <div class="chart-wrap" style="height:280px;">
-                <canvas id="teamAttendanceChart"></canvas>
-            </div>
-        </div>
-
-        <!-- last 7 days checkin -->
-<!-- last 7 days checkin + today's status snapshot -->
-<div class="row g-3 mt-1">
-
-    <div class="col-md-4">
-        <div class="card shadow h-100">
-            <div class="card-header-custom">
-                <span style="font-weight:700;"><i class="bi bi-calendar-week me-2"></i>Last 7 Days Overview</span>
-            </div>
-            <div class="card-body p-4">
-
-                <span class="l7-period-badge">
-                    <i class="bi bi-clock-history"></i> Rolling 7-Day Window
-                </span>
-
-                <div class="l7-card-body">
-                    <div class="l7-tile tile-checkin" style="animation-delay:0.05s;">
-                        <div class="l7-value"><i class="bi bi-box-arrow-in-right l7-mini-icon"></i><asp:Literal ID="litL7AvgCheckIn" runat="server" Text="--:--" /></div>
-                        <div class="l7-label">Avg Check-In</div>
-                    </div>
-
-                    <div class="l7-tile tile-checkout" style="animation-delay:0.12s;">
-                        <div class="l7-value"><i class="bi bi-box-arrow-right l7-mini-icon"></i><asp:Literal ID="litL7AvgCheckOut" runat="server" Text="--:--" /></div>
-                        <div class="l7-label">Avg Check-Out</div>
-                    </div>
-
-                    <div class="l7-tile tile-hours" style="animation-delay:0.19s;">
-                        <div class="l7-value"><i class="bi bi-hourglass-split l7-mini-icon"></i><asp:Literal ID="litL7AvgHours" runat="server" Text="0.0" /> hrs</div>
-                        <div class="l7-label">Avg Time Spent</div>
-                    </div>
-
-                    <div class="l7-tile tile-absent" style="animation-delay:0.26s;">
-                        <div class="l7-value"><i class="bi bi-person-x-fill l7-mini-icon"></i><asp:Literal ID="litL7TotalAbsents" runat="server" Text="0" /></div>
-                        <div class="l7-label">Total Absents</div>
                     </div>
                 </div>
 
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="card shadow h-100 status-compact">
-            <div class="card-header-custom">
-                <span style="font-weight:700;"><i class="bi bi-bar-chart-steps me-2"></i>Today's Status Snapshot</span>
-            </div>
-
-            <div class="card-body p-3">
-    <div class="status-count-hero">
-        <span class="big-num"><asp:Literal ID="litStatusTotalCount" runat="server" Text="0" /></span>
-        <span class="big-label">Total Employees Tracked</span>
-    </div>
-    <div class="chart-wrap" style="height:220px;">
-        <canvas id="statusChart"></canvas>
-    </div>
-    <asp:Label ID="lblNoStatus" runat="server" CssClass="empty-state" Text="No attendance data for today." Visible="false" />
-</div>
-
-                    </div>
-                    <div class="candle-segment seg-late"
-                         style="flex-grow: <asp:Literal ID="litLateWidth" runat="server" Text="0" />;">
-                        <div class="candle-tooltip">
-                            <span class="tooltip-title">Late (<asp:Literal ID="litLateStatusCount" runat="server" Text="0" />)</span>
-                            <asp:Literal ID="litLateNamesList" runat="server" Text="None" />
+                <div class="col-md-4">
+                    <div class="card shadow h-100 status-compact">
+                        <div class="card-header-custom">
+                            <span style="font-weight:700;"><i class="bi bi-bar-chart-steps me-2"></i>Today's Status Snapshot</span>
                         </div>
-                    </div>
-                    <div class="candle-segment seg-absent"
-                         style="flex-grow: <asp:Literal ID="litAbsentWidth" runat="server" Text="0" />;">
-                        <div class="candle-tooltip">
-                            <span class="tooltip-title">Absent (<asp:Literal ID="litAbsentStatusCount" runat="server" Text="0" />)</span>
-                            <asp:Literal ID="litAbsentNamesList" runat="server" Text="None" />
+                        <div class="card-body p-3">
+                            <div class="status-count-hero">
+                                <span class="big-num"><asp:Literal ID="litStatusTotalCount" runat="server" Text="0" /></span>
+                                <span class="big-label">Total Employees Tracked</span>
+                            </div>
+                            <div class="chart-wrap" style="height:240px;">
+                                <canvas id="statusChart"></canvas>
+                            </div>
+                            <asp:Label ID="lblNoStatus" runat="server" CssClass="empty-state" Text="No attendance data for today." Visible="false" />
                         </div>
                     </div>
                 </div>
 
             </div>
+
         </div>
-    </div>
 
-</div>
-</div>
-
-
-
-</div>
-
-
-
-<asp:Literal ID="ltrTeamAttendanceScript" runat="server" />
+        <asp:Literal ID="ltrTeamAttendanceScript" runat="server" />
         <asp:Literal ID="ltrStatusChartScript" runat="server" />
-
-           
         <asp:Literal ID="ltrAttendanceChartScript" runat="server" />
         <asp:Literal ID="ltrChartScript" runat="server" />
 

@@ -276,60 +276,6 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Label lblNoStatus;
 
         /// <summary>
-        /// litLateWidth control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litLateWidth;
-
-        /// <summary>
-        /// litLateStatusCount control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litLateStatusCount;
-
-        /// <summary>
-        /// litLateNamesList control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litLateNamesList;
-
-        /// <summary>
-        /// litAbsentWidth control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litAbsentWidth;
-
-        /// <summary>
-        /// litAbsentStatusCount control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litAbsentStatusCount;
-
-        /// <summary>
-        /// litAbsentNamesList control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litAbsentNamesList;
-
-        /// <summary>
         /// ltrTeamAttendanceScript control.
         /// </summary>
         /// <remarks>
