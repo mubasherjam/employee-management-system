@@ -18,7 +18,7 @@
     <style>
 
         /* ---- Leave summary list ---- */
-/* ---- Leave summary header (distinct gradient, not navy) ---- */
+/* ---- Leave summary header (kept, unchanged) ---- */
         .card-header-leave {
             background: linear-gradient(135deg, #6a4ce0 0%, #4b2fb0 55%, #7c5cff 100%);
             color: #fff;
@@ -38,122 +38,86 @@
         .card-header-leave .section-header-title,
         .card-header-leave .section-count-badge { position: relative; z-index: 2; }
 
-        /* ---- Leave summary rows ---- */
-        /* ---- Leave summary rows: bold, professional aesthetic ---- */
-       /* ---- Leave summary: whole row IS the progress bar ---- */
-        .leave-bar-item {
+        /* ---- Leave Summary: circular progress ring cards ---- */
+              /* ---- Leave Summary: circular progress ring cards (compact, md4 sizing) ---- */
+        .leave-ring-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        @media (max-width: 575px) { .leave-ring-grid { grid-template-columns: 1fr; } }
+
+        .leave-ring-card {
             position: relative;
-            height: 76px;
-            border-radius: 18px;
+            background: #fff;
+            border-radius: 16px;
+            padding: 14px 10px 12px;
+            border: 1px solid #eef0f4;
             overflow: hidden;
-            background: #eef0f4;
-            border: 1px solid #e5e7ee;
+            text-align: center;
             opacity: 0;
-            transform: translateY(10px);
-            animation: leaveRowIn 0.45s ease forwards;
-            transition: box-shadow 0.25s ease, transform 0.25s ease;
+            transform: translateY(12px);
+            animation: leaveCardIn 0.5s ease forwards;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
-        .leave-bar-item:nth-child(1) { animation-delay: 0.05s; }
-        .leave-bar-item:nth-child(2) { animation-delay: 0.13s; }
-        .leave-bar-item:nth-child(3) { animation-delay: 0.21s; }
-        .leave-bar-item:nth-child(4) { animation-delay: 0.29s; }
-        .leave-bar-item:nth-child(5) { animation-delay: 0.37s; }
+        .leave-ring-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 26px rgba(20,30,60,0.14);
+        }
+        @keyframes leaveCardIn { to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes leaveRowIn {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .leave-bar-item:not(:last-child) { margin-bottom: 14px; }
-        .leave-bar-item:hover {
-            box-shadow: 0 14px 32px rgba(20,30,60,0.14);
-            transform: translateY(-3px);
-        }
-
-        /* the fill sweeps across as the row's own background */
-        .leave-bar-fill {
-            position: absolute; top: 0; left: 0; bottom: 0;
-            width: 0%;
-            z-index: 1;
-            transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .leave-bar-fill.purple { background: linear-gradient(90deg, #7c5cff, #5f3fc4); }
-        .leave-bar-fill.red    { background: linear-gradient(90deg, #ff6b4a, #e0392b); }
-        .leave-bar-fill.blue   { background: linear-gradient(90deg, #4a80e0, #2a5cc4); }
-        .leave-bar-fill.pink   { background: linear-gradient(90deg, #ee5fa0, #c22e73); }
-        .leave-bar-fill::after {
-            content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 45%;
-            background: linear-gradient(rgba(255,255,255,0.25), rgba(255,255,255,0));
-        }
-
-                .leave-bar-inner {
-            position: relative; z-index: 2;
-            height: 100%;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 14px;
-        }
-
-                 /* Opaque chip holding icon + name - always readable, independent of fill color */
-                         .leave-bar-chip {
-            display: flex; align-items: center; gap: 12px;
-            
-            border-radius: 14px;
-            padding: 8px 18px 8px 8px;
-        }
-
-
-.leave-bar-icon {
-            width: 46px; height: 46px; border-radius: 13px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.15rem; color: #fff; flex-shrink: 0;
-            position: relative;
-            background: linear-gradient(160deg, #2c3350 0%, #12162a 100%);
-            box-shadow: 0 6px 16px rgba(10,14,30,0.35);
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-        .leave-bar-icon::before {
-            content: '';
-            position: absolute; inset: 0;
-            border-radius: inherit;
-            background: linear-gradient(160deg, rgba(255,255,255,0.14), rgba(255,255,255,0) 55%);
+        .leave-ring-blob {
+            position: absolute;
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(124,92,255,0.07), transparent 70%);
+            top: -30px; right: -22px;
             pointer-events: none;
         }
-        .leave-bar-icon i { position: relative; z-index: 1; }
 
-        /* small color-coded dot, corner accent that ties back to the leave type */
-        .leave-bar-icon-dot {
-            position: absolute; bottom: -3px; right: -3px;
-            width: 15px; height: 15px; border-radius: 50%;
-            border: 2.5px solid #fff;
-            z-index: 2;
+        .leave-ring-header {
+            display: flex; align-items: center; gap: 7px;
+            margin-bottom: 8px; text-align: left;
         }
-        .leave-bar-icon-dot.purple { background: #7c5cff; }
-        .leave-bar-icon-dot.red    { background: #e0392b; }
-        .leave-bar-icon-dot.blue   { background: #2a5cc4; }
-        .leave-bar-icon-dot.pink   { background: #c22e73; }
-
-        .leave-bar-name {
-            font-weight: 800; font-size: 0.96rem; letter-spacing: -0.01em;
-            color: #1a2332;
-            white-space: nowrap;
+        .leave-ring-icon {
+            width: 28px; height: 28px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 0.78rem; flex-shrink: 0;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.18);
         }
-        .leave-bar-name {
-            font-weight: 800; font-size: 0.96rem; letter-spacing: -0.01em;
-            color: #1a2332;
-            white-space: nowrap;
+        .leave-ring-title {
+            font-weight: 800; font-size: 0.7rem; color: #1a2332;
+            line-height: 1.2;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
-        .leave-bar-badge {
-            font-size: 0.78rem; font-weight: 800; white-space: nowrap;
-            padding: 8px 16px; border-radius: 20px;
-            background: #fff;
-            box-shadow: 0 4px 14px rgba(20,30,60,0.15);
-            flex-shrink: 0;
+        .leave-ring-svg-wrap {
+            position: relative;
+            width: 90px; height: 90px;
+            margin: 0 auto 10px;
         }
-        .leave-bar-badge.purple { color: #5f3fc4; }
-        .leave-bar-badge.red    { color: #e0392b; }
-        .leave-bar-badge.blue   { color: #2a5cc4; }
-        .leave-bar-badge.pink   { color: #c22e73; }
+        .leave-ring-svg-wrap svg { transform: rotate(-90deg); }
+        .leave-ring-track { fill: none; stroke: #eef0f4; stroke-width: 8; }
+        .leave-ring-progress {
+            fill: none; stroke-width: 8; stroke-linecap: round;
+            transition: stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .leave-ring-center {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .leave-ring-num { font-size: 1.15rem; font-weight: 800; color: #1a2332; line-height: 1; }
+        .leave-ring-sub {
+            font-size: 0.56rem; color: #8892a0; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.02em; margin-top: 2px;
+        }
+
+        .leave-ring-footer {
+            display: flex; align-items: center; justify-content: center; gap: 4px;
+            font-size: 0.68rem; color: #8892a0; font-weight: 600;
+        }
+        .leave-ring-footer b { color: #1a2332; font-weight: 800; }
+        .leave-ring-divider { color: #d7dde5; }
 
         /* leave summary ends here */
 
@@ -919,18 +883,18 @@
 <!-- ============================= -->
             <!-- LEAVE SUMMARY SECTION -->
             <!-- ============================= -->
-            <div class="mt-4">
-                <div class="card shadow">
-                    <div class="card-header-leave section-header">
-                        <span class="section-header-title"><i class="bi bi-calendar2-week-fill"></i> Leave Summary</span>
-                        <span class="section-count-badge"><i class="bi bi-list-check me-1"></i><asp:Literal ID="litLeaveTypeCount" runat="server" Text="0" /> Types</span>
-                    </div>
-                    <div class="card-body p-4">
-                        <asp:Literal ID="litLeaveList" runat="server" />
-                        <asp:Label ID="lblNoLeave" runat="server" CssClass="empty-state" Text="No leave data yet." Visible="false" />
-                    </div>
-                </div>
-            </div>
+<div class="col-lg-4">
+    <div class="card shadow">
+        <div class="card-header-leave section-header">
+            <span class="section-header-title"><i class="bi bi-calendar2-week-fill"></i> Leave Summary</span>
+            <span class="section-count-badge"><i class="bi bi-list-check me-1"></i><asp:Literal ID="litLeaveTypeCount" runat="server" Text="0" /> Types</span>
+        </div>
+        <div class="card-body p-3">
+            <asp:Literal ID="litLeaveList" runat="server" />
+            <asp:Label ID="lblNoLeave" runat="server" CssClass="empty-state" Text="No leave data yet." Visible="false" />
+        </div>
+    </div>
+</div>
 <!-- ============================= -->
             <!-- ORG CHART SECTION -->
             <!-- ============================= -->
@@ -1142,15 +1106,15 @@
     // Auto-expand the CEO's direct reports on page load, so the chart isn't just one lonely box
   
     // Animate leave progress bars from 0 to their real width on load
-    window.addEventListener('load', function () {
-        var fills = document.querySelectorAll('.leave-bar-fill');
-        fills.forEach(function (fill, i) {
-            var target = fill.getAttribute('data-target-width');
-            setTimeout(function () {
-                fill.style.width = target + '%';
-            }, 150 + (i * 100));
-        });
+window.addEventListener('load', function () {
+    var rings = document.querySelectorAll('.leave-ring-progress');
+    rings.forEach(function (ring, i) {
+        var target = ring.getAttribute('data-target-offset');
+        setTimeout(function () {
+            ring.style.strokeDashoffset = target;
+        }, 200 + (i * 120));
     });
+});
   
     
 </script>

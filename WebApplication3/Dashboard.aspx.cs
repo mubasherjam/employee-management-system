@@ -80,7 +80,6 @@ namespace HRMSApp
 
 
         // leave summary method
-
         private void BindLeaveSummary()
         {
             List<LeaveSummaryItem> items = new List<LeaveSummaryItem>();
@@ -111,25 +110,75 @@ namespace HRMSApp
             }
 
             litLeaveTypeCount.Text = items.Count.ToString();
+
+            double circumference = 2 * Math.PI * 36; // matches r=36 in the SVG markup
             StringBuilder listHtml = new StringBuilder();
+            int idx = 0;
+
             foreach (var item in items)
             {
                 int remaining = item.Quota - item.Availed;
-                int percentUsed = item.Quota == 0 ? 0 : (int)Math.Round(item.Availed * 100.0 / item.Quota);
-                string colorClass = GetLeaveColorClass(item.LeaveType);
+                if (remaining < 0) remaining = 0;
 
-                listHtml.Append("<div class='leave-bar-item'>");
-                listHtml.Append("<div class='leave-bar-fill " + colorClass + "' data-target-width='" + percentUsed + "'></div>");
-                listHtml.Append("<div class='leave-bar-inner'>");
-                listHtml.Append("<div class='leave-bar-chip'>");
-                listHtml.Append("<div class='leave-bar-icon'><i class='bi " + GetLeaveIconClass(item.LeaveType) + "'></i><span class='leave-bar-icon-dot " + colorClass + "'></span></div>");
-                listHtml.Append("<span class='leave-bar-name'>" + item.LeaveType + "</span>");
+                double percentRemaining = item.Quota == 0 ? 0 : (remaining * 100.0 / item.Quota);
+                double targetOffset = circumference - (percentRemaining / 100.0) * circumference;
+
+                string colorHex = GetLeaveColorHex(item.LeaveType);
+                string iconClass = GetLeaveIconClass(item.LeaveType);
+
+                listHtml.Append("<div class='leave-ring-card' style='animation-delay:" + (idx * 0.08).ToString("0.00") + "s;'>");
+                listHtml.Append("<div class='leave-ring-blob'></div>");
+
+                listHtml.Append("<div class='leave-ring-header'>");
+                listHtml.Append("<div class='leave-ring-icon' style='background:" + colorHex + ";'><i class='bi " + iconClass + "'></i></div>");
+                listHtml.Append("<div class='leave-ring-title'>" + item.LeaveType + "</div>");
                 listHtml.Append("</div>");
-                listHtml.Append("<div class='leave-bar-badge " + colorClass + "'>" + remaining + " / " + item.Quota + " left</div>");
-                listHtml.Append("</div></div>");
+
+                listHtml.Append("<div class='leave-ring-svg-wrap'>");
+
+                // OLD:
+                // listHtml.Append("<svg width='130' height='130' viewBox='0 0 130 130'>");
+                // listHtml.Append("<circle cx='65' cy='65' r='52' class='leave-ring-track' />");
+                // listHtml.Append("<circle cx='65' cy='65' r='52' class='leave-ring-progress' stroke='" + colorHex + "' " +
+
+                // NEW:
+                listHtml.Append("<svg width='90' height='90' viewBox='0 0 90 90'>");
+                listHtml.Append("<circle cx='45' cy='45' r='36' class='leave-ring-track' />");
+                listHtml.Append("<circle cx='45' cy='45' r='36' class='leave-ring-progress' stroke='" + colorHex + "' " +
+
+                                    "stroke-dasharray='" + circumference.ToString("0.0") + "' " +
+                    "stroke-dashoffset='" + circumference.ToString("0.0") + "' " +
+                    "data-target-offset='" + targetOffset.ToString("0.0") + "' />");
+                listHtml.Append("</svg>");
+                listHtml.Append("<div class='leave-ring-center'>");
+                listHtml.Append("<span class='leave-ring-num'>" + remaining + "</span>");
+                listHtml.Append("<span class='leave-ring-sub'>days left</span>");
+                listHtml.Append("</div>");
+                listHtml.Append("</div>");
+
+                listHtml.Append("<div class='leave-ring-footer'>");
+                listHtml.Append("<span class='leave-ring-stat'><b>" + item.Availed + "</b> used</span>");
+                listHtml.Append("<span class='leave-ring-divider'>/</span>");
+                listHtml.Append("<span class='leave-ring-stat'><b>" + item.Quota + "</b> total</span>");
+                listHtml.Append("</div>");
+
+                listHtml.Append("</div>");
+                idx++;
             }
-            litLeaveList.Text = listHtml.ToString();
-            // Chart.js block removed - no longer needed
+
+            litLeaveList.Text = "<div class='leave-ring-grid'>" + listHtml.ToString() + "</div>";
+        }
+
+        private string GetLeaveColorHex(string leaveType)
+        {
+            switch (leaveType.Trim().ToLower())
+            {
+                case "annual leave": return "#7c5cff";
+                case "sick leave": return "#e0392b";
+                case "casual leave": return "#2a5cc4";
+                case "emergency leave": return "#c22e73";
+                default: return "#7c5cff";
+            }
         }
 
         private string GetLeaveIconClass(string leaveType)
@@ -144,17 +193,6 @@ namespace HRMSApp
             }
         }
 
-        private string GetLeaveColorClass(string leaveType)
-        {
-            switch (leaveType.Trim().ToLower())
-            {
-                case "annual leave": return "purple";
-                case "sick leave": return "red";
-                case "casual leave": return "blue";
-                case "emergency leave": return "pink";
-                default: return "purple";
-            }
-        }
 
         // small helper class, add at the bottom of the Dashboard class or as its own file
         private class LeaveSummaryItem
