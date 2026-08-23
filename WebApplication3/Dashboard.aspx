@@ -40,81 +40,82 @@
 
         /* ---- Leave Summary: circular progress ring cards ---- */
               /* ---- Leave Summary: circular progress ring cards (compact, md4 sizing) ---- */
+               /* ---- Leave Summary: circular progress ring cards (extra compact) ---- */
         .leave-ring-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 8px;
         }
         @media (max-width: 575px) { .leave-ring-grid { grid-template-columns: 1fr; } }
 
         .leave-ring-card {
             position: relative;
             background: #fff;
-            border-radius: 16px;
-            padding: 14px 10px 12px;
+            border-radius: 13px;
+            padding: 10px 8px 9px;
             border: 1px solid #eef0f4;
             overflow: hidden;
             text-align: center;
             opacity: 0;
-            transform: translateY(12px);
+            transform: translateY(10px);
             animation: leaveCardIn 0.5s ease forwards;
             transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
         .leave-ring-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 26px rgba(20,30,60,0.14);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(20,30,60,0.13);
         }
         @keyframes leaveCardIn { to { opacity: 1; transform: translateY(0); } }
 
         .leave-ring-blob {
             position: absolute;
-            width: 80px; height: 80px;
+            width: 60px; height: 60px;
             border-radius: 50%;
             background: radial-gradient(circle, rgba(124,92,255,0.07), transparent 70%);
-            top: -30px; right: -22px;
+            top: -22px; right: -16px;
             pointer-events: none;
         }
 
         .leave-ring-header {
-            display: flex; align-items: center; gap: 7px;
-            margin-bottom: 8px; text-align: left;
+            display: flex; align-items: center; gap: 5px;
+            margin-bottom: 6px; text-align: left;
         }
         .leave-ring-icon {
-            width: 28px; height: 28px; border-radius: 8px;
+            width: 22px; height: 22px; border-radius: 7px;
             display: flex; align-items: center; justify-content: center;
-            color: #fff; font-size: 0.78rem; flex-shrink: 0;
-            box-shadow: 0 5px 12px rgba(0,0,0,0.18);
+            color: #fff; font-size: 0.65rem; flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.18);
         }
         .leave-ring-title {
-            font-weight: 800; font-size: 0.7rem; color: #1a2332;
-            line-height: 1.2;
+            font-weight: 800; font-size: 0.62rem; color: #1a2332;
+            line-height: 1.15;
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
         .leave-ring-svg-wrap {
             position: relative;
-            width: 90px; height: 90px;
-            margin: 0 auto 10px;
+            width: 66px; height: 66px;
+            margin: 0 auto 8px;
         }
         .leave-ring-svg-wrap svg { transform: rotate(-90deg); }
-        .leave-ring-track { fill: none; stroke: #eef0f4; stroke-width: 8; }
+        .leave-ring-track { fill: none; stroke: #eef0f4; stroke-width: 6; }
         .leave-ring-progress {
-            fill: none; stroke-width: 8; stroke-linecap: round;
+            fill: none; stroke-width: 6; stroke-linecap: round;
             transition: stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .leave-ring-center {
             position: absolute; inset: 0;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .leave-ring-num { font-size: 1.15rem; font-weight: 800; color: #1a2332; line-height: 1; }
+        .leave-ring-num { font-size: 0.92rem; font-weight: 800; color: #1a2332; line-height: 1; }
         .leave-ring-sub {
-            font-size: 0.56rem; color: #8892a0; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.02em; margin-top: 2px;
+            font-size: 0.44rem; color: #8892a0; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.02em; margin-top: 1px;
         }
 
         .leave-ring-footer {
-            display: flex; align-items: center; justify-content: center; gap: 4px;
-            font-size: 0.68rem; color: #8892a0; font-weight: 600;
+            display: flex; align-items: center; justify-content: center; gap: 3px;
+            font-size: 0.58rem; color: #8892a0; font-weight: 600;
         }
         .leave-ring-footer b { color: #1a2332; font-weight: 800; }
         .leave-ring-divider { color: #d7dde5; }
@@ -889,7 +890,7 @@
             <span class="section-header-title"><i class="bi bi-calendar2-week-fill"></i> Leave Summary</span>
             <span class="section-count-badge"><i class="bi bi-list-check me-1"></i><asp:Literal ID="litLeaveTypeCount" runat="server" Text="0" /> Types</span>
         </div>
-        <div class="card-body p-3">
+        <div class="card-body p-2">
             <asp:Literal ID="litLeaveList" runat="server" />
             <asp:Label ID="lblNoLeave" runat="server" CssClass="empty-state" Text="No leave data yet." Visible="false" />
         </div>

@@ -111,7 +111,7 @@ namespace HRMSApp
 
             litLeaveTypeCount.Text = items.Count.ToString();
 
-            double circumference = 2 * Math.PI * 36; // matches r=36 in the SVG markup
+            double circumference = 2 * Math.PI * 26; // matches r=36 in the SVG markup
             StringBuilder listHtml = new StringBuilder();
             int idx = 0;
 
@@ -142,11 +142,11 @@ namespace HRMSApp
                 // listHtml.Append("<circle cx='65' cy='65' r='52' class='leave-ring-progress' stroke='" + colorHex + "' " +
 
                 // NEW:
-                listHtml.Append("<svg width='90' height='90' viewBox='0 0 90 90'>");
-                listHtml.Append("<circle cx='45' cy='45' r='36' class='leave-ring-track' />");
-                listHtml.Append("<circle cx='45' cy='45' r='36' class='leave-ring-progress' stroke='" + colorHex + "' " +
+                listHtml.Append("<svg width='66' height='66' viewBox='0 0 66 66'>");
+                listHtml.Append("<circle cx='33' cy='33' r='26' class='leave-ring-track' />");
+                listHtml.Append("<circle cx='33' cy='33' r='26' class='leave-ring-progress' stroke='" + colorHex + "' " +
 
-                                    "stroke-dasharray='" + circumference.ToString("0.0") + "' " +
+                                                    "stroke-dasharray='" + circumference.ToString("0.0") + "' " +
                     "stroke-dashoffset='" + circumference.ToString("0.0") + "' " +
                     "data-target-offset='" + targetOffset.ToString("0.0") + "' />");
                 listHtml.Append("</svg>");
