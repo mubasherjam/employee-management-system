@@ -37,82 +37,85 @@
         .card-header-leave .section-header-title,
         .card-header-leave .section-count-badge { position: relative; z-index: 2; }
 
-        /* ---- Leave Summary: circular progress ring cards ---- */
-        .leave-ring-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 8px;
-        }
-        @media (max-width: 575px) { .leave-ring-grid { grid-template-columns: 1fr; } }
-
+        /* ---- Leave Summary: MD4 grid (3-per-row) progress ring cards ---- */
         .leave-ring-card {
             position: relative;
             background: #fff;
-            border-radius: 13px;
-            padding: 10px 8px 9px;
+            border-radius: 16px;
+            padding: 22px 20px 20px;
             border: 1px solid #eef0f4;
             overflow: hidden;
             text-align: center;
+            height: 100%;
             opacity: 0;
             transform: translateY(10px);
             animation: leaveCardIn 0.5s ease forwards;
             transition: transform 0.25s ease, box-shadow 0.25s ease;
         }
         .leave-ring-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(20,30,60,0.13);
+            transform: translateY(-4px);
+            box-shadow: 0 14px 28px rgba(20,30,60,0.13);
         }
         @keyframes leaveCardIn { to { opacity: 1; transform: translateY(0); } }
 
         .leave-ring-blob {
             position: absolute;
-            width: 60px; height: 60px;
+            width: 120px; height: 120px;
             border-radius: 50%;
             background: radial-gradient(circle, rgba(124,92,255,0.07), transparent 70%);
-            top: -22px; right: -16px;
+            top: -40px; right: -30px;
             pointer-events: none;
         }
 
         .leave-ring-header {
-            display: flex; align-items: center; gap: 5px;
-            margin-bottom: 6px; text-align: left;
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 16px; text-align: left;
         }
         .leave-ring-icon {
-            width: 22px; height: 22px; border-radius: 7px;
+            width: 36px; height: 36px; border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            color: #fff; font-size: 0.65rem; flex-shrink: 0;
+            color: #fff; font-size: 1rem; flex-shrink: 0;
             box-shadow: 0 4px 10px rgba(0,0,0,0.18);
         }
         .leave-ring-title {
-            font-weight: 800; font-size: 0.62rem; color: #1a2332;
-            line-height: 1.15;
+            font-weight: 800; font-size: 0.95rem; color: #1a2332;
+            line-height: 1.2;
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
         .leave-ring-svg-wrap {
             position: relative;
-            width: 66px; height: 66px;
-            margin: 0 auto 8px;
+            width: 108px; height: 108px;
+            margin: 0 auto 16px;
         }
         .leave-ring-svg-wrap svg { transform: rotate(-90deg); }
-        .leave-ring-track { fill: none; stroke: #eef0f4; stroke-width: 6; }
+        .leave-ring-track { fill: none; stroke: #eef0f4; stroke-width: 8; }
         .leave-ring-progress {
-            fill: none; stroke-width: 6; stroke-linecap: round;
+            fill: none; stroke-width: 8; stroke-linecap: round;
             transition: stroke-dashoffset 1.2s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .leave-ring-center {
             position: absolute; inset: 0;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .leave-ring-num { font-size: 0.92rem; font-weight: 800; color: #1a2332; line-height: 1; }
+        .leave-ring-num { font-size: 1.6rem; font-weight: 800; color: #1a2332; line-height: 1; }
         .leave-ring-sub {
-            font-size: 0.44rem; color: #8892a0; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.02em; margin-top: 1px;
+            font-size: 0.62rem; color: #8892a0; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.04em; margin-top: 3px;
+        }
+
+        .leave-usage-bar-bg {
+            height: 6px; border-radius: 6px; background: #eef0f4;
+            overflow: hidden; margin-bottom: 14px;
+        }
+        .leave-usage-bar-fill {
+            height: 100%; border-radius: 6px;
+            transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .leave-ring-footer {
-            display: flex; align-items: center; justify-content: center; gap: 3px;
-            font-size: 0.58rem; color: #8892a0; font-weight: 600;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+            font-size: 0.8rem; color: #8892a0; font-weight: 600;
         }
         .leave-ring-footer b { color: #1a2332; font-weight: 800; }
         .leave-ring-divider { color: #d7dde5; }
@@ -475,102 +478,77 @@
         }
 
 
-        /* ---- Last 7 Days Summary Card ---- */
+        /* ---- Last 7 Days Summary Card (modern duotone tiles) ---- */
         .l7-card-body {
-            padding: 4px 2px 2px 2px;
+            padding: 2px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 14px;
+            gap: 12px;
         }
 
         .l7-tile {
             position: relative;
-            border-radius: 18px;
-            padding: 20px 18px;
+            border-radius: 16px;
+            padding: 16px 16px 14px;
             overflow: hidden;
             color: #fff;
-            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 104px;
+            transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease;
             opacity: 0;
-            transform: translateY(14px);
-            animation: l7RiseIn 0.55s ease forwards;
-            isolation: isolate;
+            transform: translateY(12px);
+            animation: l7RiseIn 0.5s ease forwards;
         }
-        .l7-tile:hover { transform: translateY(-5px) scale(1.015); }
+        .l7-tile:hover { transform: translateY(-4px); }
         @keyframes l7RiseIn { to { opacity: 1; transform: translateY(0); } }
 
-        /* Layered decorative glow + mesh texture per tile */
+        /* Soft diagonal sheen instead of blurred blobs, for a cleaner modern finish */
         .l7-tile::before {
             content: '';
-            position: absolute;
-            width: 100px; height: 100px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.16);
-            top: -35px; right: -25px;
-            z-index: -1;
-            filter: blur(1px);
-        }
-        .l7-tile::after {
-            content: '';
-            position: absolute;
-            width: 60px; height: 60px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.09);
-            bottom: -20px; left: -15px;
-            z-index: -1;
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0) 55%);
+            pointer-events: none;
         }
 
-        .l7-tile.tile-checkin {
-            background: linear-gradient(140deg, #3b7ff5 0%, #2c5fd6 55%, #1e46b8 100%);
-            box-shadow: 0 12px 26px rgba(30,70,184,0.32), inset 0 1px 0 rgba(255,255,255,0.15);
-        }
-        .l7-tile.tile-checkout {
-            background: linear-gradient(140deg, #9b7bff 0%, #7c5cff 55%, #6032e0 100%);
-            box-shadow: 0 12px 26px rgba(96,50,224,0.32), inset 0 1px 0 rgba(255,255,255,0.15);
-        }
-        .l7-tile.tile-hours {
-            background: linear-gradient(140deg, #34d399 0%, #16a34a 55%, #0d7a37 100%);
-            box-shadow: 0 12px 26px rgba(13,122,55,0.32), inset 0 1px 0 rgba(255,255,255,0.15);
-        }
-        .l7-tile.tile-absent {
-            background: linear-gradient(140deg, #f472b6 0%, #e0448a 55%, #b91c63 100%);
-            box-shadow: 0 12px 26px rgba(185,28,99,0.32), inset 0 1px 0 rgba(255,255,255,0.15);
-        }
+        .l7-tile.tile-checkin  { background: linear-gradient(135deg, #4f8cf7, #2955c9); box-shadow: 0 8px 20px rgba(41,85,201,0.28); }
+        .l7-tile.tile-checkout { background: linear-gradient(135deg, #9b7bff, #6a4ce0); box-shadow: 0 8px 20px rgba(106,76,224,0.28); }
+        .l7-tile.tile-hours    { background: linear-gradient(135deg, #34d399, #16a34a); box-shadow: 0 8px 20px rgba(22,163,74,0.28); }
+        .l7-tile.tile-absent   { background: linear-gradient(135deg, #f472b6, #d63384); box-shadow: 0 8px 20px rgba(214,51,132,0.28); }
 
-        .l7-tile:hover.tile-checkin  { box-shadow: 0 20px 40px rgba(30,70,184,0.45), inset 0 1px 0 rgba(255,255,255,0.2); }
-        .l7-tile:hover.tile-checkout { box-shadow: 0 20px 40px rgba(96,50,224,0.45), inset 0 1px 0 rgba(255,255,255,0.2); }
-        .l7-tile:hover.tile-hours    { box-shadow: 0 20px 40px rgba(13,122,55,0.45), inset 0 1px 0 rgba(255,255,255,0.2); }
-        .l7-tile:hover.tile-absent   { box-shadow: 0 20px 40px rgba(185,28,99,0.45), inset 0 1px 0 rgba(255,255,255,0.2); }
+        .l7-tile:hover.tile-checkin  { box-shadow: 0 14px 28px rgba(41,85,201,0.4); }
+        .l7-tile:hover.tile-checkout { box-shadow: 0 14px 28px rgba(106,76,224,0.4); }
+        .l7-tile:hover.tile-hours    { box-shadow: 0 14px 28px rgba(22,163,74,0.4); }
+        .l7-tile:hover.tile-absent   { box-shadow: 0 14px 28px rgba(214,51,132,0.4); }
 
-        .l7-icon {
+        .l7-icon-badge {
             position: relative; z-index: 2;
-            width: 38px; height: 38px;
-            border-radius: 11px;
-            background: rgba(255,255,255,0.22);
-            border: 1px solid rgba(255,255,255,0.25);
+            width: 30px; height: 30px;
+            border-radius: 9px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.28);
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.05rem;
-            margin-bottom: 14px;
-            backdrop-filter: blur(6px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            transition: transform 0.25s ease;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+            transition: transform 0.2s ease;
         }
-        .l7-tile:hover .l7-icon { transform: rotate(-6deg) scale(1.08); }
+        .l7-tile:hover .l7-icon-badge { transform: scale(1.08); }
 
         .l7-value {
             position: relative; z-index: 2;
-            font-size: 1.5rem; font-weight: 800;
+            font-size: 1.2rem; font-weight: 800;
             line-height: 1.15;
             letter-spacing: -0.01em;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .l7-label {
             position: relative; z-index: 2;
-            font-size: 0.73rem;
-            color: rgba(255,255,255,0.88);
+            font-size: 0.66rem;
+            color: rgba(255,255,255,0.85);
             font-weight: 700;
-            margin-top: 4px;
+            margin-top: 3px;
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.05em;
         }
 
         .l7-period-badge {
@@ -579,7 +557,7 @@
             color: #4a5568;
             font-size: 0.73rem; font-weight: 700;
             padding: 6px 14px; border-radius: 20px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             border: 1px solid #e2e7f0;
         }
         .l7-period-badge i { color: #7c5cff; }
@@ -712,59 +690,8 @@
     font-style: italic;
 }
 
-/* ---- Compact PILL variant of Last 7 Days tiles (smaller) ---- */
-        .l7-compact .l7-card-body {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-        }
-
-        .l7-compact .l7-tile {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 8px 10px;
-            border-radius: 12px;
-            min-height: unset;
-        }
-
-        .l7-compact .l7-tile::before {
-            width: 36px; height: 36px;
-            top: -12px; right: -8px;
-        }
-        .l7-compact .l7-tile::after {
-            width: 22px; height: 22px;
-            bottom: -8px; left: 10px;
-        }
-
-        .l7-compact .l7-value {
-            font-size: 0.85rem;
-            line-height: 1.1;
-        }
-
-        .l7-compact .l7-label {
-            font-size: 0.56rem;
-            margin-top: 1px;
-            letter-spacing: 0.01em;
-        }
-
-        .l7-compact .l7-period-badge {
-            font-size: 0.62rem;
-            padding: 3px 9px;
-            margin-bottom: 8px;
-        }
-
         .l7-compact .card-body.p-3 {
-            padding: 12px !important;
-        }
-
-
-
-        .l7-compact .l7-mini-icon {
-            font-size: 0.72rem;
-            margin-right: 7px;
-            opacity: 0.85;
-            vertical-align: middle;
+            padding: 18px !important;
         }
 
     </style>
@@ -1012,20 +939,32 @@
                             </span>
                             <div class="l7-card-body">
                                 <div class="l7-tile tile-checkin" style="animation-delay:0.05s;">
-                                    <div class="l7-value"><i class="bi bi-box-arrow-in-right l7-mini-icon"></i><asp:Literal ID="litL7AvgCheckIn" runat="server" Text="--:--" /></div>
-                                    <div class="l7-label">Avg Check-In</div>
+                                    <span class="l7-icon-badge"><i class="bi bi-box-arrow-in-right"></i></span>
+                                    <div>
+                                        <div class="l7-value"><asp:Literal ID="litL7AvgCheckIn" runat="server" Text="--:--" /></div>
+                                        <div class="l7-label">Avg Check-In</div>
+                                    </div>
                                 </div>
                                 <div class="l7-tile tile-checkout" style="animation-delay:0.12s;">
-                                    <div class="l7-value"><i class="bi bi-box-arrow-right l7-mini-icon"></i><asp:Literal ID="litL7AvgCheckOut" runat="server" Text="--:--" /></div>
-                                    <div class="l7-label">Avg Check-Out</div>
+                                    <span class="l7-icon-badge"><i class="bi bi-box-arrow-right"></i></span>
+                                    <div>
+                                        <div class="l7-value"><asp:Literal ID="litL7AvgCheckOut" runat="server" Text="--:--" /></div>
+                                        <div class="l7-label">Avg Check-Out</div>
+                                    </div>
                                 </div>
                                 <div class="l7-tile tile-hours" style="animation-delay:0.19s;">
-                                    <div class="l7-value"><i class="bi bi-hourglass-split l7-mini-icon"></i><asp:Literal ID="litL7AvgHours" runat="server" Text="0.0" /> hrs</div>
-                                    <div class="l7-label">Avg Time Spent</div>
+                                    <span class="l7-icon-badge"><i class="bi bi-hourglass-split"></i></span>
+                                    <div>
+                                        <div class="l7-value"><asp:Literal ID="litL7AvgHours" runat="server" Text="0.0" /> hrs</div>
+                                        <div class="l7-label">Avg Time Spent</div>
+                                    </div>
                                 </div>
                                 <div class="l7-tile tile-absent" style="animation-delay:0.26s;">
-                                    <div class="l7-value"><i class="bi bi-person-x-fill l7-mini-icon"></i><asp:Literal ID="litL7TotalAbsents" runat="server" Text="0" /></div>
-                                    <div class="l7-label">Total Absents</div>
+                                    <span class="l7-icon-badge"><i class="bi bi-person-x-fill"></i></span>
+                                    <div>
+                                        <div class="l7-value"><asp:Literal ID="litL7TotalAbsents" runat="server" Text="0" /></div>
+                                        <div class="l7-label">Total Absents</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

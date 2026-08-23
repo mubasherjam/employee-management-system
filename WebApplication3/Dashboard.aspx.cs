@@ -111,7 +111,7 @@ namespace HRMSApp
 
             litLeaveTypeCount.Text = items.Count.ToString();
 
-            double circumference = 2 * Math.PI * 26; // matches r=36 in the SVG markup
+            double circumference = 2 * Math.PI * 40; // matches r=40 in the SVG markup
             StringBuilder listHtml = new StringBuilder();
             int idx = 0;
 
@@ -123,9 +123,15 @@ namespace HRMSApp
                 double percentRemaining = item.Quota == 0 ? 0 : (remaining * 100.0 / item.Quota);
                 double targetOffset = circumference - (percentRemaining / 100.0) * circumference;
 
+                double percentUsed = item.Quota == 0 ? 0 : (item.Availed * 100.0 / item.Quota);
+                if (percentUsed > 100) percentUsed = 100;
+                if (percentUsed < 0) percentUsed = 0;
+
                 string colorHex = GetLeaveColorHex(item.LeaveType);
                 string iconClass = GetLeaveIconClass(item.LeaveType);
 
+                // MD4 grid: 1-up on phones, 2-up on tablets, 3-up (col-md-4) on desktop
+                listHtml.Append("<div class='col-sm-6 col-md-4'>");
                 listHtml.Append("<div class='leave-ring-card' style='animation-delay:" + (idx * 0.08).ToString("0.00") + "s;'>");
                 listHtml.Append("<div class='leave-ring-blob'></div>");
 
@@ -135,17 +141,9 @@ namespace HRMSApp
                 listHtml.Append("</div>");
 
                 listHtml.Append("<div class='leave-ring-svg-wrap'>");
-
-                // OLD:
-                // listHtml.Append("<svg width='130' height='130' viewBox='0 0 130 130'>");
-                // listHtml.Append("<circle cx='65' cy='65' r='52' class='leave-ring-track' />");
-                // listHtml.Append("<circle cx='65' cy='65' r='52' class='leave-ring-progress' stroke='" + colorHex + "' " +
-
-                // NEW:
-                listHtml.Append("<svg width='66' height='66' viewBox='0 0 66 66'>");
-                listHtml.Append("<circle cx='33' cy='33' r='26' class='leave-ring-track' />");
-                listHtml.Append("<circle cx='33' cy='33' r='26' class='leave-ring-progress' stroke='" + colorHex + "' " +
-
+                listHtml.Append("<svg width='108' height='108' viewBox='0 0 108 108'>");
+                listHtml.Append("<circle cx='54' cy='54' r='40' class='leave-ring-track' />");
+                listHtml.Append("<circle cx='54' cy='54' r='40' class='leave-ring-progress' stroke='" + colorHex + "' " +
                                                     "stroke-dasharray='" + circumference.ToString("0.0") + "' " +
                     "stroke-dashoffset='" + circumference.ToString("0.0") + "' " +
                     "data-target-offset='" + targetOffset.ToString("0.0") + "' />");
@@ -156,6 +154,9 @@ namespace HRMSApp
                 listHtml.Append("</div>");
                 listHtml.Append("</div>");
 
+                listHtml.Append("<div class='leave-usage-bar-bg'><div class='leave-usage-bar-fill' style='width:" +
+                    percentUsed.ToString("0") + "%; background:" + colorHex + ";'></div></div>");
+
                 listHtml.Append("<div class='leave-ring-footer'>");
                 listHtml.Append("<span class='leave-ring-stat'><b>" + item.Availed + "</b> used</span>");
                 listHtml.Append("<span class='leave-ring-divider'>/</span>");
@@ -163,10 +164,11 @@ namespace HRMSApp
                 listHtml.Append("</div>");
 
                 listHtml.Append("</div>");
+                listHtml.Append("</div>");
                 idx++;
             }
 
-            litLeaveList.Text = "<div class='leave-ring-grid'>" + listHtml.ToString() + "</div>";
+            litLeaveList.Text = "<div class='row g-3'>" + listHtml.ToString() + "</div>";
         }
 
         private string GetLeaveColorHex(string leaveType)
