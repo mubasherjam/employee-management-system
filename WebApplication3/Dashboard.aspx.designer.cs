@@ -204,6 +204,15 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Label lblNoAttendance;
 
         /// <summary>
+        /// litTeamAttCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litTeamAttCount;
+
+        /// <summary>
         /// rptTeamAttendance control.
         /// </summary>
         /// <remarks>

@@ -592,6 +592,8 @@ namespace HRMSApp
                 return;
             }
 
+            litTeamAttCount.Text = dt.Rows.Count.ToString();
+
             rptTeamAttendance.DataSource = dt;
             rptTeamAttendance.DataBind();
 

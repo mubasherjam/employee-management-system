@@ -17,8 +17,7 @@
 
     <style>
 
-        /* ---- Leave summary list ---- */
-/* ---- Leave summary header (kept, unchanged) ---- */
+        /* ---- Leave summary header ---- */
         .card-header-leave {
             background: linear-gradient(135deg, #6a4ce0 0%, #4b2fb0 55%, #7c5cff 100%);
             color: #fff;
@@ -39,11 +38,9 @@
         .card-header-leave .section-count-badge { position: relative; z-index: 2; }
 
         /* ---- Leave Summary: circular progress ring cards ---- */
-              /* ---- Leave Summary: circular progress ring cards (compact, md4 sizing) ---- */
-               /* ---- Leave Summary: circular progress ring cards (extra compact) ---- */
         .leave-ring-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 8px;
         }
         @media (max-width: 575px) { .leave-ring-grid { grid-template-columns: 1fr; } }
@@ -235,7 +232,6 @@
         }
 
         /* ---- Recent employees list ---- */
-       /* ---- Recent employees list ---- */
         .recent-item {
             display: flex; align-items: center; gap: 14px;
             padding: 14px 12px;
@@ -480,7 +476,6 @@
 
 
         /* ---- Last 7 Days Summary Card ---- */
-       /* ---- Last 7 Days Summary Card (v2 - richer visuals) ---- */
         .l7-card-body {
             padding: 4px 2px 2px 2px;
             display: grid;
@@ -786,49 +781,53 @@
                 <div class="page-subtitle">Overview of your workforce and department activity</div>
             </div>
 
-            <!-- Stat cards -->
-            <div class="row g-3 mb-4">
-               <div class="col-6 col-lg-3">
-    <div class="stat-card purple">
-        <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
-        <div>
-            <div class="stat-value"><asp:Literal ID="litActiveCount" runat="server" Text="0" /></div>
-            <div class="stat-label">Active Employees</div>
-        </div>
-    </div>
-</div>
-<div class="col-6 col-lg-3">
-    <div class="stat-card red">
-        <div class="stat-icon"><i class="bi bi-person-dash-fill"></i></div>
-        <div>
-            <div class="stat-value"><asp:Literal ID="litInactiveCount" runat="server" Text="0" /></div>
-            <div class="stat-label">Inactive Employees</div>
-        </div>
-    </div>
-</div>
-<div class="col-6 col-lg-3">
-    <div class="stat-card blue">
-        <div class="stat-icon"><i class="bi bi-building"></i></div>
-        <div>
-            <div class="stat-value"><asp:Literal ID="litDeptCount" runat="server" Text="0" /></div>
-            <div class="stat-label">Departments</div>
-        </div>
-    </div>
-</div>
-<div class="col-6 col-lg-3">
-    <div class="stat-card green">
-        <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
-        <div>
-            <div class="stat-value"><asp:Literal ID="litTotalPayroll" runat="server" Text="0" /></div>
-            <div class="stat-label">Monthly Payroll</div>
-        </div>
-    </div>
-</div>
+            <!-- ============================= -->
+            <!-- STAT CARDS -->
+            <!-- ============================= -->
+            <div class="row g-3">
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card purple">
+                        <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+                        <div>
+                            <div class="stat-value"><asp:Literal ID="litActiveCount" runat="server" Text="0" /></div>
+                            <div class="stat-label">Active Employees</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card red">
+                        <div class="stat-icon"><i class="bi bi-person-dash-fill"></i></div>
+                        <div>
+                            <div class="stat-value"><asp:Literal ID="litInactiveCount" runat="server" Text="0" /></div>
+                            <div class="stat-label">Inactive Employees</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card blue">
+                        <div class="stat-icon"><i class="bi bi-building"></i></div>
+                        <div>
+                            <div class="stat-value"><asp:Literal ID="litDeptCount" runat="server" Text="0" /></div>
+                            <div class="stat-label">Departments</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card green">
+                        <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+                        <div>
+                            <div class="stat-value"><asp:Literal ID="litTotalPayroll" runat="server" Text="0" /></div>
+                            <div class="stat-label">Monthly Payroll</div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Recent employees + Department breakdown -->
-            <div class="row g-3">
-<div class="col-lg-6">
+            <!-- ============================= -->
+            <!-- RECENT EMPLOYEES + DEPARTMENT BREAKDOWN -->
+            <!-- ============================= -->
+            <div class="row g-3 mt-4">
+                <div class="col-lg-6">
                     <div class="card shadow">
                         <div class="card-header-custom section-header">
                             <span class="section-header-title"><i class="bi bi-clock-history"></i> Recently Added</span>
@@ -858,7 +857,7 @@
                     </div>
                 </div>
 
-               <div class="col-lg-6">
+                <div class="col-lg-6">
                     <div class="card shadow">
                         <div class="card-header-custom section-header">
                             <span class="section-header-title"><i class="bi bi-bar-chart-fill"></i> Department Breakdown</span>
@@ -874,29 +873,25 @@
                 </div>
             </div>
 
+            <!-- ============================= -->
+            <!-- LEAVE SUMMARY SECTION -->
+            <!-- ============================= -->
+            <div class="row g-3 mt-4">
+                <div class="col-12">
+                    <div class="card shadow">
+                        <div class="card-header-leave section-header">
+                            <span class="section-header-title"><i class="bi bi-calendar2-week-fill"></i> Leave Summary</span>
+                            <span class="section-count-badge"><i class="bi bi-list-check me-1"></i><asp:Literal ID="litLeaveTypeCount" runat="server" Text="0" /> Types</span>
+                        </div>
+                        <div class="card-body p-3">
+                            <asp:Literal ID="litLeaveList" runat="server" />
+                            <asp:Label ID="lblNoLeave" runat="server" CssClass="empty-state" Text="No leave data yet." Visible="false" />
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-             <!-- ============================= -->
-            <!-- LEAVE SUMMARY SECTION (new) -->
             <!-- ============================= -->
-          <!-- ============================= -->
-            <!-- LEAVE SUMMARY SECTION -->
-            <!-- ============================= -->
-<!-- ============================= -->
-            <!-- LEAVE SUMMARY SECTION -->
-            <!-- ============================= -->
-<div class="col-lg-4">
-    <div class="card shadow">
-        <div class="card-header-leave section-header">
-            <span class="section-header-title"><i class="bi bi-calendar2-week-fill"></i> Leave Summary</span>
-            <span class="section-count-badge"><i class="bi bi-list-check me-1"></i><asp:Literal ID="litLeaveTypeCount" runat="server" Text="0" /> Types</span>
-        </div>
-        <div class="card-body p-2">
-            <asp:Literal ID="litLeaveList" runat="server" />
-            <asp:Label ID="lblNoLeave" runat="server" CssClass="empty-state" Text="No leave data yet." Visible="false" />
-        </div>
-    </div>
-</div>
-<!-- ============================= -->
             <!-- ORG CHART SECTION -->
             <!-- ============================= -->
             <div class="mt-4">
@@ -956,7 +951,7 @@
                 <div class="card shadow">
                     <div class="card-header-custom section-header">
                         <span class="section-header-title"><i class="bi bi-people-fill"></i> Team Attendance Summary</span>
-                        <span class="section-count-badge"><i class="bi bi-person-check me-1"></i>5 Members</span>
+                        <span class="section-count-badge"><i class="bi bi-person-check me-1"></i><asp:Literal ID="litTeamAttCount" runat="server" Text="0" /> Members</span>
                     </div>
 
                     <div class="card-body p-4 pb-2">
@@ -1004,9 +999,9 @@
             <!-- ============================= -->
             <!-- LAST 7 DAYS + STATUS SNAPSHOT ROW -->
             <!-- ============================= -->
-            <div class="row g-3 mt-1">
+            <div class="row g-3 mt-4">
 
-                <div class="col-md-4">
+                <div class="col-lg-6">
                     <div class="card shadow h-100 l7-compact">
                         <div class="card-header-custom">
                             <span style="font-weight:700;"><i class="bi bi-calendar-week me-2"></i>Last 7 Days Overview</span>
@@ -1037,7 +1032,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-lg-6">
                     <div class="card shadow h-100 status-compact">
                         <div class="card-header-custom">
                             <span style="font-weight:700;"><i class="bi bi-bar-chart-steps me-2"></i>Today's Status Snapshot</span>
