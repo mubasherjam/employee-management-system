@@ -664,6 +664,159 @@ namespace HRMSApp
                     }
                 }
             }
+
+            BindLast7DaysTrendChart();
+        }
+
+        // last 7 days trend chart: check-in/check-out window, avg hours and absents per day
+        private void BindLast7DaysTrendChart()
+        {
+            StringBuilder labels = new StringBuilder();
+            StringBuilder checkInMins = new StringBuilder();
+            StringBuilder checkOutMins = new StringBuilder();
+            StringBuilder hours = new StringBuilder();
+            StringBuilder absents = new StringBuilder();
+            bool hasData = false;
+            DateTime rangeStart = DateTime.MinValue, rangeEnd = DateTime.MinValue;
+
+            using (SqlConnection con = new SqlConnection(conStr))
+            using (SqlCommand cmd = new SqlCommand(
+                @"DECLARE @MaxDate DATE = (SELECT MAX(Attendance_Date) FROM TeamAttendanceSample);
+                  DECLARE @StartDate DATE = DATEADD(DAY, -6, @MaxDate);
+
+                  SELECT
+                      Attendance_Date AS RawDate,
+                      FORMAT(Attendance_Date, 'ddd MMM dd') AS DateLabel,
+                      AVG(DATEDIFF(MINUTE, 0, CAST(Check_In_Date_Time AS TIME))) AS AvgCheckInMin,
+                      AVG(DATEDIFF(MINUTE, 0, CAST(Check_Out_Date_Time AS TIME))) AS AvgCheckOutMin,
+                      ROUND(AVG(CASE WHEN Total_Time_Spend > 0 THEN Total_Time_Spend END), 2) AS AvgHours,
+                      SUM(CASE WHEN Status = 'Not Arrived' THEN 1 ELSE 0 END) AS Absents
+                  FROM TeamAttendanceSample
+                  WHERE Attendance_Date BETWEEN @StartDate AND @MaxDate
+                  GROUP BY Attendance_Date
+                  ORDER BY Attendance_Date ASC", con))
+            {
+                con.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        if (!hasData) rangeStart = Convert.ToDateTime(dr["RawDate"]);
+                        rangeEnd = Convert.ToDateTime(dr["RawDate"]);
+                        hasData = true;
+                        if (labels.Length > 0) { labels.Append(","); checkInMins.Append(","); checkOutMins.Append(","); hours.Append(","); absents.Append(","); }
+
+                        labels.Append("'").Append(dr["DateLabel"].ToString()).Append("'");
+                        checkInMins.Append(dr["AvgCheckInMin"] == DBNull.Value ? "null" : Convert.ToInt32(dr["AvgCheckInMin"]).ToString());
+                        checkOutMins.Append(dr["AvgCheckOutMin"] == DBNull.Value ? "null" : Convert.ToInt32(dr["AvgCheckOutMin"]).ToString());
+                        hours.Append(dr["AvgHours"] == DBNull.Value ? "0" : Convert.ToDecimal(dr["AvgHours"]).ToString("0.00"));
+                        absents.Append(Convert.ToInt32(dr["Absents"]));
+                    }
+                }
+            }
+
+            if (!hasData)
+            {
+                lblNoL7Trend.Visible = true;
+                return;
+            }
+
+            litL7Range.Text = rangeStart.ToString("MMM d") + " &ndash; " + rangeEnd.ToString("MMM d");
+
+            string script = @"
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                function fmtTime(minutes) {
+                    if (minutes === null || minutes === undefined || isNaN(minutes)) return '--:--';
+                    var h = Math.floor(minutes / 60), m = Math.round(minutes % 60);
+                    var ap = h >= 12 ? 'PM' : 'AM';
+                    var h12 = h % 12; if (h12 === 0) h12 = 12;
+                    return h12 + ':' + (m < 10 ? '0' : '') + m + ' ' + ap;
+                }
+
+                var dayLabels = [" + labels + @"];
+
+                // One tiny single-metric trend line per KPI tile - deliberately no axes/legend,
+                // so each tile reads as ""the number, and whether this week trended up or down"".
+                // The y-range is always padded around the data's own min/max (never a fixed 0-based
+                // scale), so a near-flat week still reads as a visible line instead of vanishing flat.
+                function makeSparkline(canvasId, data, formatter, lineColor, fillColor) {
+                    var el = document.getElementById(canvasId);
+                    if (!el) return;
+                    var ctx = el.getContext('2d');
+                    var fillGrad = ctx.createLinearGradient(0, 0, 0, 46);
+                    fillGrad.addColorStop(0, fillColor.replace('ALPHA', '0.35'));
+                    fillGrad.addColorStop(1, fillColor.replace('ALPHA', '0.02'));
+
+                    var validVals = data.filter(function (v) { return v !== null && v !== undefined && !isNaN(v); });
+                    var lastIdx = -1;
+                    for (var i = data.length - 1; i >= 0; i--) {
+                        if (data[i] !== null && data[i] !== undefined && !isNaN(data[i])) { lastIdx = i; break; }
+                    }
+                    var pointRadii = data.map(function (v, i) { return i === lastIdx ? 3.5 : 0; });
+
+                    var min = Math.min.apply(null, validVals);
+                    var max = Math.max.apply(null, validVals);
+                    var range = max - min;
+                    var pad = range === 0 ? (Math.abs(max) * 0.08 || 1) : range * 0.35;
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dayLabels,
+                            datasets: [{
+                                data: data,
+                                borderColor: lineColor,
+                                backgroundColor: fillGrad,
+                                borderWidth: 2.25,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: pointRadii,
+                                pointHoverRadius: 5,
+                                pointBackgroundColor: '#fbbf24',
+                                pointBorderColor: '#fbbf24',
+                                pointBorderWidth: 0,
+                                pointHoverBackgroundColor: '#fbbf24',
+                                pointHoverBorderColor: '#fbbf24',
+                                pointHoverBorderWidth: 0,
+                                spanGaps: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { intersect: false, mode: 'index' },
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: '#1a2332',
+                                    displayColors: false,
+                                    padding: 8,
+                                    cornerRadius: 8,
+                                    titleFont: { size: 11, weight: '700' },
+                                    bodyFont: { size: 11 },
+                                    callbacks: {
+                                        title: function (items) { return items[0].label; },
+                                        label: function (item) { return formatter(item.raw); }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { display: false },
+                                y: { display: false, min: min - pad, max: max + pad }
+                            }
+                        }
+                    });
+                }
+
+                makeSparkline('l7SparkCheckIn', [" + checkInMins + @"], fmtTime, '#4f8cf7', 'rgba(79,140,247,ALPHA)');
+                makeSparkline('l7SparkCheckOut', [" + checkOutMins + @"], fmtTime, '#9b7bff', 'rgba(155,123,255,ALPHA)');
+                makeSparkline('l7SparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#34d399', 'rgba(52,211,153,ALPHA)');
+                makeSparkline('l7SparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#f472b6', 'rgba(244,114,182,ALPHA)');
+            });
+        </script>";
+
+            ltrL7ChartScript.Text = script;
         }
 
 
