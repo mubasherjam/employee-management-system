@@ -13,7 +13,7 @@ public class ShowImage : IHttpHandler
 
         if (context.Request.QueryString["EmpID"] == null)
         {
-            ServeDefaultAvatar(context);
+            ServeDefaultAvatar(context, null);
             return;
         }
 
@@ -35,18 +35,43 @@ public class ShowImage : IHttpHandler
             }
             else
             {
-                ServeDefaultAvatar(context);
+                ServeDefaultAvatar(context, empId);
             }
         }
     }
 
-    // If no photo was uploaded, serve a tiny transparent placeholder instead of breaking the <img> tag
-    private void ServeDefaultAvatar(HttpContext context)
+    // Redirects to a DiceBear-generated cartoon avatar, biased by the employee's gender
+    private void ServeDefaultAvatar(HttpContext context, int? empId)
     {
-        context.Response.ContentType = "image/gif";
-        byte[] transparentGif = Convert.FromBase64String(
-            "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBTAA7");
-        context.Response.BinaryWrite(transparentGif);
+        string gender = "male"; // fallback if unknown
+
+        if (empId.HasValue)
+        {
+            string conStr = ConfigurationManager.ConnectionStrings["myDB1"].ConnectionString;
+            using (SqlConnection con = new SqlConnection(conStr))
+            using (SqlCommand cmd = new SqlCommand("SELECT Gender FROM Employee WHERE EmpID = @EmpID", con))
+            {
+                cmd.Parameters.AddWithValue("@EmpID", empId.Value);
+                con.Open();
+                object result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
+                {
+                    gender = result.ToString().Trim().ToLower();
+                }
+            }
+        }
+
+        string seed = empId.HasValue ? "emp" + empId.Value : "guest";
+
+        string genderParams = gender == "female"
+            ? "top=longHairStraight,longHairCurly,longHairBun,longHairFro&facialHairProbability=0"
+            : "top=shortHairShortFlat,shortHairShortCurly,shortHairShortWaved&facialHairProbability=35";
+
+        string avatarUrl = "https://api.dicebear.com/9.x/avataaars/svg?seed=" +
+            Uri.EscapeDataString(seed) + "&" + genderParams + "&backgroundColor=b6e3f4,c0aede,d1d4f9";
+
+        context.Response.Redirect(avatarUrl, false);
+        context.ApplicationInstance.CompleteRequest();
     }
 
     public bool IsReusable => false;
