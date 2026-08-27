@@ -231,6 +231,15 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Label lblNoTeamAttendance;
 
         /// <summary>
+        /// litL7Range control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litL7Range;
+
+        /// <summary>
         /// litL7AvgCheckIn control.
         /// </summary>
         /// <remarks>
@@ -267,13 +276,49 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Literal litL7TotalAbsents;
 
         /// <summary>
-        /// litL7Range control.
+        /// litL7RangeAlt control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litL7Range;
+        protected global::System.Web.UI.WebControls.Literal litL7RangeAlt;
+
+        /// <summary>
+        /// litL7AvgCheckInAlt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litL7AvgCheckInAlt;
+
+        /// <summary>
+        /// litL7AvgCheckOutAlt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litL7AvgCheckOutAlt;
+
+        /// <summary>
+        /// litL7AvgHoursAlt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litL7AvgHoursAlt;
+
+        /// <summary>
+        /// litL7TotalAbsentsAlt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litL7TotalAbsentsAlt;
 
         /// <summary>
         /// lblNoL7Trend control.
@@ -283,15 +328,6 @@ namespace HRMSApp
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblNoL7Trend;
-
-        /// <summary>
-        /// ltrL7ChartScript control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal ltrL7ChartScript;
 
         /// <summary>
         /// litStatusTotalCount control.
@@ -346,5 +382,14 @@ namespace HRMSApp
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal ltrChartScript;
+
+        /// <summary>
+        /// ltrL7ChartScript control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ltrL7ChartScript;
     }
 }

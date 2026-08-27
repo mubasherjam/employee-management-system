@@ -661,6 +661,11 @@ namespace HRMSApp
                         litL7AvgCheckOut.Text = dr["AvgCheckOut"] == DBNull.Value ? "--:--" : dr["AvgCheckOut"].ToString();
                         litL7AvgHours.Text = dr["AvgHoursSpent"] == DBNull.Value ? "0.0" : Convert.ToDecimal(dr["AvgHoursSpent"]).ToString("0.0");
                         litL7TotalAbsents.Text = dr["TotalAbsents"].ToString();
+
+                        litL7AvgCheckInAlt.Text = litL7AvgCheckIn.Text;
+                        litL7AvgCheckOutAlt.Text = litL7AvgCheckOut.Text;
+                        litL7AvgHoursAlt.Text = litL7AvgHours.Text;
+                        litL7TotalAbsentsAlt.Text = litL7TotalAbsents.Text;
                     }
                 }
             }
@@ -722,6 +727,7 @@ namespace HRMSApp
             }
 
             litL7Range.Text = rangeStart.ToString("MMM d") + " &ndash; " + rangeEnd.ToString("MMM d");
+            litL7RangeAlt.Text = litL7Range.Text;
 
             string script = @"
         <script>
@@ -813,6 +819,80 @@ namespace HRMSApp
                 makeSparkline('l7SparkCheckOut', [" + checkOutMins + @"], fmtTime, '#9b7bff', 'rgba(155,123,255,ALPHA)');
                 makeSparkline('l7SparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#34d399', 'rgba(52,211,153,ALPHA)');
                 makeSparkline('l7SparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#f472b6', 'rgba(244,114,182,ALPHA)');
+
+                // Vertical variant: indexAxis:'y' maps the day category to the y-axis instead of x,
+                // so the line runs top-to-bottom inside a tall, plain card. No area fill (a fill
+                // gradient sized off the canvas's un-laid-out clientWidth degenerated into a solid
+                // block on first paint) and no hover tooltip (its default positioner doesn't account
+                // for the rotated axis and renders off-anchor) - the short weekday ticks on the y-axis
+                // plus the big value above already give this enough context on their own.
+                function makeVerticalSpark(canvasId, data, lineColor) {
+                    var el = document.getElementById(canvasId);
+                    if (!el) return;
+                    var ctx = el.getContext('2d');
+
+                    var validVals = data.filter(function (v) { return v !== null && v !== undefined && !isNaN(v); });
+                    var lastIdx = -1;
+                    for (var i = data.length - 1; i >= 0; i--) {
+                        if (data[i] !== null && data[i] !== undefined && !isNaN(data[i])) { lastIdx = i; break; }
+                    }
+                    var pointRadii = data.map(function (v, i) { return i === lastIdx ? 4 : 0; });
+
+                    var min = Math.min.apply(null, validVals);
+                    var max = Math.max.apply(null, validVals);
+                    var range = max - min;
+                    var pad = range === 0 ? (Math.abs(max) * 0.08 || 1) : range * 0.3;
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dayLabels,
+                            datasets: [{
+                                data: data,
+                                borderColor: lineColor,
+                                borderWidth: 2.5,
+                                fill: false,
+                                tension: 0.35,
+                                pointRadius: pointRadii,
+                                pointBackgroundColor: lineColor,
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 1.5,
+                                spanGaps: true
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: { enabled: false }
+                            },
+                            scales: {
+                                x: { display: false, min: min - pad, max: max + pad },
+                                y: {
+                                    display: true,
+                                    grid: { display: false },
+                                    border: { display: false },
+                                    ticks: {
+                                        color: '#adb5bd',
+                                        font: { size: 9, weight: '600' },
+                                        padding: 6,
+                                        callback: function (value) {
+                                            var lbl = dayLabels[value];
+                                            return lbl ? lbl.substring(0, 3) : '';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                makeVerticalSpark('l7vSparkCheckIn', [" + checkInMins + @"], '#4f8cf7');
+                makeVerticalSpark('l7vSparkCheckOut', [" + checkOutMins + @"], '#9b7bff');
+                makeVerticalSpark('l7vSparkHours', [" + hours + @"], '#34d399');
+                makeVerticalSpark('l7vSparkAbsent', [" + absents + @"], '#f472b6');
             });
         </script>";
 
