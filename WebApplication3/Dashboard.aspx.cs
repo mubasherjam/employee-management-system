@@ -751,7 +751,7 @@ namespace HRMSApp
                 // scale), so a near-flat week still reads as a visible line instead of vanishing flat.
                 function makeSparkline(canvasId, data, formatter, lineColor, fillColor, tooltipEnabled) {
                     var el = document.getElementById(canvasId);
-                    if (!el) return;
+                    if (!el) return null;
                     var ctx = el.getContext('2d');
                     var fillGrad = ctx.createLinearGradient(0, 0, 0, 46);
                     fillGrad.addColorStop(0, fillColor.replace('ALPHA', '0.35'));
@@ -769,7 +769,7 @@ namespace HRMSApp
                     var range = max - min;
                     var pad = range === 0 ? (Math.abs(max) * 0.08 || 1) : range * 0.35;
 
-                    new Chart(ctx, {
+                    return new Chart(ctx, {
                         type: 'line',
                         data: {
                             labels: dayLabels,
@@ -818,15 +818,26 @@ namespace HRMSApp
                     });
                 }
 
-                makeSparkline('l7SparkCheckIn', [" + checkInMins + @"], fmtTime, '#4f8cf7', 'rgba(79,140,247,ALPHA)');
-                makeSparkline('l7SparkCheckOut', [" + checkOutMins + @"], fmtTime, '#9b7bff', 'rgba(155,123,255,ALPHA)');
-                makeSparkline('l7SparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#34d399', 'rgba(52,211,153,ALPHA)');
-                makeSparkline('l7SparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#f472b6', 'rgba(244,114,182,ALPHA)');
+                var l7SparkCharts = [
+                    makeSparkline('l7SparkCheckIn', [" + checkInMins + @"], fmtTime, '#4f8cf7', 'rgba(79,140,247,ALPHA)'),
+                    makeSparkline('l7SparkCheckOut', [" + checkOutMins + @"], fmtTime, '#9b7bff', 'rgba(155,123,255,ALPHA)'),
+                    makeSparkline('l7SparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#34d399', 'rgba(52,211,153,ALPHA)'),
+                    makeSparkline('l7SparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#f472b6', 'rgba(244,114,182,ALPHA)'),
+                    makeSparkline('l7vSparkCheckIn', [" + checkInMins + @"], fmtTime, '#4f8cf7', 'rgba(79,140,247,ALPHA)', false),
+                    makeSparkline('l7vSparkCheckOut', [" + checkOutMins + @"], fmtTime, '#9b7bff', 'rgba(155,123,255,ALPHA)', false),
+                    makeSparkline('l7vSparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#34d399', 'rgba(52,211,153,ALPHA)', false),
+                    makeSparkline('l7vSparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#f472b6', 'rgba(244,114,182,ALPHA)', false)
+                ];
 
-                makeSparkline('l7vSparkCheckIn', [" + checkInMins + @"], fmtTime, '#4f8cf7', 'rgba(79,140,247,ALPHA)', false);
-                makeSparkline('l7vSparkCheckOut', [" + checkOutMins + @"], fmtTime, '#9b7bff', 'rgba(155,123,255,ALPHA)', false);
-                makeSparkline('l7vSparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#34d399', 'rgba(52,211,153,ALPHA)', false);
-                makeSparkline('l7vSparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#f472b6', 'rgba(244,114,182,ALPHA)', false);
+                // The panel's own entrance animation and grid layout can settle a moment after
+                // Chart.js takes its first size reading, which is what left some sparklines
+                // measuring the wrong column width. Re-measuring once things are fully laid out
+                // fixes that without guessing at a fixed delay that could still race the animation.
+                window.addEventListener('load', function () {
+                    setTimeout(function () {
+                        l7SparkCharts.forEach(function (c) { if (c) c.resize(); });
+                    }, 700);
+                });
             });
         </script>";
 

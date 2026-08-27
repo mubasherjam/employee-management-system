@@ -582,7 +582,7 @@
         .l7u-panel {
             position: relative;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             gap: 1px;
             border-radius: 16px;
             overflow: hidden;
@@ -602,6 +602,7 @@
 
         .l7u-item {
             position: relative;
+            min-width: 0;
             background: #fff;
             padding: 18px 18px 14px;
             opacity: 0;
@@ -649,8 +650,14 @@
 
         .l7u-spark {
             position: relative;
+            width: 100%;
             height: 48px;
-            margin: 4px -4px 0;
+            margin: 4px 0 0;
+        }
+        .l7u-spark canvas {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
         }
 
         /* ---- Compensation History Card (TGC Range trend) ---- */
