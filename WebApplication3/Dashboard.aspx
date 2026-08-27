@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
 
     <style>
@@ -574,79 +575,104 @@
             margin: 6px -4px 0;
         }
 
-        /* ---- Last 7 Days Overview: vertical-trend variant ----
-           Plain white cards (shadow only, no color fill) each holding a top-to-bottom
-           line chart, so this can be compared side-by-side with the tile design above.
-           2x2 layout gives each card enough width for its value text and axis labels
-           to breathe - a cramped 4-across row was the main problem with the first pass. */
-        .l7v-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: repeat(2, minmax(190px, 1fr));
-            gap: 14px;
-        }
-        .l7v-card {
-            background: #fff;
-            border-radius: 14px;
-            padding: 16px 16px 12px;
-            border: 1px solid #eef0f4;
-            border-top: 3px solid transparent;
-            box-shadow: 0 4px 14px rgba(20,30,60,0.06);
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
+        /* ---- Compensation History Card (TGC Range trend) ---- */
+        .tgc-card {
+            position: relative;
+            overflow: hidden;
             opacity: 0;
             transform: translateY(10px);
-            animation: l7RiseIn 0.45s ease forwards;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            animation: l7RiseIn 0.5s ease forwards;
+            transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
         }
-        .l7v-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 22px rgba(20,30,60,0.12);
+        .tgc-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 36px rgba(20,30,60,0.16) !important;
         }
-        .l7v-card.accent-checkin  { border-top-color: #4f8cf7; }
-        .l7v-card.accent-checkout { border-top-color: #9b7bff; }
-        .l7v-card.accent-hours    { border-top-color: #34d399; }
-        .l7v-card.accent-absent   { border-top-color: #f472b6; }
+        .tgc-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, #4f8cf7, #7c5cff, #34d399, #4f8cf7);
+            background-size: 300% 100%;
+            animation: tgcGradientShift 6s ease infinite;
+            z-index: 3;
+        }
+        @keyframes tgcGradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-        .l7v-card-head {
+        .tgc-toolbar {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
         }
-        .l7v-icon-badge {
-            width: 34px; height: 34px;
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.85rem;
-            color: #fff;
-            flex-shrink: 0;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.18);
-        }
-        .l7v-badge-checkin  { background: linear-gradient(135deg, #4f8cf7, #2955c9); }
-        .l7v-badge-checkout { background: linear-gradient(135deg, #9b7bff, #6a4ce0); }
-        .l7v-badge-hours    { background: linear-gradient(135deg, #34d399, #16a34a); }
-        .l7v-badge-absent   { background: linear-gradient(135deg, #f472b6, #d63384); }
 
-        .l7v-card-head-text { min-width: 0; }
-        .l7v-value {
-            font-size: 1.15rem; font-weight: 800; color: #1a2332;
-            line-height: 1.2;
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        .tgc-growth-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #e7f9ef, #dcf5e8);
+            color: #16a34a;
+            border: 1px solid #cdeedd;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: default;
         }
-        .l7v-label {
-            font-size: 0.64rem; color: #8892a0; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.04em;
-            margin-top: 2px;
+        .tgc-growth-chip:hover {
+            transform: scale(1.06);
+            box-shadow: 0 6px 14px rgba(22,163,74,0.18);
         }
-        .l7v-chart-wrap {
+        .tgc-growth-chip.negative {
+            background: linear-gradient(135deg, #fdecec, #fbe0e0);
+            color: #dc2626;
+            border-color: #f7d3d3;
+        }
+        .tgc-growth-chip.negative:hover {
+            box-shadow: 0 6px 14px rgba(220,38,38,0.18);
+        }
+        .tgc-growth-chip i {
+            font-size: 0.82rem;
+            transition: transform 0.2s ease;
+        }
+        .tgc-growth-chip:hover i {
+            transform: translateY(-2px);
+        }
+
+        .tgc-chart-wrap {
             position: relative;
-            width: 100%;
-            flex: 1;
-            min-height: 0;
+            height: 260px;
         }
 
+        .tgc-current-row {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px dashed #e9edf3;
+        }
+        .tgc-current-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1a2332;
+            letter-spacing: -0.01em;
+            transition: color 0.2s ease;
+        }
+        .tgc-current-label {
+            font-size: 0.72rem;
+            color: #8892a0;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
 
         /* ---- Status Breakdown Card (candle bar with hover tooltip) ---- */
         .status-count-hero {
@@ -1104,48 +1130,82 @@
                                 <i class="bi bi-clock-history"></i>
                                 <asp:Literal ID="litL7RangeAlt" runat="server" Text="Rolling 7-Day Window" />
                             </span>
-                            <div class="l7v-grid">
-                                <div class="l7v-card accent-checkin" style="animation-delay:0.05s;">
-                                    <div class="l7v-card-head">
-                                        <span class="l7v-icon-badge l7v-badge-checkin"><i class="bi bi-box-arrow-in-right"></i></span>
-                                        <div class="l7v-card-head-text">
-                                            <div class="l7v-value"><asp:Literal ID="litL7AvgCheckInAlt" runat="server" Text="--:--" /></div>
-                                            <div class="l7v-label">Avg Check-In</div>
+                            <div class="l7-grid">
+                                <div class="l7-tile tile-checkin" style="animation-delay:0.05s;">
+                                    <div class="l7-tile-top">
+                                        <span class="l7-icon-badge"><i class="bi bi-box-arrow-in-right"></i></span>
+                                        <div>
+                                            <div class="l7-value"><asp:Literal ID="litL7AvgCheckInAlt" runat="server" Text="--:--" /></div>
+                                            <div class="l7-label">Avg Check-In</div>
                                         </div>
                                     </div>
-                                    <div class="l7v-chart-wrap"><canvas id="l7vSparkCheckIn"></canvas></div>
+                                    <div class="l7-spark-wrap"><canvas id="l7vSparkCheckIn"></canvas></div>
                                 </div>
-                                <div class="l7v-card accent-checkout" style="animation-delay:0.1s;">
-                                    <div class="l7v-card-head">
-                                        <span class="l7v-icon-badge l7v-badge-checkout"><i class="bi bi-box-arrow-right"></i></span>
-                                        <div class="l7v-card-head-text">
-                                            <div class="l7v-value"><asp:Literal ID="litL7AvgCheckOutAlt" runat="server" Text="--:--" /></div>
-                                            <div class="l7v-label">Avg Check-Out</div>
+                                <div class="l7-tile tile-checkout" style="animation-delay:0.1s;">
+                                    <div class="l7-tile-top">
+                                        <span class="l7-icon-badge"><i class="bi bi-box-arrow-right"></i></span>
+                                        <div>
+                                            <div class="l7-value"><asp:Literal ID="litL7AvgCheckOutAlt" runat="server" Text="--:--" /></div>
+                                            <div class="l7-label">Avg Check-Out</div>
                                         </div>
                                     </div>
-                                    <div class="l7v-chart-wrap"><canvas id="l7vSparkCheckOut"></canvas></div>
+                                    <div class="l7-spark-wrap"><canvas id="l7vSparkCheckOut"></canvas></div>
                                 </div>
-                                <div class="l7v-card accent-hours" style="animation-delay:0.15s;">
-                                    <div class="l7v-card-head">
-                                        <span class="l7v-icon-badge l7v-badge-hours"><i class="bi bi-hourglass-split"></i></span>
-                                        <div class="l7v-card-head-text">
-                                            <div class="l7v-value"><asp:Literal ID="litL7AvgHoursAlt" runat="server" Text="0.0" /> hrs</div>
-                                            <div class="l7v-label">Avg Time Spent</div>
+                                <div class="l7-tile tile-hours" style="animation-delay:0.15s;">
+                                    <div class="l7-tile-top">
+                                        <span class="l7-icon-badge"><i class="bi bi-hourglass-split"></i></span>
+                                        <div>
+                                            <div class="l7-value"><asp:Literal ID="litL7AvgHoursAlt" runat="server" Text="0.0" /> hrs</div>
+                                            <div class="l7-label">Avg Time Spent</div>
                                         </div>
                                     </div>
-                                    <div class="l7v-chart-wrap"><canvas id="l7vSparkHours"></canvas></div>
+                                    <div class="l7-spark-wrap"><canvas id="l7vSparkHours"></canvas></div>
                                 </div>
-                                <div class="l7v-card accent-absent" style="animation-delay:0.2s;">
-                                    <div class="l7v-card-head">
-                                        <span class="l7v-icon-badge l7v-badge-absent"><i class="bi bi-person-x-fill"></i></span>
-                                        <div class="l7v-card-head-text">
-                                            <div class="l7v-value"><asp:Literal ID="litL7TotalAbsentsAlt" runat="server" Text="0" /></div>
-                                            <div class="l7v-label">Total Absents</div>
+                                <div class="l7-tile tile-absent" style="animation-delay:0.2s;">
+                                    <div class="l7-tile-top">
+                                        <span class="l7-icon-badge"><i class="bi bi-person-x-fill"></i></span>
+                                        <div>
+                                            <div class="l7-value"><asp:Literal ID="litL7TotalAbsentsAlt" runat="server" Text="0" /></div>
+                                            <div class="l7-label">Total Absents</div>
                                         </div>
                                     </div>
-                                    <div class="l7v-chart-wrap"><canvas id="l7vSparkAbsent"></canvas></div>
+                                    <div class="l7-spark-wrap"><canvas id="l7vSparkAbsent"></canvas></div>
                                 </div>
                             </div>
+                            <asp:Label ID="lblNoL7TrendAlt" runat="server" CssClass="empty-state" Text="No attendance trend data yet." Visible="false" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================= -->
+            <!-- COMPENSATION HISTORY - TGC RANGE TREND -->
+            <!-- ============================= -->
+            <div class="row g-3 mt-4">
+                <div class="col-lg-6">
+                    <div class="card shadow h-100 l7-compact tgc-card">
+                        <div class="card-header-custom">
+                            <span style="font-weight:700;"><i class="bi bi-graph-up me-2"></i>Compensation History &ndash; TGC Range</span>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="tgc-toolbar">
+                                <span class="l7-period-badge">
+                                    <i class="bi bi-clock-history"></i>
+                                    <asp:Literal ID="litTgcRange" runat="server" Text="Since Joining" />
+                                </span>
+                                <span class="tgc-growth-chip" id="tgcGrowthChip">
+                                    <i class="bi bi-arrow-up-right" id="tgcGrowthIcon"></i>
+                                    <span id="tgcGrowthText">--</span>
+                                </span>
+                            </div>
+                            <div class="tgc-chart-wrap">
+                                <canvas id="tgcRangeChart"></canvas>
+                            </div>
+                            <div class="tgc-current-row">
+                                <span class="tgc-current-value" id="tgcCurrentValue">--</span>
+                                <span class="tgc-current-label">Current TGC</span>
+                            </div>
+                            <asp:Label ID="lblNoEventHistory" runat="server" CssClass="empty-state" Text="No compensation history yet." Visible="false" />
                         </div>
                     </div>
                 </div>
@@ -1158,6 +1218,7 @@
         <asp:Literal ID="ltrAttendanceChartScript" runat="server" />
         <asp:Literal ID="ltrChartScript" runat="server" />
         <asp:Literal ID="ltrL7ChartScript" runat="server" />
+        <asp:Literal ID="ltrEventHistoryChartScript" runat="server" />
 
 
         <!-- javascript function -->

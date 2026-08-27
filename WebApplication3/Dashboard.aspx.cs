@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 
 
 namespace HRMSApp
@@ -30,6 +31,7 @@ namespace HRMSApp
                 BindTeamAttendance();
                 BindLast7DaysSummary();
                 BindStatusBreakdown();
+                BindEventHistoryChart();
             }
         }
 
@@ -723,6 +725,7 @@ namespace HRMSApp
             if (!hasData)
             {
                 lblNoL7Trend.Visible = true;
+                lblNoL7TrendAlt.Visible = true;
                 return;
             }
 
@@ -820,83 +823,180 @@ namespace HRMSApp
                 makeSparkline('l7SparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#34d399', 'rgba(52,211,153,ALPHA)');
                 makeSparkline('l7SparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#f472b6', 'rgba(244,114,182,ALPHA)');
 
-                // Vertical variant: indexAxis:'y' maps the day category to the y-axis instead of x,
-                // so the line runs top-to-bottom inside a tall, plain card. No area fill (a fill
-                // gradient sized off the canvas's un-laid-out clientWidth degenerated into a solid
-                // block on first paint) and no hover tooltip (its default positioner doesn't account
-                // for the rotated axis and renders off-anchor) - the short weekday ticks on the y-axis
-                // plus the big value above already give this enough context on their own.
-                function makeVerticalSpark(canvasId, data, lineColor) {
-                    var el = document.getElementById(canvasId);
-                    if (!el) return;
-                    var ctx = el.getContext('2d');
-
-                    var validVals = data.filter(function (v) { return v !== null && v !== undefined && !isNaN(v); });
-                    var lastIdx = -1;
-                    for (var i = data.length - 1; i >= 0; i--) {
-                        if (data[i] !== null && data[i] !== undefined && !isNaN(data[i])) { lastIdx = i; break; }
-                    }
-                    var pointRadii = data.map(function (v, i) { return i === lastIdx ? 4 : 0; });
-
-                    var min = Math.min.apply(null, validVals);
-                    var max = Math.max.apply(null, validVals);
-                    var range = max - min;
-                    var pad = range === 0 ? (Math.abs(max) * 0.08 || 1) : range * 0.3;
-
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: dayLabels,
-                            datasets: [{
-                                data: data,
-                                borderColor: lineColor,
-                                borderWidth: 2.5,
-                                fill: false,
-                                tension: 0.35,
-                                pointRadius: pointRadii,
-                                pointBackgroundColor: lineColor,
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 1.5,
-                                spanGaps: true
-                            }]
-                        },
-                        options: {
-                            indexAxis: 'y',
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: false },
-                                tooltip: { enabled: false }
-                            },
-                            scales: {
-                                x: { display: false, min: min - pad, max: max + pad },
-                                y: {
-                                    display: true,
-                                    grid: { display: false },
-                                    border: { display: false },
-                                    ticks: {
-                                        color: '#adb5bd',
-                                        font: { size: 9, weight: '600' },
-                                        padding: 6,
-                                        callback: function (value) {
-                                            var lbl = dayLabels[value];
-                                            return lbl ? lbl.substring(0, 3) : '';
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                }
-
-                makeVerticalSpark('l7vSparkCheckIn', [" + checkInMins + @"], '#4f8cf7');
-                makeVerticalSpark('l7vSparkCheckOut', [" + checkOutMins + @"], '#9b7bff');
-                makeVerticalSpark('l7vSparkHours', [" + hours + @"], '#34d399');
-                makeVerticalSpark('l7vSparkAbsent', [" + absents + @"], '#f472b6');
+                makeSparkline('l7vSparkCheckIn', [" + checkInMins + @"], fmtTime, '#4f8cf7', 'rgba(79,140,247,ALPHA)');
+                makeSparkline('l7vSparkCheckOut', [" + checkOutMins + @"], fmtTime, '#9b7bff', 'rgba(155,123,255,ALPHA)');
+                makeSparkline('l7vSparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#34d399', 'rgba(52,211,153,ALPHA)');
+                makeSparkline('l7vSparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#f472b6', 'rgba(244,114,182,ALPHA)');
             });
         </script>";
 
             ltrL7ChartScript.Text = script;
+        }
+
+        // compensation history trend: TGC range per event date, for the logged-in employee
+        private void BindEventHistoryChart()
+        {
+            // Shows this specific employee's compensation history to any logged-in user, regardless of role
+            int empId = 16; // <-- set this to whichever EmpID has data in EmployeeEventHistory
+
+            var byDate = new SortedDictionary<DateTime, decimal>();
+
+            using (SqlConnection con = new SqlConnection(conStr))
+            using (SqlCommand cmd = new SqlCommand("sp_EmployeeEventHistory_GetByEmpID", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@EmpID", empId);
+                con.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        DateTime eventDate = Convert.ToDateTime(dr["EventDate"]);
+                        decimal amount = dr["EntitlementAmount"] == DBNull.Value ? 0 : Convert.ToDecimal(dr["EntitlementAmount"]);
+                        byDate[eventDate] = amount;
+                    }
+                }
+            }
+
+            if (byDate.Count == 0)
+            {
+                lblNoEventHistory.Visible = true;
+                return;
+            }
+
+            litTgcRange.Text = byDate.Keys.First().ToString("MMM yyyy", CultureInfo.InvariantCulture)
+                + " – " + byDate.Keys.Last().ToString("MMM yyyy", CultureInfo.InvariantCulture);
+
+            StringBuilder labels = new StringBuilder();
+            StringBuilder values = new StringBuilder();
+            foreach (var kv in byDate)
+            {
+                if (labels.Length > 0) { labels.Append(","); values.Append(","); }
+                labels.Append("'").Append(kv.Key.ToString("MMM yy", CultureInfo.InvariantCulture)).Append("'");
+                values.Append(kv.Value.ToString("0.###", CultureInfo.InvariantCulture));
+            }
+
+            string script = @"
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var canvas = document.getElementById('tgcRangeChart');
+                var ctx = canvas.getContext('2d');
+
+                var labels = [" + labels + @"];
+                var values = [" + values + @"];
+                var lastIdx = values.length - 1;
+
+                // Cool-to-violet stroke gradient and a soft fade-to-transparent fill, so the
+                // line reads as a single accent rather than a flat, single-color chart.
+                var lineGrad = ctx.createLinearGradient(0, 0, canvas.clientWidth || 400, 0);
+                lineGrad.addColorStop(0, '#4f8cf7');
+                lineGrad.addColorStop(1, '#7c5cff');
+
+                var fillGrad = ctx.createLinearGradient(0, 0, 0, 260);
+                fillGrad.addColorStop(0, 'rgba(79,140,247,0.28)');
+                fillGrad.addColorStop(1, 'rgba(79,140,247,0.02)');
+
+                var pointColors = values.map(function (v, i) { return i === lastIdx ? '#f59e0b' : '#4f8cf7'; });
+                var pointRadii = values.map(function (v, i) { return i === lastIdx ? 6 : 4; });
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'TGC Range',
+                            data: values,
+                            borderColor: lineGrad,
+                            backgroundColor: fillGrad,
+                            borderWidth: 3,
+                            pointStyle: 'circle',
+                            pointRadius: pointRadii,
+                            pointHoverRadius: 8,
+                            pointBackgroundColor: pointColors,
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointHoverBorderWidth: 3,
+                            fill: true,
+                            tension: 0.38
+                        }]
+                    },
+                    plugins: [ChartDataLabels],
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        animation: { duration: 1400, easing: 'easeOutQuart' },
+                        layout: { padding: { top: 30, right: 12 } },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#1a2332',
+                                displayColors: false,
+                                padding: 10,
+                                cornerRadius: 10,
+                                titleFont: { size: 12, weight: '700' },
+                                bodyFont: { size: 12 },
+                                callbacks: {
+                                    title: function (items) { return items[0].label; },
+                                    label: function (item) {
+                                        var v = item.raw;
+                                        var txt = 'Rs. ' + Number(v).toLocaleString('en-US');
+                                        var idx = item.dataIndex;
+                                        if (idx > 0 && values[idx - 1]) {
+                                            var delta = (v - values[idx - 1]) / values[idx - 1] * 100;
+                                            txt += ' (' + (delta >= 0 ? '+' : '') + delta.toFixed(1) + '%)';
+                                        }
+                                        return txt;
+                                    }
+                                }
+                            },
+                            datalabels: {
+                                align: 'top',
+                                anchor: 'end',
+                                offset: 8,
+                                color: '#fff',
+                                backgroundColor: function (ctx) { return ctx.dataIndex === lastIdx ? '#f59e0b' : '#334463'; },
+                                borderRadius: 6,
+                                padding: { top: 4, bottom: 4, left: 7, right: 7 },
+                                font: { size: 10.5, weight: '700' },
+                                formatter: function (value) { return Number(value).toLocaleString('en-US'); }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#8892a0', font: { size: 11, weight: '600' } }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#eef0f4' },
+                                border: { display: false },
+                                ticks: {
+                                    color: '#8892a0',
+                                    font: { size: 10.5 },
+                                    callback: function (value) { return Number(value).toLocaleString('en-US'); }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Growth chip + current-value strip, derived from the same dataset the chart draws.
+                var first = values[0], last = values[lastIdx];
+                var growthPct = first ? ((last - first) / first * 100) : 0;
+                var chip = document.getElementById('tgcGrowthChip');
+                var icon = document.getElementById('tgcGrowthIcon');
+
+                if (growthPct < 0) {
+                    chip.classList.add('negative');
+                    icon.className = 'bi bi-arrow-down-right';
+                }
+                document.getElementById('tgcGrowthText').textContent = (growthPct >= 0 ? '+' : '') + growthPct.toFixed(1) + '%';
+                document.getElementById('tgcCurrentValue').textContent = 'Rs. ' + Number(last).toLocaleString('en-US');
+            });
+        </script>";
+
+            ltrEventHistoryChartScript.Text = script;
         }
 
 

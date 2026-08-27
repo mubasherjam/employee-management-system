@@ -276,6 +276,33 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Literal litL7TotalAbsents;
 
         /// <summary>
+        /// lblNoL7Trend control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblNoL7Trend;
+
+        /// <summary>
+        /// litStatusTotalCount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litStatusTotalCount;
+
+        /// <summary>
+        /// lblNoStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblNoStatus;
+
+        /// <summary>
         /// litL7RangeAlt control.
         /// </summary>
         /// <remarks>
@@ -321,31 +348,31 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Literal litL7TotalAbsentsAlt;
 
         /// <summary>
-        /// lblNoL7Trend control.
+        /// lblNoL7TrendAlt control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblNoL7Trend;
+        protected global::System.Web.UI.WebControls.Label lblNoL7TrendAlt;
 
         /// <summary>
-        /// litStatusTotalCount control.
+        /// litTgcRange control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litStatusTotalCount;
+        protected global::System.Web.UI.WebControls.Literal litTgcRange;
 
         /// <summary>
-        /// lblNoStatus control.
+        /// lblNoEventHistory control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblNoStatus;
+        protected global::System.Web.UI.WebControls.Label lblNoEventHistory;
 
         /// <summary>
         /// ltrTeamAttendanceScript control.
@@ -391,5 +418,14 @@ namespace HRMSApp
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal ltrL7ChartScript;
+
+        /// <summary>
+        /// ltrEventHistoryChartScript control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal ltrEventHistoryChartScript;
     }
 }
