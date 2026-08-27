@@ -13,7 +13,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
 
     <style>
@@ -575,6 +574,85 @@
             margin: 6px -4px 0;
         }
 
+        /* ---- Last 7 Days Overview - Vertical Trend: single unified panel ----
+           Same four metrics as the tile version above, but presented as one light,
+           airy panel divided by hairline gaps instead of four separate boxed cards.
+           The grid's own `gap` (filled by the panel's background color) draws the
+           dividers, so there's no per-cell border math to keep in sync. */
+        .l7u-panel {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #e8ecf3;
+            border: 1px solid #e8ecf3;
+            box-shadow: 0 6px 20px rgba(20,30,60,0.06);
+        }
+        .l7u-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #4f8cf7, #9b7bff, #34d399, #f472b6, #4f8cf7);
+            background-size: 300% 100%;
+            animation: tgcGradientShift 7s ease infinite;
+            z-index: 2;
+        }
+
+        .l7u-item {
+            position: relative;
+            background: #fff;
+            padding: 18px 18px 14px;
+            opacity: 0;
+            transform: translateY(8px);
+            animation: l7RiseIn 0.5s ease forwards;
+            transition: background 0.2s ease;
+        }
+        .l7u-item:hover { background: #fafbfe; }
+
+        .l7u-item-head {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 10px;
+        }
+        .l7u-icon {
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(20,30,60,0.18);
+            transition: transform 0.2s ease;
+        }
+        .l7u-item:hover .l7u-icon { transform: scale(1.08); }
+        .l7u-item[data-accent="checkin"]  .l7u-icon { background: linear-gradient(135deg, #4f8cf7, #2955c9); }
+        .l7u-item[data-accent="checkout"] .l7u-icon { background: linear-gradient(135deg, #9b7bff, #6a4ce0); }
+        .l7u-item[data-accent="hours"]    .l7u-icon { background: linear-gradient(135deg, #34d399, #16a34a); }
+        .l7u-item[data-accent="absent"]   .l7u-icon { background: linear-gradient(135deg, #f472b6, #d63384); }
+
+        .l7u-value {
+            font-size: 1.25rem; font-weight: 800;
+            color: #1a2332;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+        }
+        .l7u-label {
+            font-size: 0.63rem;
+            color: #8892a0;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 2px;
+        }
+
+        .l7u-spark {
+            position: relative;
+            height: 48px;
+            margin: 4px -4px 0;
+        }
+
         /* ---- Compensation History Card (TGC Range trend) ---- */
         .tgc-card {
             position: relative;
@@ -1130,46 +1208,46 @@
                                 <i class="bi bi-clock-history"></i>
                                 <asp:Literal ID="litL7RangeAlt" runat="server" Text="Rolling 7-Day Window" />
                             </span>
-                            <div class="l7-grid">
-                                <div class="l7-tile tile-checkin" style="animation-delay:0.05s;">
-                                    <div class="l7-tile-top">
-                                        <span class="l7-icon-badge"><i class="bi bi-box-arrow-in-right"></i></span>
+                            <div class="l7u-panel">
+                                <div class="l7u-item" data-accent="checkin" style="animation-delay:0.05s;">
+                                    <div class="l7u-item-head">
+                                        <span class="l7u-icon"><i class="bi bi-box-arrow-in-right"></i></span>
                                         <div>
-                                            <div class="l7-value"><asp:Literal ID="litL7AvgCheckInAlt" runat="server" Text="--:--" /></div>
-                                            <div class="l7-label">Avg Check-In</div>
+                                            <div class="l7u-value"><asp:Literal ID="litL7AvgCheckInAlt" runat="server" Text="--:--" /></div>
+                                            <div class="l7u-label">Avg Check-In</div>
                                         </div>
                                     </div>
-                                    <div class="l7-spark-wrap"><canvas id="l7vSparkCheckIn"></canvas></div>
+                                    <div class="l7u-spark"><canvas id="l7vSparkCheckIn"></canvas></div>
                                 </div>
-                                <div class="l7-tile tile-checkout" style="animation-delay:0.1s;">
-                                    <div class="l7-tile-top">
-                                        <span class="l7-icon-badge"><i class="bi bi-box-arrow-right"></i></span>
+                                <div class="l7u-item" data-accent="checkout" style="animation-delay:0.1s;">
+                                    <div class="l7u-item-head">
+                                        <span class="l7u-icon"><i class="bi bi-box-arrow-right"></i></span>
                                         <div>
-                                            <div class="l7-value"><asp:Literal ID="litL7AvgCheckOutAlt" runat="server" Text="--:--" /></div>
-                                            <div class="l7-label">Avg Check-Out</div>
+                                            <div class="l7u-value"><asp:Literal ID="litL7AvgCheckOutAlt" runat="server" Text="--:--" /></div>
+                                            <div class="l7u-label">Avg Check-Out</div>
                                         </div>
                                     </div>
-                                    <div class="l7-spark-wrap"><canvas id="l7vSparkCheckOut"></canvas></div>
+                                    <div class="l7u-spark"><canvas id="l7vSparkCheckOut"></canvas></div>
                                 </div>
-                                <div class="l7-tile tile-hours" style="animation-delay:0.15s;">
-                                    <div class="l7-tile-top">
-                                        <span class="l7-icon-badge"><i class="bi bi-hourglass-split"></i></span>
+                                <div class="l7u-item" data-accent="hours" style="animation-delay:0.15s;">
+                                    <div class="l7u-item-head">
+                                        <span class="l7u-icon"><i class="bi bi-hourglass-split"></i></span>
                                         <div>
-                                            <div class="l7-value"><asp:Literal ID="litL7AvgHoursAlt" runat="server" Text="0.0" /> hrs</div>
-                                            <div class="l7-label">Avg Time Spent</div>
+                                            <div class="l7u-value"><asp:Literal ID="litL7AvgHoursAlt" runat="server" Text="0.0" /> hrs</div>
+                                            <div class="l7u-label">Avg Time Spent</div>
                                         </div>
                                     </div>
-                                    <div class="l7-spark-wrap"><canvas id="l7vSparkHours"></canvas></div>
+                                    <div class="l7u-spark"><canvas id="l7vSparkHours"></canvas></div>
                                 </div>
-                                <div class="l7-tile tile-absent" style="animation-delay:0.2s;">
-                                    <div class="l7-tile-top">
-                                        <span class="l7-icon-badge"><i class="bi bi-person-x-fill"></i></span>
+                                <div class="l7u-item" data-accent="absent" style="animation-delay:0.2s;">
+                                    <div class="l7u-item-head">
+                                        <span class="l7u-icon"><i class="bi bi-person-x-fill"></i></span>
                                         <div>
-                                            <div class="l7-value"><asp:Literal ID="litL7TotalAbsentsAlt" runat="server" Text="0" /></div>
-                                            <div class="l7-label">Total Absents</div>
+                                            <div class="l7u-value"><asp:Literal ID="litL7TotalAbsentsAlt" runat="server" Text="0" /></div>
+                                            <div class="l7u-label">Total Absents</div>
                                         </div>
                                     </div>
-                                    <div class="l7-spark-wrap"><canvas id="l7vSparkAbsent"></canvas></div>
+                                    <div class="l7u-spark"><canvas id="l7vSparkAbsent"></canvas></div>
                                 </div>
                             </div>
                             <asp:Label ID="lblNoL7TrendAlt" runat="server" CssClass="empty-state" Text="No attendance trend data yet." Visible="false" />

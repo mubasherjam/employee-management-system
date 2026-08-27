@@ -749,7 +749,7 @@ namespace HRMSApp
                 // so each tile reads as ""the number, and whether this week trended up or down"".
                 // The y-range is always padded around the data's own min/max (never a fixed 0-based
                 // scale), so a near-flat week still reads as a visible line instead of vanishing flat.
-                function makeSparkline(canvasId, data, formatter, lineColor, fillColor) {
+                function makeSparkline(canvasId, data, formatter, lineColor, fillColor, tooltipEnabled) {
                     var el = document.getElementById(canvasId);
                     if (!el) return;
                     var ctx = el.getContext('2d');
@@ -797,7 +797,7 @@ namespace HRMSApp
                             interaction: { intersect: false, mode: 'index' },
                             plugins: {
                                 legend: { display: false },
-                                tooltip: {
+                                tooltip: tooltipEnabled === false ? { enabled: false } : {
                                     backgroundColor: '#1a2332',
                                     displayColors: false,
                                     padding: 8,
@@ -823,10 +823,10 @@ namespace HRMSApp
                 makeSparkline('l7SparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#34d399', 'rgba(52,211,153,ALPHA)');
                 makeSparkline('l7SparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#f472b6', 'rgba(244,114,182,ALPHA)');
 
-                makeSparkline('l7vSparkCheckIn', [" + checkInMins + @"], fmtTime, '#4f8cf7', 'rgba(79,140,247,ALPHA)');
-                makeSparkline('l7vSparkCheckOut', [" + checkOutMins + @"], fmtTime, '#9b7bff', 'rgba(155,123,255,ALPHA)');
-                makeSparkline('l7vSparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#34d399', 'rgba(52,211,153,ALPHA)');
-                makeSparkline('l7vSparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#f472b6', 'rgba(244,114,182,ALPHA)');
+                makeSparkline('l7vSparkCheckIn', [" + checkInMins + @"], fmtTime, '#4f8cf7', 'rgba(79,140,247,ALPHA)', false);
+                makeSparkline('l7vSparkCheckOut', [" + checkOutMins + @"], fmtTime, '#9b7bff', 'rgba(155,123,255,ALPHA)', false);
+                makeSparkline('l7vSparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#34d399', 'rgba(52,211,153,ALPHA)', false);
+                makeSparkline('l7vSparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#f472b6', 'rgba(244,114,182,ALPHA)', false);
             });
         </script>";
 
@@ -899,6 +899,44 @@ namespace HRMSApp
                 var pointColors = values.map(function (v, i) { return i === lastIdx ? '#f59e0b' : '#4f8cf7'; });
                 var pointRadii = values.map(function (v, i) { return i === lastIdx ? 6 : 4; });
 
+                // Draws a small rounded 'chip' with the value above each point, using only
+                // the canvas 2D API Chart.js already exposes - no datalabels plugin required,
+                // so this file has no extra script tag to bring along into another project.
+                var valueChipsPlugin = {
+                    id: 'tgcValueChips',
+                    afterDatasetsDraw: function (chart) {
+                        var chipCtx = chart.ctx;
+                        var meta = chart.getDatasetMeta(0);
+                        chipCtx.save();
+                        chipCtx.font = '700 10.5px Inter, sans-serif';
+                        chipCtx.textAlign = 'center';
+                        chipCtx.textBaseline = 'middle';
+                        meta.data.forEach(function (point, i) {
+                            var text = Number(values[i]).toLocaleString('en-US');
+                            var padX = 7, padY = 4, textH = 10.5, radius = 6;
+                            var chipW = chipCtx.measureText(text).width + padX * 2;
+                            var chipH = textH + padY * 2;
+                            var cx = point.x;
+                            var cy = point.y - 8 - chipH / 2;
+                            var x = cx - chipW / 2, y = cy - chipH / 2;
+
+                            chipCtx.beginPath();
+                            chipCtx.moveTo(x + radius, y);
+                            chipCtx.arcTo(x + chipW, y, x + chipW, y + chipH, radius);
+                            chipCtx.arcTo(x + chipW, y + chipH, x, y + chipH, radius);
+                            chipCtx.arcTo(x, y + chipH, x, y, radius);
+                            chipCtx.arcTo(x, y, x + chipW, y, radius);
+                            chipCtx.closePath();
+                            chipCtx.fillStyle = i === lastIdx ? '#f59e0b' : '#334463';
+                            chipCtx.fill();
+
+                            chipCtx.fillStyle = '#fff';
+                            chipCtx.fillText(text, cx, cy + 1);
+                        });
+                        chipCtx.restore();
+                    }
+                };
+
                 new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -920,7 +958,7 @@ namespace HRMSApp
                             tension: 0.38
                         }]
                     },
-                    plugins: [ChartDataLabels],
+                    plugins: [valueChipsPlugin],
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
@@ -949,17 +987,6 @@ namespace HRMSApp
                                         return txt;
                                     }
                                 }
-                            },
-                            datalabels: {
-                                align: 'top',
-                                anchor: 'end',
-                                offset: 8,
-                                color: '#fff',
-                                backgroundColor: function (ctx) { return ctx.dataIndex === lastIdx ? '#f59e0b' : '#334463'; },
-                                borderRadius: 6,
-                                padding: { top: 4, bottom: 4, left: 7, right: 7 },
-                                font: { size: 10.5, weight: '700' },
-                                formatter: function (value) { return Number(value).toLocaleString('en-US'); }
                             }
                         },
                         scales: {
