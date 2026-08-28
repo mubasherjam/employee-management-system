@@ -1346,7 +1346,6 @@
     }
 
     // Auto-expand the CEO's direct reports on page load, so the chart isn't just one lonely box
-  
     // Animate leave progress bars from 0 to their real width on load
 window.addEventListener('load', function () {
     var rings = document.querySelectorAll('.leave-ring-progress');
