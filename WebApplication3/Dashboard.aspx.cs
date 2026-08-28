@@ -650,27 +650,16 @@ namespace HRMSApp
         // last 7 days checkin card
         private void BindLast7DaysSummary()
         {
-            using (SqlConnection con = new SqlConnection(conStr))
-            using (SqlCommand cmd = new SqlCommand("sp_TeamAttendance_Last7Days", con))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
-                con.Open();
-                using (SqlDataReader dr = cmd.ExecuteReader())
-                {
-                    if (dr.Read())
-                    {
-                        litL7AvgCheckIn.Text = dr["AvgCheckIn"] == DBNull.Value ? "--:--" : dr["AvgCheckIn"].ToString();
-                        litL7AvgCheckOut.Text = dr["AvgCheckOut"] == DBNull.Value ? "--:--" : dr["AvgCheckOut"].ToString();
-                        litL7AvgHours.Text = dr["AvgHoursSpent"] == DBNull.Value ? "0.0" : Convert.ToDecimal(dr["AvgHoursSpent"]).ToString("0.0");
-                        litL7TotalAbsents.Text = dr["TotalAbsents"].ToString();
+            // Static sample data (no database call)
+            litL7AvgCheckIn.Text = "09:05 AM";
+            litL7AvgCheckOut.Text = "06:30 PM";
+            litL7AvgHours.Text = "8.2";
+            litL7TotalAbsents.Text = "5";
 
-                        litL7AvgCheckInAlt.Text = litL7AvgCheckIn.Text;
-                        litL7AvgCheckOutAlt.Text = litL7AvgCheckOut.Text;
-                        litL7AvgHoursAlt.Text = litL7AvgHours.Text;
-                        litL7TotalAbsentsAlt.Text = litL7TotalAbsents.Text;
-                    }
-                }
-            }
+            litL7AvgCheckInAlt.Text = litL7AvgCheckIn.Text;
+            litL7AvgCheckOutAlt.Text = litL7AvgCheckOut.Text;
+            litL7AvgHoursAlt.Text = litL7AvgHours.Text;
+            litL7TotalAbsentsAlt.Text = litL7TotalAbsents.Text;
 
             BindLast7DaysTrendChart();
         }
@@ -678,55 +667,32 @@ namespace HRMSApp
         // last 7 days trend chart: check-in/check-out window, avg hours and absents per day
         private void BindLast7DaysTrendChart()
         {
+            DateTime rangeEnd = DateTime.Today;
+            DateTime rangeStart = rangeEnd.AddDays(-6);
+
+            // Static sample data (no database call): averages to check-in 9:05 AM,
+            // check-out 6:30 PM, 8.2 hrs/day, and 5 absents across the week.
+            int[] checkInMinutes = { 540, 550, 545, 548, 542, 546, 544 };
+            int[] checkOutMinutes = { 1105, 1115, 1108, 1112, 1106, 1112, 1112 };
+            decimal[] avgHoursPerDay = { 8.0m, 8.4m, 8.1m, 8.3m, 8.0m, 8.5m, 8.1m };
+            int[] absentsPerDay = { 1, 0, 1, 1, 0, 1, 1 };
+
             StringBuilder labels = new StringBuilder();
             StringBuilder checkInMins = new StringBuilder();
             StringBuilder checkOutMins = new StringBuilder();
             StringBuilder hours = new StringBuilder();
             StringBuilder absents = new StringBuilder();
-            bool hasData = false;
-            DateTime rangeStart = DateTime.MinValue, rangeEnd = DateTime.MinValue;
 
-            using (SqlConnection con = new SqlConnection(conStr))
-            using (SqlCommand cmd = new SqlCommand(
-                @"DECLARE @MaxDate DATE = (SELECT MAX(Attendance_Date) FROM TeamAttendanceSample);
-                  DECLARE @StartDate DATE = DATEADD(DAY, -6, @MaxDate);
-
-                  SELECT
-                      Attendance_Date AS RawDate,
-                      FORMAT(Attendance_Date, 'ddd MMM dd') AS DateLabel,
-                      AVG(DATEDIFF(MINUTE, 0, CAST(Check_In_Date_Time AS TIME))) AS AvgCheckInMin,
-                      AVG(DATEDIFF(MINUTE, 0, CAST(Check_Out_Date_Time AS TIME))) AS AvgCheckOutMin,
-                      ROUND(AVG(CASE WHEN Total_Time_Spend > 0 THEN Total_Time_Spend END), 2) AS AvgHours,
-                      SUM(CASE WHEN Status = 'Not Arrived' THEN 1 ELSE 0 END) AS Absents
-                  FROM TeamAttendanceSample
-                  WHERE Attendance_Date BETWEEN @StartDate AND @MaxDate
-                  GROUP BY Attendance_Date
-                  ORDER BY Attendance_Date ASC", con))
+            for (int i = 0; i < 7; i++)
             {
-                con.Open();
-                using (SqlDataReader dr = cmd.ExecuteReader())
-                {
-                    while (dr.Read())
-                    {
-                        if (!hasData) rangeStart = Convert.ToDateTime(dr["RawDate"]);
-                        rangeEnd = Convert.ToDateTime(dr["RawDate"]);
-                        hasData = true;
-                        if (labels.Length > 0) { labels.Append(","); checkInMins.Append(","); checkOutMins.Append(","); hours.Append(","); absents.Append(","); }
+                DateTime day = rangeStart.AddDays(i);
+                if (labels.Length > 0) { labels.Append(","); checkInMins.Append(","); checkOutMins.Append(","); hours.Append(","); absents.Append(","); }
 
-                        labels.Append("'").Append(dr["DateLabel"].ToString()).Append("'");
-                        checkInMins.Append(dr["AvgCheckInMin"] == DBNull.Value ? "null" : Convert.ToInt32(dr["AvgCheckInMin"]).ToString());
-                        checkOutMins.Append(dr["AvgCheckOutMin"] == DBNull.Value ? "null" : Convert.ToInt32(dr["AvgCheckOutMin"]).ToString());
-                        hours.Append(dr["AvgHours"] == DBNull.Value ? "0" : Convert.ToDecimal(dr["AvgHours"]).ToString("0.00"));
-                        absents.Append(Convert.ToInt32(dr["Absents"]));
-                    }
-                }
-            }
-
-            if (!hasData)
-            {
-                lblNoL7Trend.Visible = true;
-                lblNoL7TrendAlt.Visible = true;
-                return;
+                labels.Append("'").Append(day.ToString("ddd MMM dd")).Append("'");
+                checkInMins.Append(checkInMinutes[i]);
+                checkOutMins.Append(checkOutMinutes[i]);
+                hours.Append(avgHoursPerDay[i].ToString("0.00"));
+                absents.Append(absentsPerDay[i]);
             }
 
             litL7Range.Text = rangeStart.ToString("MMM d") + " &ndash; " + rangeEnd.ToString("MMM d");
