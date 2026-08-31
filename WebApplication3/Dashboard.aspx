@@ -660,6 +660,146 @@
             height: 100% !important;
         }
 
+        /* ---- Reporting Line Card (MD4, static front-end) ---- */
+        .rl-card {
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: l7RiseIn 0.5s ease forwards;
+            transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
+        }
+        .rl-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 36px rgba(20,30,60,0.16) !important;
+        }
+        .rl-header {
+            background: linear-gradient(135deg, #4b74c9 0%, #2f4f8f 100%);
+            color: #fff;
+            padding: 20px 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+        .rl-header i { font-size: 1.15rem; opacity: 0.95; }
+
+        .rl-body { padding: 20px 22px 16px; }
+
+        .rl-tree { position: relative; }
+
+        .rl-label {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #4b5b7d;
+            background: #eef2fa;
+            padding: 5px 12px;
+            border-radius: 8px;
+            margin: 0 0 10px;
+        }
+        .rl-tree .rl-label:not(:first-child) { margin-top: 16px; }
+        .rl-indirect-note {
+            font-weight: 500;
+            text-transform: none;
+            letter-spacing: normal;
+            color: #9aa6bd;
+            font-size: 0.68rem;
+            margin-left: 6px;
+        }
+        .rl-count-badge {
+            background: #dbe6fb;
+            color: #2f4f8f;
+            border-radius: 20px;
+            padding: 2px 10px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            margin-left: 8px;
+        }
+
+        .rl-card-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f5f8fd;
+            border: 1px solid #eef2fa;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 10px;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+        .rl-card-row:hover {
+            background: #eef3fb;
+            transform: translateX(2px);
+        }
+        .rl-reportee-row:last-child { margin-bottom: 0; }
+
+        .rl-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.78rem;
+            flex-shrink: 0;
+            background: #7c8aa8;
+        }
+        .rl-avatar-manager {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, #4b74c9, #2f4f8f);
+            font-size: 1rem;
+        }
+        /* cycle avatar colors for unlimited reportees */
+        .rl-reportee-row:nth-of-type(4n+1) .rl-avatar { background: linear-gradient(135deg, #4f79d1, #33509b); }
+        .rl-reportee-row:nth-of-type(4n+2) .rl-avatar { background: linear-gradient(135deg, #ff9f57, #f0752a); }
+        .rl-reportee-row:nth-of-type(4n+3) .rl-avatar { background: linear-gradient(135deg, #4fc98a, #2ba268); }
+        .rl-reportee-row:nth-of-type(4n+4) .rl-avatar { background: linear-gradient(135deg, #f0616e, #d63c4a); }
+
+        .rl-name { font-weight: 700; color: #1a2332; font-size: 0.88rem; }
+        .rl-manager-sub { font-size: 0.72rem; color: #8892a0; font-weight: 500; margin-top: 1px; }
+        .rl-indirect-star { color: #c9a227; font-weight: 800; }
+
+        .rl-you-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #1a2332;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 0.03em;
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin: 0 0 6px;
+        }
+
+        .rl-reportees-list {
+            max-height: 232px;
+            overflow-y: auto;
+            padding-right: 6px;
+            margin-right: -6px;
+        }
+        .rl-reportees-list::-webkit-scrollbar { width: 6px; }
+        .rl-reportees-list::-webkit-scrollbar-track { background: transparent; }
+        .rl-reportees-list::-webkit-scrollbar-thumb { background: #dbe3f0; border-radius: 6px; }
+        .rl-reportees-list::-webkit-scrollbar-thumb:hover { background: #c3cee3; }
+
+        .rl-scroll-hint {
+            text-align: center;
+            font-size: 0.72rem;
+            color: #8892a0;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .rl-scroll-hint i { margin-right: 3px; }
+        /* reporting line card ends here */
+
         /* ---- Compensation History Card (TGC Range trend) ---- */
         .tgc-card {
             position: relative;
@@ -1291,6 +1431,70 @@
                                 <span class="tgc-current-label">Current TGC</span>
                             </div>
                             <asp:Label ID="lblNoEventHistory" runat="server" CssClass="empty-state" Text="No compensation history yet." Visible="false" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================= -->
+                <!-- MD4 CARD - REPORTING LINE (static front-end, unlimited reportees) -->
+                <!-- ============================= -->
+                <div class="col-lg-6">
+                    <div class="card shadow h-100 l7-compact md4-card rl-card">
+                        <div class="rl-header">
+                            <i class="bi bi-diagram-3"></i>
+                            <span>Reporting Line</span>
+                        </div>
+                        <div class="card-body p-3 rl-body">
+                            <div class="rl-tree">
+                                <span class="rl-label">Reporting To</span>
+                                <div class="rl-card-row rl-manager-row">
+                                    <div class="rl-avatar rl-avatar-manager"><i class="bi bi-person-fill"></i></div>
+                                    <div>
+                                        <div class="rl-name">Employee No. 2950</div>
+                                        <div class="rl-manager-sub">Manager</div>
+                                    </div>
+                                </div>
+
+                                <div class="rl-you-badge"><i class="bi bi-person-check-fill"></i> YOU</div>
+
+                                <span class="rl-label">
+                                    Reportees
+                                    <span class="rl-indirect-note">(*) Indirect Reportees</span>
+                                    <span class="rl-count-badge" id="rlReporteeCount">12</span>
+                                </span>
+
+                                <div class="rl-reportees-list" id="rlReporteesList">
+                                    <div class="rl-card-row rl-reportee-row">
+                                        <div class="rl-avatar">60</div>
+                                        <div class="rl-name">Employee No. 13160</div>
+                                    </div>
+                                    <div class="rl-card-row rl-reportee-row">
+                                        <div class="rl-avatar">73</div>
+                                        <div class="rl-name">Employee No. 14473</div>
+                                    </div>
+                                    <div class="rl-card-row rl-reportee-row">
+                                        <div class="rl-avatar">50</div>
+                                        <div class="rl-name">Employee No. 22050</div>
+                                    </div>
+                                    <div class="rl-card-row rl-reportee-row">
+                                        <div class="rl-avatar">61</div>
+                                        <div class="rl-name">Employee No. 23961 <span class="rl-indirect-star">*</span></div>
+                                    </div>
+                                    <div class="rl-card-row rl-reportee-row">
+                                        <div class="rl-avatar">34</div>
+                                        <div class="rl-name">Employee No. 18234</div>
+                                    </div>
+                                    <div class="rl-card-row rl-reportee-row">
+                                        <div class="rl-avatar">88</div>
+                                        <div class="rl-name">Employee No. 19588 <span class="rl-indirect-star">*</span></div>
+                                    </div>
+                                    <div class="rl-card-row rl-reportee-row">
+                                        <div class="rl-avatar">27</div>
+                                        <div class="rl-name">Employee No. 20127</div>
+                                    </div>
+                                </div>
+                                <div class="rl-scroll-hint"><i class="bi bi-chevron-down"></i> Scroll for more</div>
+                            </div>
                         </div>
                     </div>
                 </div>
