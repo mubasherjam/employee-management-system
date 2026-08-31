@@ -478,100 +478,88 @@
         }
 
 
-        /* ---- Last 7 Days Summary Card (KPI tiles, each with its own single-metric sparkline) ---- */
+        /* ---- Last 7 Days Summary Card (KPI list, each row with its own single-metric sparkline) ----
+           Redesigned as a clean row list rather than a colored tile grid, to match the light,
+           understated card language used everywhere else on this dashboard. */
         .l7-period-badge {
             display: inline-flex; align-items: center; gap: 7px;
             background: linear-gradient(135deg, #eef1f8, #e4e9f5);
             color: #4a5568;
             font-size: 0.73rem; font-weight: 700;
             padding: 6px 14px; border-radius: 20px;
-            margin-bottom: 14px;
+            margin-bottom: 4px;
             border: 1px solid #e2e7f0;
         }
         .l7-period-badge i { color: #7c5cff; }
 
-        .l7-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+        .l7-subtitle {
+            font-size: 0.78rem;
+            color: #8892a0;
+            font-weight: 500;
+            margin: 0 0 6px;
         }
 
-        .l7-tile {
+        .l7-list { display: flex; flex-direction: column; }
+
+        .l7-row {
             position: relative;
-            border-radius: 16px;
-            padding: 16px 16px 12px;
-            overflow: hidden;
-            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 6px;
+            border-bottom: 1px solid #f0f2f7;
+            border-radius: 10px;
             opacity: 0;
-            transform: translateY(10px);
-            animation: l7RiseIn 0.45s ease forwards;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transform: translateX(-10px);
+            animation: l7RowIn 0.4s ease forwards;
+            transition: background 0.2s ease, padding-left 0.2s ease;
         }
-        .l7-tile:hover { transform: translateY(-4px); }
+        .l7-row:last-child { border-bottom: none; }
+        .l7-row:hover { background: #f7f9fd; padding-left: 10px; }
+        @keyframes l7RowIn { to { opacity: 1; transform: translateX(0); } }
         @keyframes l7RiseIn { to { opacity: 1; transform: translateY(0); } }
 
-        /* Decorative highlight lives in the empty top-right corner only, away from the
-           icon/value/label so it never washes out the text's contrast. */
-        .l7-tile::before {
-            content: '';
-            position: absolute;
-            width: 90px; height: 90px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.05);
-            top: -34px; right: -22px;
-            pointer-events: none;
-        }
-
-        /* One shared neutral charcoal background across all four tiles - each metric keeps
-           its own identity through the icon badge and sparkline color instead of a colored card. */
-        .l7-tile {
-            background: #1A3263;
-            box-shadow: 0 8px 20px rgba(15,18,26,0.35);
-        }
-        .l7-tile:hover {
-            box-shadow: 0 14px 28px rgba(15,18,26,0.5);
-        }
-
-        .l7-tile-top {
-            position: relative; z-index: 2;
-            display: flex; align-items: center; gap: 12px;
-            margin-bottom: 10px;
-        }
-
-        .l7-icon-badge {
-            width: 32px; height: 32px;
-            border-radius: 9px;
+        .l7-row-icon {
+            width: 42px; height: 42px;
+            border-radius: 13px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.85rem;
+            font-size: 1.1rem;
             flex-shrink: 0;
-            color: #fff;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+            transition: transform 0.25s ease;
         }
-        .tile-checkin  .l7-icon-badge { background: linear-gradient(135deg, #4f8cf7, #2955c9); }
-        .tile-checkout .l7-icon-badge { background: linear-gradient(135deg, #9b7bff, #6a4ce0); }
-        .tile-hours    .l7-icon-badge { background: linear-gradient(135deg, #34d399, #16a34a); }
-        .tile-absent   .l7-icon-badge { background: linear-gradient(135deg, #f472b6, #d63384); }
+        .l7-row:hover .l7-row-icon { transform: scale(1.08) rotate(-3deg); }
 
+        .l7-row[data-accent="checkin"]  .l7-row-icon { background: linear-gradient(135deg, rgba(79,140,247,0.16), rgba(41,85,201,0.16)); color: #2955c9; }
+        .l7-row[data-accent="checkout"] .l7-row-icon { background: linear-gradient(135deg, rgba(155,123,255,0.16), rgba(106,76,224,0.16)); color: #6a4ce0; }
+        .l7-row[data-accent="hours"]    .l7-row-icon { background: linear-gradient(135deg, rgba(52,211,153,0.18), rgba(22,163,74,0.18)); color: #16a34a; }
+        .l7-row[data-accent="absent"]   .l7-row-icon { background: linear-gradient(135deg, rgba(244,114,182,0.16), rgba(214,51,132,0.16)); color: #d63384; }
+
+        .l7-row-text { flex: 1; min-width: 0; }
         .l7-value {
-            font-size: 1.3rem; font-weight: 800;
-            line-height: 1.15;
+            font-size: 1.15rem; font-weight: 800;
+            color: #1a2332;
+            line-height: 1.2;
             letter-spacing: -0.01em;
             white-space: nowrap;
         }
         .l7-label {
-            font-size: 0.64rem;
-            color: rgba(255,255,255,0.85);
+            font-size: 0.68rem;
+            color: #8892a0;
             font-weight: 700;
             margin-top: 2px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
         }
 
         .l7-spark-wrap {
-            position: relative;
-            z-index: 2;
-            height: 46px;
-            margin: 6px -4px 0;
+            width: 96px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+        .l7-spark-wrap canvas { display: block; width: 100% !important; height: 100% !important; }
+
+        @media (max-width: 420px) {
+            .l7-spark-wrap { width: 60px; }
         }
 
         /* ---- Last 7 Days Overview - Vertical Trend: single unified panel ----
@@ -1365,44 +1353,37 @@
                                 <i class="bi bi-clock-history"></i>
                                 <asp:Literal ID="litL7Range" runat="server" Text="Rolling 7-Day Window" />
                             </span>
-                            <div class="l7-grid">
-                                <div class="l7-tile tile-checkin" style="animation-delay:0.05s;">
-                                    <div class="l7-tile-top">
-                                        <span class="l7-icon-badge"><i class="bi bi-box-arrow-in-right"></i></span>
-                                        <div>
-                                            <div class="l7-value"><asp:Literal ID="litL7AvgCheckIn" runat="server" Text="--:--" /></div>
-                                            <div class="l7-label">Avg Check-In</div>
-                                        </div>
+                            <p class="l7-subtitle">Attendance trends over the last 7 working days</p>
+                            <div class="l7-list">
+                                <div class="l7-row" data-accent="checkin" style="animation-delay:0.05s;">
+                                    <span class="l7-row-icon"><i class="bi bi-box-arrow-in-right"></i></span>
+                                    <div class="l7-row-text">
+                                        <div class="l7-value"><asp:Literal ID="litL7AvgCheckIn" runat="server" Text="--:--" /></div>
+                                        <div class="l7-label">Avg Check-In</div>
                                     </div>
                                     <div class="l7-spark-wrap"><canvas id="l7SparkCheckIn"></canvas></div>
                                 </div>
-                                <div class="l7-tile tile-checkout" style="animation-delay:0.1s;">
-                                    <div class="l7-tile-top">
-                                        <span class="l7-icon-badge"><i class="bi bi-box-arrow-right"></i></span>
-                                        <div>
-                                            <div class="l7-value"><asp:Literal ID="litL7AvgCheckOut" runat="server" Text="--:--" /></div>
-                                            <div class="l7-label">Avg Check-Out</div>
-                                        </div>
+                                <div class="l7-row" data-accent="checkout" style="animation-delay:0.1s;">
+                                    <span class="l7-row-icon"><i class="bi bi-box-arrow-right"></i></span>
+                                    <div class="l7-row-text">
+                                        <div class="l7-value"><asp:Literal ID="litL7AvgCheckOut" runat="server" Text="--:--" /></div>
+                                        <div class="l7-label">Avg Check-Out</div>
                                     </div>
                                     <div class="l7-spark-wrap"><canvas id="l7SparkCheckOut"></canvas></div>
                                 </div>
-                                <div class="l7-tile tile-hours" style="animation-delay:0.15s;">
-                                    <div class="l7-tile-top">
-                                        <span class="l7-icon-badge"><i class="bi bi-hourglass-split"></i></span>
-                                        <div>
-                                            <div class="l7-value"><asp:Literal ID="litL7AvgHours" runat="server" Text="0.0" /> hrs</div>
-                                            <div class="l7-label">Avg Time Spent</div>
-                                        </div>
+                                <div class="l7-row" data-accent="hours" style="animation-delay:0.15s;">
+                                    <span class="l7-row-icon"><i class="bi bi-hourglass-split"></i></span>
+                                    <div class="l7-row-text">
+                                        <div class="l7-value"><asp:Literal ID="litL7AvgHours" runat="server" Text="0.0" /> hrs</div>
+                                        <div class="l7-label">Avg Time Spent</div>
                                     </div>
                                     <div class="l7-spark-wrap"><canvas id="l7SparkHours"></canvas></div>
                                 </div>
-                                <div class="l7-tile tile-absent" style="animation-delay:0.2s;">
-                                    <div class="l7-tile-top">
-                                        <span class="l7-icon-badge"><i class="bi bi-person-x-fill"></i></span>
-                                        <div>
-                                            <div class="l7-value"><asp:Literal ID="litL7TotalAbsents" runat="server" Text="0" /></div>
-                                            <div class="l7-label">Total Absents</div>
-                                        </div>
+                                <div class="l7-row" data-accent="absent" style="animation-delay:0.2s;">
+                                    <span class="l7-row-icon"><i class="bi bi-person-x-fill"></i></span>
+                                    <div class="l7-row-text">
+                                        <div class="l7-value"><asp:Literal ID="litL7TotalAbsents" runat="server" Text="0" /></div>
+                                        <div class="l7-label">Total Absents</div>
                                     </div>
                                     <div class="l7-spark-wrap"><canvas id="l7SparkAbsent"></canvas></div>
                                 </div>
@@ -1653,11 +1634,9 @@ window.addEventListener('load', function () {
         }, 200 + (i * 120));
     });
 });
-  
-    
-</script>
 
- 
+
+</script>
     </form>
 </body>
 </html>

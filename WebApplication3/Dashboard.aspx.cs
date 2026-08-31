@@ -785,10 +785,10 @@ namespace HRMSApp
                 }
 
                 var l7SparkCharts = [
-                    makeSparkline('l7SparkCheckIn', [" + checkInMins + @"], fmtTime, '#4f8cf7', 'rgba(79,140,247,ALPHA)'),
-                    makeSparkline('l7SparkCheckOut', [" + checkOutMins + @"], fmtTime, '#9b7bff', 'rgba(155,123,255,ALPHA)'),
-                    makeSparkline('l7SparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#34d399', 'rgba(52,211,153,ALPHA)'),
-                    makeSparkline('l7SparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#f472b6', 'rgba(244,114,182,ALPHA)'),
+                    makeSparkline('l7SparkCheckIn', [" + checkInMins + @"], fmtTime, '#2955c9', 'rgba(41,85,201,ALPHA)'),
+                    makeSparkline('l7SparkCheckOut', [" + checkOutMins + @"], fmtTime, '#6a4ce0', 'rgba(106,76,224,ALPHA)'),
+                    makeSparkline('l7SparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#16a34a', 'rgba(22,163,74,ALPHA)'),
+                    makeSparkline('l7SparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#d63384', 'rgba(214,51,132,ALPHA)'),
                     makeSparkline('l7vSparkCheckIn', [" + checkInMins + @"], fmtTime, '#4f8cf7', 'rgba(79,140,247,ALPHA)', false),
                     makeSparkline('l7vSparkCheckOut', [" + checkOutMins + @"], fmtTime, '#9b7bff', 'rgba(155,123,255,ALPHA)', false),
                     makeSparkline('l7vSparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#34d399', 'rgba(52,211,153,ALPHA)', false),
