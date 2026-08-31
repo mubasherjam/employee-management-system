@@ -674,50 +674,101 @@
             box-shadow: 0 18px 36px rgba(20,30,60,0.16) !important;
         }
         .rl-header {
-            background: linear-gradient(135deg, #4b74c9 0%, #2f4f8f 100%);
+            background: linear-gradient(135deg, #5687d6 0%, #2f4f8f 55%, #253f77 100%);
             color: #fff;
-            padding: 20px 28px;
+            padding: 18px 28px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             font-weight: 700;
+            position: relative;
+            overflow: hidden;
         }
-        .rl-header i { font-size: 1.15rem; opacity: 0.95; }
+        .rl-header::before {
+            content: '';
+            position: absolute;
+            width: 150px; height: 150px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            top: -65px; right: -25px;
+        }
+        .rl-header > * { position: relative; z-index: 2; }
+        .rl-header-icon {
+            width: 34px; height: 34px; border-radius: 10px;
+            background: rgba(255,255,255,0.18);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; flex-shrink: 0;
+        }
 
-        .rl-body { padding: 20px 22px 16px; }
+        .rl-body { padding: 22px 24px 18px; }
 
-        .rl-tree { position: relative; }
+        .rl-tree { position: relative; padding-left: 26px; }
+        .rl-tree::before {
+            content: '';
+            position: absolute;
+            left: 9px; top: 10px; bottom: 14px;
+            width: 2px;
+            background: linear-gradient(180deg, #c3d3f0 0%, #dde6f7 60%, #eef2fa 100%);
+            border-radius: 2px;
+        }
+        .rl-node { position: relative; }
+        .rl-node::before {
+            content: '';
+            position: absolute;
+            left: -17px; top: 50%;
+            width: 15px; height: 2px;
+            background: #c3d3f0;
+            transform: translateY(-1px);
+        }
+        .rl-node::after {
+            content: '';
+            position: absolute;
+            left: -21px; top: 50%;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #8fa8de;
+            transform: translate(-1px, -50%);
+            z-index: 2;
+        }
 
         .rl-label {
             display: inline-flex;
             align-items: center;
             font-size: 0.7rem;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: #4b5b7d;
             background: #eef2fa;
-            padding: 5px 12px;
+            padding: 6px 12px;
             border-radius: 8px;
-            margin: 0 0 10px;
+            margin: 0 0 12px;
         }
-        .rl-tree .rl-label:not(:first-child) { margin-top: 16px; }
+        .rl-label-flex {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .rl-tree .rl-label:not(:first-child) { margin-top: 20px; }
         .rl-indirect-note {
             font-weight: 500;
             text-transform: none;
             letter-spacing: normal;
             color: #9aa6bd;
-            font-size: 0.68rem;
-            margin-left: 6px;
+            font-size: 0.66rem;
+            margin-left: 4px;
         }
         .rl-count-badge {
-            background: #dbe6fb;
-            color: #2f4f8f;
+            background: linear-gradient(135deg, #4b74c9, #2f4f8f);
+            color: #fff;
             border-radius: 20px;
-            padding: 2px 10px;
-            font-size: 0.68rem;
+            padding: 2px 11px;
+            font-size: 0.7rem;
             font-weight: 800;
-            margin-left: 8px;
+            box-shadow: 0 3px 8px rgba(47,79,143,0.3);
         }
 
         .rl-card-row {
@@ -726,16 +777,20 @@
             gap: 12px;
             background: #f5f8fd;
             border: 1px solid #eef2fa;
+            border-left: 3px solid #c3d3f0;
             border-radius: 12px;
-            padding: 10px 14px;
+            padding: 11px 14px;
             margin-bottom: 10px;
-            transition: background 0.2s ease, transform 0.2s ease;
+            box-shadow: 0 2px 6px rgba(20,30,60,0.03);
+            transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
         .rl-card-row:hover {
             background: #eef3fb;
-            transform: translateX(2px);
+            transform: translateX(3px);
+            box-shadow: 0 6px 14px rgba(47,79,143,0.1);
         }
-        .rl-reportee-row:last-child { margin-bottom: 0; }
+        .rl-manager-row { border-left-color: #4b74c9; }
+        .rl-reportee-row:last-child { margin-bottom: 2px; }
 
         .rl-avatar {
             width: 34px;
@@ -749,16 +804,21 @@
             font-size: 0.78rem;
             flex-shrink: 0;
             background: #7c8aa8;
+            box-shadow: 0 3px 8px rgba(20,30,60,0.15);
         }
         .rl-avatar-manager {
             width: 38px; height: 38px;
             background: linear-gradient(135deg, #4b74c9, #2f4f8f);
             font-size: 1rem;
         }
-        /* cycle avatar colors for unlimited reportees */
+        /* cycle avatar + accent colors for unlimited reportees */
+        .rl-reportee-row:nth-of-type(4n+1) { border-left-color: #4f79d1; }
         .rl-reportee-row:nth-of-type(4n+1) .rl-avatar { background: linear-gradient(135deg, #4f79d1, #33509b); }
+        .rl-reportee-row:nth-of-type(4n+2) { border-left-color: #ff9f57; }
         .rl-reportee-row:nth-of-type(4n+2) .rl-avatar { background: linear-gradient(135deg, #ff9f57, #f0752a); }
+        .rl-reportee-row:nth-of-type(4n+3) { border-left-color: #4fc98a; }
         .rl-reportee-row:nth-of-type(4n+3) .rl-avatar { background: linear-gradient(135deg, #4fc98a, #2ba268); }
+        .rl-reportee-row:nth-of-type(4n+4) { border-left-color: #f0616e; }
         .rl-reportee-row:nth-of-type(4n+4) .rl-avatar { background: linear-gradient(135deg, #f0616e, #d63c4a); }
 
         .rl-name { font-weight: 700; color: #1a2332; font-size: 0.88rem; }
@@ -766,38 +826,69 @@
         .rl-indirect-star { color: #c9a227; font-weight: 800; }
 
         .rl-you-badge {
-            display: inline-flex;
+            display: flex;
+            width: fit-content;
             align-items: center;
             gap: 6px;
-            background: #1a2332;
+            background: linear-gradient(135deg, #1a2332, #2c3a52);
             color: #fff;
             font-weight: 700;
             font-size: 0.75rem;
             letter-spacing: 0.03em;
-            padding: 6px 16px;
+            padding: 7px 18px;
             border-radius: 20px;
-            margin: 0 0 6px;
+            margin: 0 0 10px;
+            box-shadow: 0 4px 10px rgba(26,35,50,0.25);
         }
 
+        .rl-reportees-wrap { position: relative; }
+
         .rl-reportees-list {
-            max-height: 232px;
+            max-height: 224px;
             overflow-y: auto;
-            padding-right: 6px;
-            margin-right: -6px;
+            padding-right: 10px;
+            margin-right: -10px;
+            scrollbar-width: thin;
+            scrollbar-color: #90a8dd #e4eaf6;
         }
-        .rl-reportees-list::-webkit-scrollbar { width: 6px; }
-        .rl-reportees-list::-webkit-scrollbar-track { background: transparent; }
-        .rl-reportees-list::-webkit-scrollbar-thumb { background: #dbe3f0; border-radius: 6px; }
-        .rl-reportees-list::-webkit-scrollbar-thumb:hover { background: #c3cee3; }
+        .rl-reportees-list::-webkit-scrollbar { width: 10px; }
+        .rl-reportees-list::-webkit-scrollbar-track {
+            background: #e4eaf6;
+            border-radius: 8px;
+        }
+        .rl-reportees-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #90a8dd, #6685c9);
+            border-radius: 8px;
+            border: 2px solid #e4eaf6;
+        }
+        .rl-reportees-list::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #7691cf, #4f6cb3);
+        }
+
+        .rl-scroll-fade {
+            position: absolute;
+            left: 0; right: 10px; bottom: 0;
+            height: 26px;
+            background: linear-gradient(180deg, rgba(255,255,255,0), #ffffff 85%);
+            pointer-events: none;
+        }
 
         .rl-scroll-hint {
             text-align: center;
             font-size: 0.72rem;
-            color: #8892a0;
-            font-weight: 600;
-            margin-top: 10px;
+            color: #6685c9;
+            font-weight: 700;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            animation: rlBounce 1.6s ease-in-out infinite;
         }
-        .rl-scroll-hint i { margin-right: 3px; }
+        @keyframes rlBounce {
+            0%, 100% { transform: translateY(0); opacity: 0.75; }
+            50% { transform: translateY(3px); opacity: 1; }
+        }
         /* reporting line card ends here */
 
         /* ---- Compensation History Card (TGC Range trend) ---- */
@@ -1441,13 +1532,13 @@
                 <div class="col-lg-6">
                     <div class="card shadow h-100 l7-compact md4-card rl-card">
                         <div class="rl-header">
-                            <i class="bi bi-diagram-3"></i>
+                            <span class="rl-header-icon"><i class="bi bi-diagram-3"></i></span>
                             <span>Reporting Line</span>
                         </div>
                         <div class="card-body p-3 rl-body">
                             <div class="rl-tree">
-                                <span class="rl-label">Reporting To</span>
-                                <div class="rl-card-row rl-manager-row">
+                                <span class="rl-label rl-node">Reporting To</span>
+                                <div class="rl-card-row rl-manager-row rl-node">
                                     <div class="rl-avatar rl-avatar-manager"><i class="bi bi-person-fill"></i></div>
                                     <div>
                                         <div class="rl-name">Employee No. 2950</div>
@@ -1455,43 +1546,45 @@
                                     </div>
                                 </div>
 
-                                <div class="rl-you-badge"><i class="bi bi-person-check-fill"></i> YOU</div>
+                                <div class="rl-you-badge rl-node"><i class="bi bi-person-check-fill"></i> YOU</div>
 
-                                <span class="rl-label">
-                                    Reportees
-                                    <span class="rl-indirect-note">(*) Indirect Reportees</span>
+                                <div class="rl-label rl-label-flex rl-node">
+                                    <span>Reportees <span class="rl-indirect-note">(*) Indirect Reportees</span></span>
                                     <span class="rl-count-badge" id="rlReporteeCount">12</span>
-                                </span>
+                                </div>
 
-                                <div class="rl-reportees-list" id="rlReporteesList">
-                                    <div class="rl-card-row rl-reportee-row">
-                                        <div class="rl-avatar">60</div>
-                                        <div class="rl-name">Employee No. 13160</div>
+                                <div class="rl-reportees-wrap">
+                                    <div class="rl-reportees-list" id="rlReporteesList">
+                                        <div class="rl-card-row rl-reportee-row rl-node">
+                                            <div class="rl-avatar">60</div>
+                                            <div class="rl-name">Employee No. 13160</div>
+                                        </div>
+                                        <div class="rl-card-row rl-reportee-row rl-node">
+                                            <div class="rl-avatar">73</div>
+                                            <div class="rl-name">Employee No. 14473</div>
+                                        </div>
+                                        <div class="rl-card-row rl-reportee-row rl-node">
+                                            <div class="rl-avatar">50</div>
+                                            <div class="rl-name">Employee No. 22050</div>
+                                        </div>
+                                        <div class="rl-card-row rl-reportee-row rl-node">
+                                            <div class="rl-avatar">61</div>
+                                            <div class="rl-name">Employee No. 23961 <span class="rl-indirect-star">*</span></div>
+                                        </div>
+                                        <div class="rl-card-row rl-reportee-row rl-node">
+                                            <div class="rl-avatar">34</div>
+                                            <div class="rl-name">Employee No. 18234</div>
+                                        </div>
+                                        <div class="rl-card-row rl-reportee-row rl-node">
+                                            <div class="rl-avatar">88</div>
+                                            <div class="rl-name">Employee No. 19588 <span class="rl-indirect-star">*</span></div>
+                                        </div>
+                                        <div class="rl-card-row rl-reportee-row rl-node">
+                                            <div class="rl-avatar">27</div>
+                                            <div class="rl-name">Employee No. 20127</div>
+                                        </div>
                                     </div>
-                                    <div class="rl-card-row rl-reportee-row">
-                                        <div class="rl-avatar">73</div>
-                                        <div class="rl-name">Employee No. 14473</div>
-                                    </div>
-                                    <div class="rl-card-row rl-reportee-row">
-                                        <div class="rl-avatar">50</div>
-                                        <div class="rl-name">Employee No. 22050</div>
-                                    </div>
-                                    <div class="rl-card-row rl-reportee-row">
-                                        <div class="rl-avatar">61</div>
-                                        <div class="rl-name">Employee No. 23961 <span class="rl-indirect-star">*</span></div>
-                                    </div>
-                                    <div class="rl-card-row rl-reportee-row">
-                                        <div class="rl-avatar">34</div>
-                                        <div class="rl-name">Employee No. 18234</div>
-                                    </div>
-                                    <div class="rl-card-row rl-reportee-row">
-                                        <div class="rl-avatar">88</div>
-                                        <div class="rl-name">Employee No. 19588 <span class="rl-indirect-star">*</span></div>
-                                    </div>
-                                    <div class="rl-card-row rl-reportee-row">
-                                        <div class="rl-avatar">27</div>
-                                        <div class="rl-name">Employee No. 20127</div>
-                                    </div>
+                                    <div class="rl-scroll-fade"></div>
                                 </div>
                                 <div class="rl-scroll-hint"><i class="bi bi-chevron-down"></i> Scroll for more</div>
                             </div>
