@@ -87,21 +87,33 @@ namespace HRMSApp
             };
 
             const int maxDays = 31;
-            var sb = new StringBuilder();
-            sb.Append("<div class='leavecal-scroll'><table class='leavecal-table'><thead><tr><th class='leavecal-monthcol'>Month</th>");
-            for (int d = 1; d <= maxDays; d++) sb.Append("<th>").Append(d).Append("</th>");
-            sb.Append("</tr></thead><tbody>");
+
+            // Two independent tables instead of one sticky column: the month names never
+            // scroll, and the day grid scrolls in its own pane. Both share the .leavecal-row
+            // fixed row height so the two stay lined up.
+            var monthSb = new StringBuilder();
+            monthSb.Append("<table class='leavecal-table'><thead><tr class='leavecal-row'><th>Month</th></tr></thead><tbody>");
+            for (int m = 1; m <= 12; m++)
+            {
+                monthSb.Append("<tr class='leavecal-row'><td>").Append(monthShort[m - 1]).Append("</td></tr>");
+            }
+            monthSb.Append("</tbody></table>");
+
+            var daySb = new StringBuilder();
+            daySb.Append("<table class='leavecal-table leavecal-daytable'><thead><tr class='leavecal-row'>");
+            for (int d = 1; d <= maxDays; d++) daySb.Append("<th>").Append(d).Append("</th>");
+            daySb.Append("</tr></thead><tbody>");
 
             for (int m = 1; m <= 12; m++)
             {
                 int daysInMonth = DateTime.DaysInMonth(year, m);
-                sb.Append("<tr><td class='leavecal-monthcol'>").Append(monthShort[m - 1]).Append("</td>");
+                daySb.Append("<tr class='leavecal-row'>");
 
                 for (int d = 1; d <= maxDays; d++)
                 {
                     if (d > daysInMonth)
                     {
-                        sb.Append("<td class='leavecal-cell lc-blank'></td>");
+                        daySb.Append("<td class='leavecal-cell lc-blank'></td>");
                         continue;
                     }
 
@@ -123,15 +135,21 @@ namespace HRMSApp
                     }
 
                     string title = dt.ToString("MMM d, yyyy", CultureInfo.InvariantCulture) + " - " + label;
-                    sb.Append("<td class='leavecal-cell'><span class='leavecal-chip ").Append(css)
-                      .Append("' title='").Append(title).Append("'>")
-                      .Append(d).Append("</span></td>");
+                    daySb.Append("<td class='leavecal-cell'><span class='leavecal-chip ").Append(css)
+                         .Append("' title='").Append(title).Append("'>")
+                         .Append(d).Append("</span></td>");
                 }
 
-                sb.Append("</tr>");
+                daySb.Append("</tr>");
             }
 
-            sb.Append("</tbody></table></div>");
+            daySb.Append("</tbody></table>");
+
+            var sb = new StringBuilder();
+            sb.Append("<div class='leavecal-panes'>")
+              .Append("<div class='leavecal-monthpane'>").Append(monthSb).Append("</div>")
+              .Append("<div class='leavecal-scroll'>").Append(daySb).Append("</div>")
+              .Append("</div>");
             return sb.ToString();
         }
 
