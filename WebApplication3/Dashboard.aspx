@@ -1109,6 +1109,151 @@
             padding: 18px !important;
         }
 
+        /* ---- Yearly Leave Calendar Card (static preview) ---- */
+        .leavecal-card {
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: l7RiseIn 0.5s ease forwards;
+            transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease;
+        }
+        .leavecal-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 36px rgba(20,30,60,0.16) !important;
+        }
+        .leavecal-header {
+            background: linear-gradient(135deg, #14b8a6 0%, #0891b2 55%, #0e7490 100%);
+            color: #fff;
+            padding: 18px 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .leavecal-header::before {
+            content: '';
+            position: absolute;
+            width: 150px; height: 150px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            top: -65px; right: -25px;
+        }
+        .leavecal-header .section-header-title,
+        .leavecal-header .section-count-badge { position: relative; z-index: 2; }
+
+        .leavecal-body { padding: 22px 24px 20px; }
+
+        /* ---- Frozen month column + independently-scrolling day grid ----
+           A position:sticky <td> repeated on every one of 12 rows proved unreliable in
+           practice (overlap/ghosting across browsers). Instead the month names live in their
+           own small, never-scrolling table; the day grid is a second table in its own
+           overflow-x:auto pane. Row heights are pinned to the same value on both tables via
+           .leavecal-row so the two stay visually aligned line-for-line. */
+        .leavecal-panes {
+            display: flex;
+            align-items: stretch;
+            border-radius: 12px;
+            border: 1px solid #eef0f4;
+            background: #fafbfc;
+            overflow: hidden;
+        }
+        .leavecal-monthpane {
+            flex: 0 0 auto;
+            background: #fff;
+            box-shadow: 3px 0 8px -2px rgba(20,30,60,0.14);
+            position: relative;
+            z-index: 1;
+            padding: 10px 6px 10px 10px;
+        }
+        .leavecal-scroll {
+            flex: 1 1 auto;
+            overflow-x: auto;
+            padding: 10px 10px 10px 0;
+            scrollbar-width: thin;
+            scrollbar-color: #9bd7cf #e4eaf6;
+        }
+        .leavecal-scroll::-webkit-scrollbar { height: 10px; }
+        .leavecal-scroll::-webkit-scrollbar-track { background: #e4eaf6; border-radius: 8px; }
+        .leavecal-scroll::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, #5eead4, #0891b2);
+            border-radius: 8px; border: 2px solid #e4eaf6;
+        }
+
+        .leavecal-table { border-collapse: separate; border-spacing: 0; }
+        .leavecal-table th, .leavecal-table td {
+            padding: 0; box-sizing: border-box; vertical-align: middle;
+        }
+        .leavecal-row { height: 33px; }
+
+        .leavecal-monthpane th, .leavecal-monthpane td {
+            text-align: left;
+            padding: 0 16px 0 10px;
+            font-weight: 800; color: #1a2332; font-size: 0.75rem;
+            white-space: nowrap;
+        }
+        .leavecal-monthpane thead th {
+            color: #8892a0; font-weight: 800; font-size: 0.66rem;
+        }
+
+        .leavecal-daytable thead th {
+            color: #8892a0; font-weight: 800; text-align: center;
+            font-size: 0.66rem; min-width: 33px;
+        }
+        .leavecal-cell {
+            text-align: center;
+        }
+        .lc-blank { background: transparent; }
+
+        .leavecal-chip {
+            display: flex; align-items: center; justify-content: center;
+            width: 27px; height: 27px;
+            margin: 0 auto;
+            border-radius: 7px;
+            font-weight: 700; font-size: 0.68rem;
+            color: #6b7280;
+            cursor: default;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .leavecal-chip:hover {
+            position: relative;
+            transform: scale(1.22);
+            box-shadow: 0 6px 14px rgba(20,30,60,0.22);
+        }
+        .leavecal-chip.lc-normal { background: #fff; border: 1px solid #eef0f4; }
+        .leavecal-chip.lc-weekend { background: #cfd6e2; color: #48506b; }
+        .leavecal-chip.lc-ph { background: linear-gradient(135deg, #4ade80, #16a34a); color: #fff; box-shadow: 0 2px 6px rgba(22,163,74,0.35); }
+        .leavecal-chip.lc-cl { background: linear-gradient(135deg, #22d3ee, #0891b2); color: #fff; box-shadow: 0 2px 6px rgba(8,145,178,0.35); }
+        .leavecal-chip.lc-sl { background: linear-gradient(135deg, #c084fc, #9333ea); color: #fff; box-shadow: 0 2px 6px rgba(147,51,234,0.35); }
+        .leavecal-chip.lc-al { background: linear-gradient(135deg, #d4b96a, #b8973f); color: #fff; box-shadow: 0 2px 6px rgba(184,151,63,0.35); }
+
+        .leavecal-scroll-hint {
+            text-align: center;
+            font-size: 0.72rem;
+            color: #0891b2;
+            font-weight: 700;
+            margin-top: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+
+        .leavecal-legend {
+            display: flex; flex-wrap: wrap;
+            gap: 9px 16px;
+            margin-top: 16px; padding-top: 14px;
+            border-top: 1px dashed #e9edf3;
+        }
+        .leavecal-legend-item {
+            display: flex; align-items: center; gap: 7px;
+            font-size: 0.75rem; font-weight: 600; color: #4a5568;
+        }
+        .leavecal-legend-dot {
+            width: 13px; height: 13px; border-radius: 4px; flex-shrink: 0;
+        }
+        .leavecal-legend-dot.lc-normal { background: #fff; border: 1px solid #d7dde5; }
+        .leavecal-legend-dot.lc-weekend { background: #cfd6e2; }
+        .leavecal-legend-dot.lc-ph { background: linear-gradient(135deg, #4ade80, #16a34a); }
+        .leavecal-legend-dot.lc-cl { background: linear-gradient(135deg, #22d3ee, #0891b2); }
+        .leavecal-legend-dot.lc-sl { background: linear-gradient(135deg, #c084fc, #9333ea); }
+        .leavecal-legend-dot.lc-al { background: linear-gradient(135deg, #d4b96a, #b8973f); }
+
     </style>
 </head>
 <body>
@@ -1568,6 +1713,32 @@
                                     <div class="rl-scroll-fade"></div>
                                 </div>
                                 <div class="rl-scroll-hint"><i class="bi bi-chevron-down"></i> Scroll for more</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================= -->
+            <!-- YEARLY LEAVE CALENDAR (static preview) -->
+            <!-- ============================= -->
+            <div class="row g-3 mt-4">
+                <div class="col-md-6">
+                    <div class="card shadow h-100 l7-compact leavecal-card">
+                        <div class="leavecal-header section-header">
+                            <span class="section-header-title"><i class="bi bi-calendar3"></i> Yearly Leave Calendar</span>
+                            <span class="section-count-badge"><i class="bi bi-eye me-1"></i>Static Preview</span>
+                        </div>
+                        <div class="card-body p-3 leavecal-body">
+                            <asp:Literal ID="litLeaveCalendar" runat="server" />
+                            <div class="leavecal-scroll-hint"><i class="bi bi-arrow-left-right"></i> Scroll to see all days</div>
+                            <div class="leavecal-legend">
+                                <span class="leavecal-legend-item"><span class="leavecal-legend-dot lc-normal"></span> Working Day</span>
+                                <span class="leavecal-legend-item"><span class="leavecal-legend-dot lc-weekend"></span> Weekend</span>
+                                <span class="leavecal-legend-item"><span class="leavecal-legend-dot lc-ph"></span> Public Holiday</span>
+                                <span class="leavecal-legend-item"><span class="leavecal-legend-dot lc-cl"></span> Casual Leave</span>
+                                <span class="leavecal-legend-item"><span class="leavecal-legend-dot lc-sl"></span> Sick Leave</span>
+                                <span class="leavecal-legend-item"><span class="leavecal-legend-dot lc-al"></span> Annual Leave</span>
                             </div>
                         </div>
                     </div>

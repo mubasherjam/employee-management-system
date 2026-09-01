@@ -32,7 +32,107 @@ namespace HRMSApp
                 BindLast7DaysSummary();
                 BindStatusBreakdown();
                 BindEventHistoryChart();
+                RenderLeaveCalendar();
             }
+        }
+
+        // ---- Yearly Leave Calendar (static preview data; will be wired to sp_Leave_GetCalendar next) ----
+        private void RenderLeaveCalendar()
+        {
+            litLeaveCalendar.Text = BuildLeaveCalendarHtml();
+        }
+
+        private string BuildLeaveCalendarHtml()
+        {
+            int year = 2026;
+            string[] monthShort = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+            // static demo overlay: (month, day) -> (css class, label). Weekends are computed from the real calendar below.
+            var overrides = new Dictionary<(int month, int day), (string css, string label)>
+            {
+                { (1, 1),   ("lc-ph", "Public Holiday") },
+                { (1, 14),  ("lc-cl", "Casual Leave") },
+                { (1, 22),  ("lc-sl", "Sick Leave") },
+                { (2, 5),   ("lc-al", "Annual Leave") },
+                { (2, 17),  ("lc-ph", "Public Holiday") },
+                { (2, 24),  ("lc-cl", "Casual Leave") },
+                { (3, 3),   ("lc-sl", "Sick Leave") },
+                { (3, 18),  ("lc-ph", "Public Holiday") },
+                { (3, 27),  ("lc-al", "Annual Leave") },
+                { (4, 9),   ("lc-al", "Annual Leave") },
+                { (4, 20),  ("lc-cl", "Casual Leave") },
+                { (4, 28),  ("lc-ph", "Public Holiday") },
+                { (5, 1),   ("lc-ph", "Public Holiday") },
+                { (5, 11),  ("lc-cl", "Casual Leave") },
+                { (5, 26),  ("lc-sl", "Sick Leave") },
+                { (6, 1),   ("lc-sl", "Sick Leave") },
+                { (6, 17),  ("lc-cl", "Casual Leave") },
+                { (6, 29),  ("lc-al", "Annual Leave") },
+                { (7, 5),   ("lc-al", "Annual Leave") },
+                { (7, 13),  ("lc-ph", "Public Holiday") },
+                { (7, 22),  ("lc-cl", "Casual Leave") },
+                { (8, 5),   ("lc-sl", "Sick Leave") },
+                { (8, 14),  ("lc-ph", "Public Holiday") },
+                { (8, 26),  ("lc-al", "Annual Leave") },
+                { (9, 7),   ("lc-cl", "Casual Leave") },
+                { (9, 20),  ("lc-sl", "Sick Leave") },
+                { (10, 12), ("lc-al", "Annual Leave") },
+                { (10, 21), ("lc-ph", "Public Holiday") },
+                { (10, 29), ("lc-cl", "Casual Leave") },
+                { (11, 1),  ("lc-cl", "Casual Leave") },
+                { (11, 16), ("lc-sl", "Sick Leave") },
+                { (12, 10), ("lc-al", "Annual Leave") },
+                { (12, 25), ("lc-ph", "Public Holiday") },
+                { (12, 28), ("lc-al", "Annual Leave") },
+            };
+
+            const int maxDays = 31;
+            var sb = new StringBuilder();
+            sb.Append("<div class='leavecal-scroll'><table class='leavecal-table'><thead><tr><th class='leavecal-monthcol'>Month</th>");
+            for (int d = 1; d <= maxDays; d++) sb.Append("<th>").Append(d).Append("</th>");
+            sb.Append("</tr></thead><tbody>");
+
+            for (int m = 1; m <= 12; m++)
+            {
+                int daysInMonth = DateTime.DaysInMonth(year, m);
+                sb.Append("<tr><td class='leavecal-monthcol'>").Append(monthShort[m - 1]).Append("</td>");
+
+                for (int d = 1; d <= maxDays; d++)
+                {
+                    if (d > daysInMonth)
+                    {
+                        sb.Append("<td class='leavecal-cell lc-blank'></td>");
+                        continue;
+                    }
+
+                    DateTime dt = new DateTime(year, m, d);
+                    bool isWeekend = dt.DayOfWeek == DayOfWeek.Saturday || dt.DayOfWeek == DayOfWeek.Sunday;
+
+                    string css = "lc-normal";
+                    string label = "Working Day";
+
+                    if (overrides.TryGetValue((m, d), out var ov))
+                    {
+                        css = ov.css;
+                        label = ov.label;
+                    }
+                    else if (isWeekend)
+                    {
+                        css = "lc-weekend";
+                        label = "Weekend";
+                    }
+
+                    string title = dt.ToString("MMM d, yyyy", CultureInfo.InvariantCulture) + " - " + label;
+                    sb.Append("<td class='leavecal-cell'><span class='leavecal-chip ").Append(css)
+                      .Append("' title='").Append(title).Append("'>")
+                      .Append(d).Append("</span></td>");
+                }
+
+                sb.Append("</tr>");
+            }
+
+            sb.Append("</tbody></table></div>");
+            return sb.ToString();
         }
 
         private void LoadDashboardData()
