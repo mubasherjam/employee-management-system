@@ -17,7 +17,7 @@
 
     <style>
 
-        /* ---- Leave summary header ---- */
+        /* ---- Leave summary header -- */
         .card-header-leave {
             background: linear-gradient(135deg, #6a4ce0 0%, #4b2fb0 55%, #7c5cff 100%);
             color: #fff;
