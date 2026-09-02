@@ -33,6 +33,7 @@ namespace HRMSApp
                 BindStatusBreakdown();
                 BindEventHistoryChart();
                 RenderLeaveCalendar();
+                RenderLeaveCalendarPro();
             }
         }
 
@@ -42,13 +43,12 @@ namespace HRMSApp
             litLeaveCalendar.Text = BuildLeaveCalendarHtml();
         }
 
-        private string BuildLeaveCalendarHtml()
+        // Shared static demo overlay: (month, day) -> (css class, label). Both the original
+        // spreadsheet-style calendar and the redesigned month-grid calendar read from this
+        // single source so the two views never drift out of sync.
+        private Dictionary<(int month, int day), (string css, string label)> GetLeaveCalendarOverrides()
         {
-            int year = 2026;
-            string[] monthShort = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
-            // static demo overlay: (month, day) -> (css class, label). Weekends are computed from the real calendar below.
-            var overrides = new Dictionary<(int month, int day), (string css, string label)>
+            return new Dictionary<(int month, int day), (string css, string label)>
             {
                 { (1, 1),   ("lc-ph", "Public Holiday") },
                 { (1, 14),  ("lc-cl", "Casual Leave") },
@@ -85,6 +85,14 @@ namespace HRMSApp
                 { (12, 25), ("lc-ph", "Public Holiday") },
                 { (12, 28), ("lc-al", "Annual Leave") },
             };
+        }
+
+        private string BuildLeaveCalendarHtml()
+        {
+            int year = 2026;
+            string[] monthShort = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+            var overrides = GetLeaveCalendarOverrides();
 
             const int maxDays = 31;
 
@@ -152,6 +160,185 @@ namespace HRMSApp
               .Append("</div>");
             return sb.ToString();
         }
+
+        // ---- Redesigned Leave Calendar (month-grid view, built to be dropped into a modal later) ----
+        private void RenderLeaveCalendarPro()
+        {
+            litLeaveCalendarPro.Text = BuildLeaveCalendarProHtml();
+        }
+
+        private string BuildLeaveCalendarProHtml()
+        {
+            // Same reference year the original calendar uses, plus three prior years so the
+            // "previous year" navigation has something real to switch between. The demo overlay
+            // (month/day -> leave type) is reused as-is for every year shown.
+            const int baseYear = 2026;
+            int[] years = { baseYear - 3, baseYear - 2, baseYear - 1, baseYear };
+            int defaultYear = baseYear;
+
+            string[] monthNames = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+            string[] weekdayMini = { "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su" };
+
+            var overrides = GetLeaveCalendarOverrides();
+
+            int phCount = overrides.Values.Count(v => v.css == "lc-ph");
+            int alCount = overrides.Values.Count(v => v.css == "lc-al");
+            int slCount = overrides.Values.Count(v => v.css == "lc-sl");
+            int clCount = overrides.Values.Count(v => v.css == "lc-cl");
+
+            bool prevDisabled = defaultYear <= years[0];
+            bool nextDisabled = defaultYear >= years[years.Length - 1];
+
+            var sb = new StringBuilder();
+            sb.Append("<div class='lcp-wrap' id='lcpRoot'>");
+
+            // ---- stat chips ----
+            sb.Append("<div class='lcp-stats-row'>");
+            sb.Append(BuildLcpStat("bi-flag-fill", phCount, "Public Holidays", "ph"));
+            sb.Append(BuildLcpStat("bi-airplane-fill", alCount, "Annual Leave", "al"));
+            sb.Append(BuildLcpStat("bi-heart-pulse-fill", slCount, "Sick Leave", "sl"));
+            sb.Append(BuildLcpStat("bi-cup-hot-fill", clCount, "Casual Leave", "cl"));
+            sb.Append("</div>");
+
+            // ---- year navigation toolbar ----
+            sb.Append("<div class='lcp-toolbar'>");
+            sb.Append("<button type='button' class='lcp-nav-btn' data-role='prevYear'" + (prevDisabled ? " disabled" : "") + " aria-label='Previous year'><i class='bi bi-chevron-left'></i></button>");
+            sb.Append("<div class='lcp-year-label' data-role='yearLabel'>" + defaultYear + "</div>");
+            sb.Append("<button type='button' class='lcp-nav-btn' data-role='nextYear'" + (nextDisabled ? " disabled" : "") + " aria-label='Next year'><i class='bi bi-chevron-right'></i></button>");
+            sb.Append("</div>");
+
+            // ---- year pills ----
+            sb.Append("<div class='lcp-year-pills' data-role='pills'>");
+            foreach (int y in years)
+            {
+                sb.Append("<button type='button' class='lcp-pill" + (y == defaultYear ? " active" : "") + "' data-year='" + y + "'>" + y + "</button>");
+            }
+            sb.Append("</div>");
+
+            // ---- year panels, each a 12-up grid of mini month calendars ----
+            sb.Append("<div class='lcp-year-panels' data-role='panels'>");
+            foreach (int y in years)
+            {
+                sb.Append("<div class='lcp-year-panel" + (y == defaultYear ? " active" : "") + "' data-year='" + y + "'>");
+                sb.Append("<div class='lcp-months-grid'>");
+
+                for (int m = 1; m <= 12; m++)
+                {
+                    int monthEventCount = overrides.Keys.Count(k => k.month == m);
+
+                    sb.Append("<div class='lcp-month-card'>");
+                    sb.Append("<div class='lcp-month-card-head'><span>" + monthNames[m - 1] + "</span>");
+                    if (monthEventCount > 0) sb.Append("<span class='lcp-month-badge'>" + monthEventCount + "</span>");
+                    sb.Append("</div>");
+
+                    sb.Append("<div class='lcp-mini-weekdays'>");
+                    foreach (var wd in weekdayMini) sb.Append("<span>" + wd + "</span>");
+                    sb.Append("</div>");
+
+                    sb.Append("<div class='lcp-mini-grid'>");
+
+                    DateTime first = new DateTime(y, m, 1);
+                    int leading = ((int)first.DayOfWeek + 6) % 7; // Monday = 0
+                    for (int i = 0; i < leading; i++) sb.Append("<div class='lcp-day lcp-day-empty'></div>");
+
+                    int daysInMonth = DateTime.DaysInMonth(y, m);
+                    for (int d = 1; d <= daysInMonth; d++)
+                    {
+                        DateTime dt = new DateTime(y, m, d);
+                        bool isWeekend = dt.DayOfWeek == DayOfWeek.Saturday || dt.DayOfWeek == DayOfWeek.Sunday;
+                        bool isToday = dt.Date == DateTime.Today;
+
+                        string tone = "lcp-normal";
+                        string label = "Working Day";
+
+                        if (overrides.TryGetValue((m, d), out var ov))
+                        {
+                            tone = "lcp-" + ov.css.Substring(3); // "lc-ph" -> "lcp-ph"
+                            label = ov.label;
+                        }
+                        else if (isWeekend)
+                        {
+                            tone = "lcp-weekend";
+                            label = "Weekend";
+                        }
+
+                        string classes = "lcp-day " + tone + (isToday ? " lcp-today" : "");
+                        sb.Append("<div class='" + classes + "'>");
+                        sb.Append("<span class='lcp-day-num'>" + d + "</span>");
+                        sb.Append("<div class='lcp-tip'><b>" + dt.ToString("MMM d, yyyy", CultureInfo.InvariantCulture) + "</b>" + label + (isToday ? " &middot; Today" : "") + "</div>");
+                        sb.Append("</div>");
+                    }
+
+                    sb.Append("</div>"); // .lcp-mini-grid
+                    sb.Append("</div>"); // .lcp-month-card
+                }
+
+                sb.Append("</div>"); // .lcp-months-grid
+                sb.Append("</div>"); // .lcp-year-panel
+            }
+            sb.Append("</div>"); // .lcp-year-panels
+
+            // ---- legend ----
+            sb.Append("<div class='lcp-legend'>");
+            sb.Append(BuildLcpLegendItem("lcp-normal", "Working Day"));
+            sb.Append(BuildLcpLegendItem("lcp-weekend", "Weekend"));
+            sb.Append(BuildLcpLegendItem("lcp-ph", "Public Holiday"));
+            sb.Append(BuildLcpLegendItem("lcp-cl", "Casual Leave"));
+            sb.Append(BuildLcpLegendItem("lcp-sl", "Sick Leave"));
+            sb.Append(BuildLcpLegendItem("lcp-al", "Annual Leave"));
+            sb.Append("</div>");
+
+            sb.Append("</div>"); // .lcp-wrap
+
+            sb.Append(@"
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var root = document.getElementById('lcpRoot');
+    if (!root) return;
+
+    var years = [" + string.Join(",", years) + @"];
+    var current = " + defaultYear + @";
+
+    var pills = root.querySelectorAll('.lcp-pill');
+    var panels = root.querySelectorAll('.lcp-year-panel');
+    var label = root.querySelector('[data-role=""yearLabel""]');
+    var prevBtn = root.querySelector('[data-role=""prevYear""]');
+    var nextBtn = root.querySelector('[data-role=""nextYear""]');
+
+    function showYear(y) {
+        if (years.indexOf(y) === -1) return;
+        current = y;
+        pills.forEach(function (p) { p.classList.toggle('active', parseInt(p.dataset.year, 10) === y); });
+        panels.forEach(function (p) { p.classList.toggle('active', parseInt(p.dataset.year, 10) === y); });
+        if (label) label.textContent = y;
+        if (prevBtn) prevBtn.disabled = (y <= years[0]);
+        if (nextBtn) nextBtn.disabled = (y >= years[years.length - 1]);
+    }
+
+    pills.forEach(function (p) {
+        p.addEventListener('click', function () { showYear(parseInt(p.dataset.year, 10)); });
+    });
+    if (prevBtn) prevBtn.addEventListener('click', function () { showYear(current - 1); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { showYear(current + 1); });
+});
+</script>");
+
+            return sb.ToString();
+        }
+
+        private string BuildLcpStat(string icon, int count, string label, string tone)
+        {
+            return "<div class='lcp-stat lcp-stat-" + tone + "'>" +
+                   "<div class='lcp-stat-icon'><i class='bi " + icon + "'></i></div>" +
+                   "<div><div class='lcp-stat-num'>" + count + "</div><div class='lcp-stat-label'>" + label + "</div></div>" +
+                   "</div>";
+        }
+
+        private string BuildLcpLegendItem(string cssClass, string label)
+        {
+            return "<span class='lcp-legend-item'><span class='lcp-legend-dot " + cssClass + "'></span>" + label + "</span>";
+        }
+        // redesigned leave calendar ends here
 
         private void LoadDashboardData()
         {
@@ -774,11 +961,6 @@ namespace HRMSApp
             litL7AvgHours.Text = "8.2";
             litL7TotalAbsents.Text = "5";
 
-            litL7AvgCheckInAlt.Text = litL7AvgCheckIn.Text;
-            litL7AvgCheckOutAlt.Text = litL7AvgCheckOut.Text;
-            litL7AvgHoursAlt.Text = litL7AvgHours.Text;
-            litL7TotalAbsentsAlt.Text = litL7TotalAbsents.Text;
-
             BindLast7DaysTrendChart();
         }
 
@@ -814,7 +996,6 @@ namespace HRMSApp
             }
 
             litL7Range.Text = rangeStart.ToString("MMM d") + " &ndash; " + rangeEnd.ToString("MMM d");
-            litL7RangeAlt.Text = litL7Range.Text;
 
             string script = @"
         <script>
@@ -866,12 +1047,12 @@ namespace HRMSApp
                                 tension: 0.4,
                                 pointRadius: pointRadii,
                                 pointHoverRadius: 5,
-                                pointBackgroundColor: '#fbbf24',
-                                pointBorderColor: '#fbbf24',
-                                pointBorderWidth: 0,
-                                pointHoverBackgroundColor: '#fbbf24',
-                                pointHoverBorderColor: '#fbbf24',
-                                pointHoverBorderWidth: 0,
+                                pointBackgroundColor: '#fff',
+                                pointBorderColor: lineColor,
+                                pointBorderWidth: 2,
+                                pointHoverBackgroundColor: lineColor,
+                                pointHoverBorderColor: '#fff',
+                                pointHoverBorderWidth: 2,
                                 spanGaps: true
                             }]
                         },
@@ -906,12 +1087,45 @@ namespace HRMSApp
                     makeSparkline('l7SparkCheckIn', [" + checkInMins + @"], fmtTime, '#2955c9', 'rgba(41,85,201,ALPHA)'),
                     makeSparkline('l7SparkCheckOut', [" + checkOutMins + @"], fmtTime, '#6a4ce0', 'rgba(106,76,224,ALPHA)'),
                     makeSparkline('l7SparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#16a34a', 'rgba(22,163,74,ALPHA)'),
-                    makeSparkline('l7SparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#d63384', 'rgba(214,51,132,ALPHA)'),
-                    makeSparkline('l7vSparkCheckIn', [" + checkInMins + @"], fmtTime, '#4f8cf7', 'rgba(79,140,247,ALPHA)', false),
-                    makeSparkline('l7vSparkCheckOut', [" + checkOutMins + @"], fmtTime, '#9b7bff', 'rgba(155,123,255,ALPHA)', false),
-                    makeSparkline('l7vSparkHours', [" + hours + @"], function (v) { return v + ' hrs'; }, '#34d399', 'rgba(52,211,153,ALPHA)', false),
-                    makeSparkline('l7vSparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#f472b6', 'rgba(244,114,182,ALPHA)', false)
+                    makeSparkline('l7SparkAbsent', [" + absents + @"], function (v) { return v + (v === 1 ? ' absent' : ' absents'); }, '#d63384', 'rgba(214,51,132,ALPHA)')
                 ];
+
+                // Small ""is this metric trending up or down this week"" badge, shown top-right
+                // of each tile. goodDirection tells it which direction should read as positive
+                // (green) vs negative (red) - check-in/check-out have no inherently ""good""
+                // direction, so they stay neutral and just report earlier/later/steady.
+                function renderTrend(elId, data, kind, goodDirection) {
+                    var el = document.getElementById(elId);
+                    if (!el) return;
+                    var valid = data.filter(function (v) { return v !== null && v !== undefined && !isNaN(v); });
+                    if (valid.length < 2) { el.style.display = 'none'; return; }
+
+                    var diff = valid[valid.length - 1] - valid[0];
+                    var direction = diff > 0 ? 'up' : (diff < 0 ? 'down' : 'flat');
+
+                    var tone = 'neutral';
+                    if (goodDirection && direction !== 'flat') {
+                        tone = (direction === goodDirection) ? 'good' : 'bad';
+                    }
+
+                    var icon = direction === 'up' ? 'bi-arrow-up-short' : (direction === 'down' ? 'bi-arrow-down-short' : 'bi-dash');
+                    var text;
+                    if (kind === 'time') {
+                        text = direction === 'up' ? 'Later' : (direction === 'down' ? 'Earlier' : 'Steady');
+                    } else if (kind === 'hours') {
+                        text = (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'h';
+                    } else {
+                        text = (diff >= 0 ? '+' : '') + diff + (Math.abs(diff) === 1 ? ' day' : ' days');
+                    }
+
+                    el.className = 'l7v2-trend tone-' + tone;
+                    el.innerHTML = '<i class=""bi ' + icon + '""></i><span>' + text + '</span>';
+                }
+
+                renderTrend('l7TrendCheckIn', [" + checkInMins + @"], 'time', null);
+                renderTrend('l7TrendCheckOut', [" + checkOutMins + @"], 'time', null);
+                renderTrend('l7TrendHours', [" + hours + @"], 'hours', 'up');
+                renderTrend('l7TrendAbsent', [" + absents + @"], 'count', 'down');
 
                 // The panel's own entrance animation and grid layout can settle a moment after
                 // Chart.js takes its first size reading, which is what left some sparklines

@@ -478,9 +478,9 @@
         }
 
 
-        /* ---- Last 7 Days Summary Card (KPI list, each row with its own single-metric sparkline) ----
-           Redesigned as a clean row list rather than a colored tile grid, to match the light,
-           understated card language used everywhere else on this dashboard. */
+        /* ---- Last 7 Days Overview (redesign): a colorful, tinted KPI tile grid so
+           each metric reads instantly by color, with a trend badge and its own
+           sparkline per tile. ---- */
         .l7-period-badge {
             display: inline-flex; align-items: center; gap: 7px;
             background: linear-gradient(135deg, #eef1f8, #e4e9f5);
@@ -499,86 +499,13 @@
             margin: 0 0 6px;
         }
 
-        .l7-list { display: flex; flex-direction: column; }
-
-        .l7-row {
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 13px 6px;
-            border-bottom: 1px solid #f0f2f7;
-            border-radius: 10px;
-            opacity: 0;
-            transform: translateX(-10px);
-            animation: l7RowIn 0.4s ease forwards;
-            transition: background 0.2s ease, padding-left 0.2s ease;
-        }
-        .l7-row:last-child { border-bottom: none; }
-        .l7-row:hover { background: #f7f9fd; padding-left: 10px; }
-        @keyframes l7RowIn { to { opacity: 1; transform: translateX(0); } }
         @keyframes l7RiseIn { to { opacity: 1; transform: translateY(0); } }
 
-        .l7-row-icon {
-            width: 42px; height: 42px;
-            border-radius: 13px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-            transition: transform 0.25s ease;
-        }
-        .l7-row:hover .l7-row-icon { transform: scale(1.08) rotate(-3deg); }
-
-        .l7-row[data-accent="checkin"]  .l7-row-icon { background: linear-gradient(135deg, rgba(79,140,247,0.16), rgba(41,85,201,0.16)); color: #2955c9; }
-        .l7-row[data-accent="checkout"] .l7-row-icon { background: linear-gradient(135deg, rgba(155,123,255,0.16), rgba(106,76,224,0.16)); color: #6a4ce0; }
-        .l7-row[data-accent="hours"]    .l7-row-icon { background: linear-gradient(135deg, rgba(52,211,153,0.18), rgba(22,163,74,0.18)); color: #16a34a; }
-        .l7-row[data-accent="absent"]   .l7-row-icon { background: linear-gradient(135deg, rgba(244,114,182,0.16), rgba(214,51,132,0.16)); color: #d63384; }
-
-        .l7-row-text { flex: 1; min-width: 0; }
-        .l7-value {
-            font-size: 1.15rem; font-weight: 800;
-            color: #1a2332;
-            line-height: 1.2;
-            letter-spacing: -0.01em;
-            white-space: nowrap;
-        }
-        .l7-label {
-            font-size: 0.68rem;
-            color: #8892a0;
-            font-weight: 700;
-            margin-top: 2px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
-
-        .l7-spark-wrap {
-            width: 96px;
-            height: 38px;
-            flex-shrink: 0;
-        }
-        .l7-spark-wrap canvas { display: block; width: 100% !important; height: 100% !important; }
-
-        @media (max-width: 420px) {
-            .l7-spark-wrap { width: 60px; }
-        }
-
-        /* ---- Last 7 Days Overview - Vertical Trend: single unified panel ----
-           Same four metrics as the tile version above, but presented as one light,
-           airy panel divided by hairline gaps instead of four separate boxed cards.
-           The grid's own `gap` (filled by the panel's background color) draws the
-           dividers, so there's no per-cell border math to keep in sync. */
-        .l7u-panel {
+        .l7v2-card {
             position: relative;
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-            gap: 1px;
-            border-radius: 16px;
             overflow: hidden;
-            background: #e8ecf3;
-            border: 1px solid #e8ecf3;
-            box-shadow: 0 6px 20px rgba(20,30,60,0.06);
         }
-        .l7u-panel::before {
+        .l7v2-card::before {
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; height: 3px;
@@ -588,64 +515,117 @@
             z-index: 2;
         }
 
-        .l7u-item {
+        /* One joined panel instead of four separate cards: a 1px gap filled by the
+           panel's own background draws a hairline divider between cells, so the
+           sections read as distinct without each needing its own border/shadow. */
+        .l7v2-tiles {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1px;
+            margin: 12px 0 4px;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #e8ecf3;
+            border: 1px solid #e8ecf3;
+            box-shadow: 0 6px 20px rgba(20,30,60,0.06);
+        }
+
+        .l7v2-tile {
             position: relative;
-            min-width: 0;
-            background: #fff;
-            padding: 18px 18px 14px;
+            padding: 16px 16px 12px 18px;
+            background-color: #fff;
+            overflow: hidden;
             opacity: 0;
             transform: translateY(8px);
-            animation: l7RiseIn 0.5s ease forwards;
-            transition: background 0.2s ease;
+            animation: l7RiseIn 0.45s ease forwards;
+            transition: box-shadow 0.2s ease;
         }
-        .l7u-item:hover { background: #fafbfe; }
+        .l7v2-tile::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0; width: 4px;
+            z-index: 1;
+        }
+        .l7v2-tile::after {
+            content: '';
+            position: absolute;
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            top: -50px; right: -35px;
+            pointer-events: none;
+            transition: transform 0.35s ease;
+        }
+        .l7v2-tile:hover { box-shadow: inset 0 0 0 9999px rgba(20,30,60,0.025); }
+        .l7v2-tile:hover::after { transform: scale(1.15); }
 
-        .l7u-item-head {
-            display: flex; align-items: center; gap: 12px;
-            margin-bottom: 10px;
-        }
-        .l7u-icon {
-            width: 34px; height: 34px;
-            border-radius: 10px;
+        /* children painted above the decorative ::after blob */
+        .l7v2-tile-top, .l7v2-value, .l7v2-label, .l7v2-spark { position: relative; z-index: 2; }
+
+        .l7v2-tile[data-accent="checkin"]  { background-image: linear-gradient(160deg, rgba(79,140,247,0.09), rgba(79,140,247,0.02) 60%); }
+        .l7v2-tile[data-accent="checkout"] { background-image: linear-gradient(160deg, rgba(155,123,255,0.09), rgba(155,123,255,0.02) 60%); }
+        .l7v2-tile[data-accent="hours"]    { background-image: linear-gradient(160deg, rgba(52,211,153,0.1), rgba(52,211,153,0.02) 60%); }
+        .l7v2-tile[data-accent="absent"]   { background-image: linear-gradient(160deg, rgba(244,114,182,0.09), rgba(244,114,182,0.02) 60%); }
+
+        .l7v2-tile[data-accent="checkin"]::before  { background: linear-gradient(180deg, #4f8cf7, #2955c9); }
+        .l7v2-tile[data-accent="checkout"]::before { background: linear-gradient(180deg, #9b7bff, #6a4ce0); }
+        .l7v2-tile[data-accent="hours"]::before    { background: linear-gradient(180deg, #34d399, #16a34a); }
+        .l7v2-tile[data-accent="absent"]::before   { background: linear-gradient(180deg, #f472b6, #d63384); }
+
+        .l7v2-tile[data-accent="checkin"]::after  { background: radial-gradient(circle, rgba(79,140,247,0.3), transparent 70%); }
+        .l7v2-tile[data-accent="checkout"]::after { background: radial-gradient(circle, rgba(155,123,255,0.3), transparent 70%); }
+        .l7v2-tile[data-accent="hours"]::after    { background: radial-gradient(circle, rgba(52,211,153,0.3), transparent 70%); }
+        .l7v2-tile[data-accent="absent"]::after   { background: radial-gradient(circle, rgba(244,114,182,0.3), transparent 70%); }
+
+        .l7v2-tile-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+
+        .l7v2-icon {
+            width: 36px; height: 36px;
+            border-radius: 11px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: #fff;
             flex-shrink: 0;
-            box-shadow: 0 4px 10px rgba(20,30,60,0.18);
-            transition: transform 0.2s ease;
+            box-shadow: 0 5px 12px rgba(20,30,60,0.18);
+            transition: transform 0.25s ease;
         }
-        .l7u-item:hover .l7u-icon { transform: scale(1.08); }
-        .l7u-item[data-accent="checkin"]  .l7u-icon { background: linear-gradient(135deg, #4f8cf7, #2955c9); }
-        .l7u-item[data-accent="checkout"] .l7u-icon { background: linear-gradient(135deg, #9b7bff, #6a4ce0); }
-        .l7u-item[data-accent="hours"]    .l7u-icon { background: linear-gradient(135deg, #34d399, #16a34a); }
-        .l7u-item[data-accent="absent"]   .l7u-icon { background: linear-gradient(135deg, #f472b6, #d63384); }
+        .l7v2-tile:hover .l7v2-icon { transform: scale(1.1) rotate(-4deg); }
+        .l7v2-tile[data-accent="checkin"]  .l7v2-icon { background: linear-gradient(135deg, #4f8cf7, #2955c9); }
+        .l7v2-tile[data-accent="checkout"] .l7v2-icon { background: linear-gradient(135deg, #9b7bff, #6a4ce0); }
+        .l7v2-tile[data-accent="hours"]    .l7v2-icon { background: linear-gradient(135deg, #34d399, #16a34a); }
+        .l7v2-tile[data-accent="absent"]   .l7v2-icon { background: linear-gradient(135deg, #f472b6, #d63384); }
 
-        .l7u-value {
-            font-size: 1.25rem; font-weight: 800;
+        .l7v2-trend {
+            display: inline-flex; align-items: center; gap: 2px;
+            font-size: 0.63rem; font-weight: 800;
+            padding: 3px 9px; border-radius: 20px;
+            color: #8892a0; background: #fff;
+            border: 1px solid #eef0f4;
+        }
+        .l7v2-trend i { font-size: 0.75rem; }
+        .l7v2-trend.tone-good { color: #16a34a; background: #e8f9ef; border-color: #cdeedd; }
+        .l7v2-trend.tone-bad  { color: #dc2626; background: #fdecec; border-color: #f7d3d3; }
+
+        .l7v2-value {
+            font-size: 1.4rem; font-weight: 800;
             color: #1a2332;
             line-height: 1.15;
             letter-spacing: -0.01em;
             white-space: nowrap;
         }
-        .l7u-label {
-            font-size: 0.63rem;
+        .l7v2-label {
+            font-size: 0.66rem;
             color: #8892a0;
             font-weight: 700;
+            margin-top: 3px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-top: 2px;
+            letter-spacing: 0.04em;
         }
 
-        .l7u-spark {
-            position: relative;
-            width: 100%;
-            height: 48px;
-            margin: 4px 0 0;
-        }
-        .l7u-spark canvas {
-            display: block;
-            width: 100% !important;
-            height: 100% !important;
+        .l7v2-spark { width: 100%; height: 40px; margin-top: 10px; }
+        .l7v2-spark canvas { display: block; width: 100% !important; height: 100% !important; }
+
+        @media (max-width: 420px) {
+            .l7v2-tiles { grid-template-columns: minmax(0, 1fr); }
         }
 
         /* ---- Reporting Line Card (MD4, static front-end) ---- */
@@ -1253,6 +1233,297 @@
         .leavecal-legend-dot.lc-cl { background: linear-gradient(135deg, #22d3ee, #0891b2); }
         .leavecal-legend-dot.lc-sl { background: linear-gradient(135deg, #c084fc, #9333ea); }
         .leavecal-legend-dot.lc-al { background: linear-gradient(135deg, #d4b96a, #b8973f); }
+        /* yearly leave calendar (original) ends here */
+
+        /* ---- Leave Calendar - Redesigned (month-grid, built to drop into a modal) ---- */
+        .lcp-card {
+            position: relative;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: l7RiseIn 0.5s ease forwards;
+        }
+        .lcp-header {
+            background: radial-gradient(120% 180% at 0% 0%, #4c2a8f 0%, #2c1a5e 45%, #1a1035 100%);
+            color: #fff;
+            padding: 12px 22px;
+            position: relative;
+            overflow: hidden;
+        }
+        .lcp-header::before {
+            content: '';
+            position: absolute;
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(124,92,255,0.35), transparent 70%);
+            top: -100px; right: -40px;
+        }
+        .lcp-header::after {
+            content: '';
+            position: absolute;
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(240,147,251,0.22), transparent 70%);
+            bottom: -70px; left: 10%;
+        }
+        .lcp-header .section-header-title,
+        .lcp-header .section-count-badge { position: relative; z-index: 2; }
+        .lcp-badge {
+            background: linear-gradient(135deg, rgba(240,147,251,0.28), rgba(124,92,255,0.28));
+            border: 1px solid rgba(255,255,255,0.22);
+        }
+        .lcp-expand-btn {
+            position: relative; z-index: 2;
+            width: 30px; height: 30px;
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,0.22);
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+        .lcp-expand-btn:hover { background: rgba(255,255,255,0.22); transform: scale(1.06); }
+
+        .lcp-wrap { padding: 2px 2px 0; }
+
+        /* stat chips */
+        .lcp-stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .lcp-stat {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 10px;
+            border-radius: 10px;
+            background: #fafbfc;
+            border: 1px solid #eef0f4;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .lcp-stat:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(20,30,60,0.08); }
+        .lcp-stat-icon {
+            width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 0.78rem;
+            box-shadow: 0 3px 7px rgba(0,0,0,0.12);
+        }
+        .lcp-stat-ph .lcp-stat-icon { background: linear-gradient(135deg, #4ade80, #16a34a); }
+        .lcp-stat-al .lcp-stat-icon { background: linear-gradient(135deg, #d4b96a, #b8973f); }
+        .lcp-stat-sl .lcp-stat-icon { background: linear-gradient(135deg, #c084fc, #9333ea); }
+        .lcp-stat-cl .lcp-stat-icon { background: linear-gradient(135deg, #22d3ee, #0891b2); }
+        .lcp-stat-num { font-size: 1rem; font-weight: 800; color: #1a2332; line-height: 1.1; }
+        .lcp-stat-label { font-size: 0.58rem; color: #8892a0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; margin-top: 1px; }
+
+        /* toolbar (year navigation) */
+        .lcp-toolbar {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+        .lcp-nav-btn {
+            width: 24px; height: 24px; border-radius: 7px;
+            border: 1px solid #eef0f4;
+            background: #fff;
+            color: #4c2a8f;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .lcp-nav-btn:hover { background: #f5f2ff; transform: scale(1.06); box-shadow: 0 6px 14px rgba(76,42,143,0.15); }
+        .lcp-nav-btn:disabled {
+            opacity: 0.35; cursor: not-allowed;
+            background: #fff; transform: none; box-shadow: none;
+        }
+        .lcp-year-label {
+            font-size: 1rem; font-weight: 800; color: #1a2332;
+            min-width: 60px; text-align: center;
+            letter-spacing: -0.01em;
+        }
+
+        /* year pills */
+        .lcp-year-pills {
+            display: flex; justify-content: center; gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .lcp-pill {
+            flex-shrink: 0;
+            border: 1px solid #eef0f4;
+            background: #fff;
+            color: #6b7280;
+            font-size: 0.68rem; font-weight: 700;
+            padding: 3px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+        .lcp-pill:hover { background: #f5f2ff; color: #4c2a8f; }
+        .lcp-pill.active {
+            background: linear-gradient(135deg, #7c5cff, #4c2a8f);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 6px 14px rgba(76,42,143,0.3);
+        }
+
+        /* year panel: 12 mini month calendars */
+        .lcp-year-panel { display: none; }
+        .lcp-year-panel.active {
+            display: block;
+            animation: l7RiseIn 0.4s ease forwards;
+        }
+
+        .lcp-months-grid {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .lcp-month-card {
+            border: 1px solid #eef0f4;
+            border-radius: 9px;
+            padding: 6px 6px 5px;
+            background: #fff;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .lcp-month-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(20,30,60,0.1); }
+
+        .lcp-month-card-head {
+            display: flex; align-items: center; justify-content: space-between;
+            font-weight: 800; color: #1a2332; font-size: 0.66rem;
+            margin-bottom: 4px;
+        }
+        .lcp-month-badge {
+            background: #f5f2ff; color: #4c2a8f;
+            font-size: 0.52rem; font-weight: 800;
+            padding: 1px 6px; border-radius: 20px;
+        }
+
+        .lcp-mini-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 1px;
+            margin-bottom: 2px;
+        }
+        .lcp-mini-weekdays span {
+            text-align: center;
+            font-size: 0.46rem;
+            font-weight: 800;
+            color: #b7bec9;
+            text-transform: uppercase;
+        }
+
+        .lcp-mini-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 1px;
+        }
+
+        .lcp-day {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            border-radius: 3px;
+            display: flex; align-items: center; justify-content: center;
+            background: #fff;
+            border: 1px solid #f1f2f5;
+            font-size: 0.52rem;
+            cursor: default;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .lcp-day:hover { transform: scale(1.22); box-shadow: 0 8px 16px rgba(20,30,60,0.18); z-index: 3; border-color: transparent; }
+        .lcp-day-empty { background: transparent; border: none; cursor: default; }
+        .lcp-day-empty:hover { transform: none; box-shadow: none; }
+
+        .lcp-day-num { font-weight: 700; color: #1a2332; }
+
+        .lcp-day.lcp-weekend { background: #f4f5f8; border-color: #eceef2; }
+        .lcp-day.lcp-weekend .lcp-day-num { color: #a3abba; }
+
+        .lcp-day.lcp-ph { background: linear-gradient(135deg, #4ade80, #16a34a); border-color: transparent; box-shadow: 0 2px 5px rgba(22,163,74,0.35); }
+        .lcp-day.lcp-cl { background: linear-gradient(135deg, #22d3ee, #0891b2); border-color: transparent; box-shadow: 0 2px 5px rgba(8,145,178,0.35); }
+        .lcp-day.lcp-sl { background: linear-gradient(135deg, #c084fc, #9333ea); border-color: transparent; box-shadow: 0 2px 5px rgba(147,51,234,0.35); }
+        .lcp-day.lcp-al { background: linear-gradient(135deg, #d4b96a, #b8973f); border-color: transparent; box-shadow: 0 2px 5px rgba(184,151,63,0.35); }
+        .lcp-day.lcp-ph .lcp-day-num, .lcp-day.lcp-cl .lcp-day-num, .lcp-day.lcp-sl .lcp-day-num, .lcp-day.lcp-al .lcp-day-num {
+            color: #fff;
+        }
+
+        .lcp-day.lcp-today {
+            box-shadow: 0 0 0 2px #4c2a8f, 0 4px 10px rgba(76,42,143,0.3);
+            z-index: 2;
+        }
+        .lcp-day.lcp-today::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            width: 3px; height: 3px;
+            border-radius: 50%;
+            background: #4c2a8f;
+        }
+        .lcp-day.lcp-ph.lcp-today::after, .lcp-day.lcp-cl.lcp-today::after,
+        .lcp-day.lcp-sl.lcp-today::after, .lcp-day.lcp-al.lcp-today::after { background: #fff; }
+
+        .lcp-tip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(4px);
+            background: #1a2332;
+            color: #fff;
+            font-size: 0.72rem;
+            line-height: 1.5;
+            padding: 8px 12px;
+            border-radius: 9px;
+            white-space: nowrap;
+            box-shadow: 0 10px 22px rgba(0,0,0,0.25);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+            z-index: 10;
+        }
+        .lcp-tip b { display: block; font-weight: 800; }
+        .lcp-tip::after {
+            content: '';
+            position: absolute;
+            top: 100%; left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #1a2332;
+        }
+        .lcp-day:hover .lcp-tip { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* legend */
+        .lcp-legend {
+            display: flex; flex-wrap: wrap;
+            gap: 5px 14px;
+            margin-top: 10px; padding-top: 8px;
+            border-top: 1px dashed #e9edf3;
+        }
+        .lcp-legend-item {
+            display: flex; align-items: center; gap: 5px;
+            font-size: 0.66rem; font-weight: 600; color: #4a5568;
+        }
+        .lcp-legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+        .lcp-legend-dot.lcp-normal { background: #fff; border: 1px solid #d7dde5; }
+        .lcp-legend-dot.lcp-weekend { background: #e4e6ec; }
+        .lcp-legend-dot.lcp-ph { background: linear-gradient(135deg, #4ade80, #16a34a); }
+        .lcp-legend-dot.lcp-cl { background: linear-gradient(135deg, #22d3ee, #0891b2); }
+        .lcp-legend-dot.lcp-sl { background: linear-gradient(135deg, #c084fc, #9333ea); }
+        .lcp-legend-dot.lcp-al { background: linear-gradient(135deg, #d4b96a, #b8973f); }
+
+        @media (max-width: 1200px) {
+            .lcp-months-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        }
+        @media (max-width: 860px) {
+            .lcp-months-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+        @media (max-width: 575px) {
+            .lcp-stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .lcp-months-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .lcp-day { border-radius: 3px; font-size: 0.58rem; }
+        }
+        /* redesigned leave calendar ends here */
 
     </style>
 </head>
@@ -1489,50 +1760,53 @@
             <div class="row g-3 mt-4">
 
                 <div class="col-lg-6">
-                    <div class="card shadow h-100 l7-compact">
-                        <div class="card-header-custom">
-                            <span style="font-weight:700;"><i class="bi bi-calendar-week me-2"></i>Last 7 Days Overview</span>
+                    <div class="card shadow h-100 l7-compact l7v2-card">
+                        <div class="card-header-custom section-header">
+                            <span class="section-header-title"><i class="bi bi-calendar-week"></i> Last 7 Days Overview</span>
+                            <span class="section-count-badge"><i class="bi bi-clock-history me-1"></i><asp:Literal ID="litL7Range" runat="server" Text="Rolling 7-Day Window" /></span>
                         </div>
                         <div class="card-body p-3">
-                            <span class="l7-period-badge">
-                                <i class="bi bi-clock-history"></i>
-                                <asp:Literal ID="litL7Range" runat="server" Text="Rolling 7-Day Window" />
-                            </span>
                             <p class="l7-subtitle">Attendance trends over the last 7 working days</p>
-                            <div class="l7-list">
-                                <div class="l7-row" data-accent="checkin" style="animation-delay:0.05s;">
-                                    <span class="l7-row-icon"><i class="bi bi-box-arrow-in-right"></i></span>
-                                    <div class="l7-row-text">
-                                        <div class="l7-value"><asp:Literal ID="litL7AvgCheckIn" runat="server" Text="--:--" /></div>
-                                        <div class="l7-label">Avg Check-In</div>
+
+                            <div class="l7v2-tiles">
+                                <div class="l7v2-tile" data-accent="checkin" style="animation-delay:0.05s;">
+                                    <div class="l7v2-tile-top">
+                                        <span class="l7v2-icon"><i class="bi bi-box-arrow-in-right"></i></span>
+                                        <span class="l7v2-trend" id="l7TrendCheckIn"></span>
                                     </div>
-                                    <div class="l7-spark-wrap"><canvas id="l7SparkCheckIn"></canvas></div>
+                                    <div class="l7v2-value"><asp:Literal ID="litL7AvgCheckIn" runat="server" Text="--:--" /></div>
+                                    <div class="l7v2-label">Avg Check-In</div>
+                                    <div class="l7v2-spark"><canvas id="l7SparkCheckIn"></canvas></div>
                                 </div>
-                                <div class="l7-row" data-accent="checkout" style="animation-delay:0.1s;">
-                                    <span class="l7-row-icon"><i class="bi bi-box-arrow-right"></i></span>
-                                    <div class="l7-row-text">
-                                        <div class="l7-value"><asp:Literal ID="litL7AvgCheckOut" runat="server" Text="--:--" /></div>
-                                        <div class="l7-label">Avg Check-Out</div>
+                                <div class="l7v2-tile" data-accent="checkout" style="animation-delay:0.1s;">
+                                    <div class="l7v2-tile-top">
+                                        <span class="l7v2-icon"><i class="bi bi-box-arrow-right"></i></span>
+                                        <span class="l7v2-trend" id="l7TrendCheckOut"></span>
                                     </div>
-                                    <div class="l7-spark-wrap"><canvas id="l7SparkCheckOut"></canvas></div>
+                                    <div class="l7v2-value"><asp:Literal ID="litL7AvgCheckOut" runat="server" Text="--:--" /></div>
+                                    <div class="l7v2-label">Avg Check-Out</div>
+                                    <div class="l7v2-spark"><canvas id="l7SparkCheckOut"></canvas></div>
                                 </div>
-                                <div class="l7-row" data-accent="hours" style="animation-delay:0.15s;">
-                                    <span class="l7-row-icon"><i class="bi bi-hourglass-split"></i></span>
-                                    <div class="l7-row-text">
-                                        <div class="l7-value"><asp:Literal ID="litL7AvgHours" runat="server" Text="0.0" /> hrs</div>
-                                        <div class="l7-label">Avg Time Spent</div>
+                                <div class="l7v2-tile" data-accent="hours" style="animation-delay:0.15s;">
+                                    <div class="l7v2-tile-top">
+                                        <span class="l7v2-icon"><i class="bi bi-hourglass-split"></i></span>
+                                        <span class="l7v2-trend" id="l7TrendHours"></span>
                                     </div>
-                                    <div class="l7-spark-wrap"><canvas id="l7SparkHours"></canvas></div>
+                                    <div class="l7v2-value"><asp:Literal ID="litL7AvgHours" runat="server" Text="0.0" /> hrs</div>
+                                    <div class="l7v2-label">Avg Time Spent</div>
+                                    <div class="l7v2-spark"><canvas id="l7SparkHours"></canvas></div>
                                 </div>
-                                <div class="l7-row" data-accent="absent" style="animation-delay:0.2s;">
-                                    <span class="l7-row-icon"><i class="bi bi-person-x-fill"></i></span>
-                                    <div class="l7-row-text">
-                                        <div class="l7-value"><asp:Literal ID="litL7TotalAbsents" runat="server" Text="0" /></div>
-                                        <div class="l7-label">Total Absents</div>
+                                <div class="l7v2-tile" data-accent="absent" style="animation-delay:0.2s;">
+                                    <div class="l7v2-tile-top">
+                                        <span class="l7v2-icon"><i class="bi bi-person-x-fill"></i></span>
+                                        <span class="l7v2-trend" id="l7TrendAbsent"></span>
                                     </div>
-                                    <div class="l7-spark-wrap"><canvas id="l7SparkAbsent"></canvas></div>
+                                    <div class="l7v2-value"><asp:Literal ID="litL7TotalAbsents" runat="server" Text="0" /></div>
+                                    <div class="l7v2-label">Total Absents</div>
+                                    <div class="l7v2-spark"><canvas id="l7SparkAbsent"></canvas></div>
                                 </div>
                             </div>
+
                             <asp:Label ID="lblNoL7Trend" runat="server" CssClass="empty-state" Text="No attendance trend data yet." Visible="false" />
                         </div>
                     </div>
@@ -1556,68 +1830,6 @@
                     </div>
                 </div>
 
-            </div>
-
-            <!-- ============================= -->
-            <!-- LAST 7 DAYS OVERVIEW - VERTICAL LINE CHART VARIANT (for comparison) -->
-            <!-- ============================= -->
-            <div class="row g-3 mt-4">
-                <div class="col-lg-6">
-                    <div class="card shadow h-100 l7-compact">
-                        <div class="card-header-custom">
-                            <span style="font-weight:700;"><i class="bi bi-graph-up-arrow me-2"></i>Last 7 Days Overview &ndash; Vertical Trend</span>
-                        </div>
-                        <div class="card-body p-3">
-                            <span class="l7-period-badge">
-                                <i class="bi bi-clock-history"></i>
-                                <asp:Literal ID="litL7RangeAlt" runat="server" Text="Rolling 7-Day Window" />
-                            </span>
-                            <div class="l7u-panel">
-                                <div class="l7u-item" data-accent="checkin" style="animation-delay:0.05s;">
-                                    <div class="l7u-item-head">
-                                        <span class="l7u-icon"><i class="bi bi-box-arrow-in-right"></i></span>
-                                        <div>
-                                            <div class="l7u-value"><asp:Literal ID="litL7AvgCheckInAlt" runat="server" Text="--:--" /></div>
-                                            <div class="l7u-label">Avg Check-In</div>
-                                        </div>
-                                    </div>
-                                    <div class="l7u-spark"><canvas id="l7vSparkCheckIn"></canvas></div>
-                                </div>
-                                <div class="l7u-item" data-accent="checkout" style="animation-delay:0.1s;">
-                                    <div class="l7u-item-head">
-                                        <span class="l7u-icon"><i class="bi bi-box-arrow-right"></i></span>
-                                        <div>
-                                            <div class="l7u-value"><asp:Literal ID="litL7AvgCheckOutAlt" runat="server" Text="--:--" /></div>
-                                            <div class="l7u-label">Avg Check-Out</div>
-                                        </div>
-                                    </div>
-                                    <div class="l7u-spark"><canvas id="l7vSparkCheckOut"></canvas></div>
-                                </div>
-                                <div class="l7u-item" data-accent="hours" style="animation-delay:0.15s;">
-                                    <div class="l7u-item-head">
-                                        <span class="l7u-icon"><i class="bi bi-hourglass-split"></i></span>
-                                        <div>
-                                            <div class="l7u-value"><asp:Literal ID="litL7AvgHoursAlt" runat="server" Text="0.0" /> hrs</div>
-                                            <div class="l7u-label">Avg Time Spent</div>
-                                        </div>
-                                    </div>
-                                    <div class="l7u-spark"><canvas id="l7vSparkHours"></canvas></div>
-                                </div>
-                                <div class="l7u-item" data-accent="absent" style="animation-delay:0.2s;">
-                                    <div class="l7u-item-head">
-                                        <span class="l7u-icon"><i class="bi bi-person-x-fill"></i></span>
-                                        <div>
-                                            <div class="l7u-value"><asp:Literal ID="litL7TotalAbsentsAlt" runat="server" Text="0" /></div>
-                                            <div class="l7u-label">Total Absents</div>
-                                        </div>
-                                    </div>
-                                    <div class="l7u-spark"><canvas id="l7vSparkAbsent"></canvas></div>
-                                </div>
-                            </div>
-                            <asp:Label ID="lblNoL7TrendAlt" runat="server" CssClass="empty-state" Text="No attendance trend data yet." Visible="false" />
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- ============================= -->
@@ -1740,6 +1952,28 @@
                                 <span class="leavecal-legend-item"><span class="leavecal-legend-dot lc-sl"></span> Sick Leave</span>
                                 <span class="leavecal-legend-item"><span class="leavecal-legend-dot lc-al"></span> Annual Leave</span>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================= -->
+            <!-- LEAVE CALENDAR - REDESIGNED (month-grid, modal-ready) -->
+            <!-- ============================= -->
+            <div class="row g-3 mt-4">
+                <div class="col-12">
+                    <div class="card shadow lcp-card">
+                        <div class="lcp-header section-header">
+                            <span class="section-header-title"><i class="bi bi-calendar-heart"></i> Leave Calendar</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="section-count-badge lcp-badge"><i class="bi bi-stars me-1"></i>Redesigned</span>
+                                <button type="button" class="lcp-expand-btn" id="btnExpandLeaveCalendar" title="Open in full view">
+                                    <i class="bi bi-arrows-fullscreen"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-2 p-md-3">
+                            <asp:Literal ID="litLeaveCalendarPro" runat="server" />
                         </div>
                     </div>
                 </div>

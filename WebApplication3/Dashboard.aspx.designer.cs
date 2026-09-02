@@ -303,60 +303,6 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Label lblNoStatus;
 
         /// <summary>
-        /// litL7RangeAlt control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litL7RangeAlt;
-
-        /// <summary>
-        /// litL7AvgCheckInAlt control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litL7AvgCheckInAlt;
-
-        /// <summary>
-        /// litL7AvgCheckOutAlt control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litL7AvgCheckOutAlt;
-
-        /// <summary>
-        /// litL7AvgHoursAlt control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litL7AvgHoursAlt;
-
-        /// <summary>
-        /// litL7TotalAbsentsAlt control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal litL7TotalAbsentsAlt;
-
-        /// <summary>
-        /// lblNoL7TrendAlt control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblNoL7TrendAlt;
-
-        /// <summary>
         /// litTgcRange control.
         /// </summary>
         /// <remarks>
@@ -382,6 +328,15 @@ namespace HRMSApp
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal litLeaveCalendar;
+
+        /// <summary>
+        /// litLeaveCalendarPro control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal litLeaveCalendarPro;
 
         /// <summary>
         /// ltrTeamAttendanceScript control.
