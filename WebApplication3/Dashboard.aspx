@@ -1236,8 +1236,13 @@
         /* yearly leave calendar (original) ends here */
 
         /* ---- Leave Calendar - Redesigned (month-grid, built to drop into a modal) ---- */
+        /* Width is capped on the card itself (not the full col-12 row) at the size we intend
+           the future modal-dialog to be, so moving this markup into a modal later needs no
+           re-tuning of the grid — it already fits its eventual box. */
         .lcp-card {
             position: relative;
+            max-width: 900px;
+            margin: 0 auto;
             opacity: 0;
             transform: translateY(10px);
             animation: l7RiseIn 0.5s ease forwards;
@@ -1377,7 +1382,7 @@
 
         .lcp-months-grid {
             display: grid;
-            grid-template-columns: repeat(6, minmax(0, 1fr));
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 8px;
         }
 
@@ -1512,10 +1517,7 @@
         .lcp-legend-dot.lcp-sl { background: linear-gradient(135deg, #c084fc, #9333ea); }
         .lcp-legend-dot.lcp-al { background: linear-gradient(135deg, #d4b96a, #b8973f); }
 
-        @media (max-width: 1200px) {
-            .lcp-months-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-        }
-        @media (max-width: 860px) {
+        @media (max-width: 700px) {
             .lcp-months-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
         }
         @media (max-width: 575px) {
@@ -1935,7 +1937,7 @@
             <!-- YEARLY LEAVE CALENDAR (static preview) -->
             <!-- ============================= -->
             <div class="row g-3 mt-4">
-                <div class="col-md-6">
+                <div class="col-12">
                     <div class="card shadow h-100 l7-compact leavecal-card">
                         <div class="leavecal-header section-header">
                             <span class="section-header-title"><i class="bi bi-calendar3"></i> Yearly Leave Calendar</span>
