@@ -321,6 +321,24 @@ namespace HRMSApp
         protected global::System.Web.UI.WebControls.Label lblNoEventHistory;
 
         /// <summary>
+        /// ddlLeaveCalYear control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlLeaveCalYear;
+
+        /// <summary>
+        /// ddlLeaveCalMonth control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlLeaveCalMonth;
+
+        /// <summary>
         /// litLeaveCalendar control.
         /// </summary>
         /// <remarks>

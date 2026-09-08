@@ -40,7 +40,21 @@ namespace HRMSApp
         // ---- Yearly Leave Calendar (static preview data; will be wired to sp_Leave_GetCalendar next) ----
         private void RenderLeaveCalendar()
         {
-            litLeaveCalendar.Text = BuildLeaveCalendarHtml();
+            int selectedYear = 2026;
+            int selectedMonth = 1;
+
+            if (ddlLeaveCalYear.SelectedValue != null) int.TryParse(ddlLeaveCalYear.SelectedValue, out selectedYear);
+            if (ddlLeaveCalMonth.SelectedValue != null) int.TryParse(ddlLeaveCalMonth.SelectedValue, out selectedMonth);
+
+            litLeaveCalendar.Text = BuildLeaveCalendarHtml(selectedYear, selectedMonth);
+        }
+
+        // Fires when either Year or Month dropdown changes - just re-renders the same calendar,
+        // using the new selection only to compute the day-name header row (Jan/Feb/etc. rows
+        // and their leave data are unaffected, since this is still a static full-year preview).
+        protected void ddlLeaveCalFilter_Changed(object sender, EventArgs e)
+        {
+            RenderLeaveCalendar();
         }
 
         // Shared static demo overlay: (month, day) -> (css class, label). Both the original
@@ -49,56 +63,58 @@ namespace HRMSApp
         private Dictionary<(int month, int day), (string css, string label)> GetLeaveCalendarOverrides()
         {
             return new Dictionary<(int month, int day), (string css, string label)>
-            {
-                { (1, 1),   ("lc-ph", "Public Holiday") },
-                { (1, 14),  ("lc-cl", "Casual Leave") },
-                { (1, 22),  ("lc-sl", "Sick Leave") },
-                { (2, 5),   ("lc-al", "Annual Leave") },
-                { (2, 17),  ("lc-ph", "Public Holiday") },
-                { (2, 24),  ("lc-cl", "Casual Leave") },
-                { (3, 3),   ("lc-sl", "Sick Leave") },
-                { (3, 18),  ("lc-ph", "Public Holiday") },
-                { (3, 27),  ("lc-al", "Annual Leave") },
-                { (4, 9),   ("lc-al", "Annual Leave") },
-                { (4, 20),  ("lc-cl", "Casual Leave") },
-                { (4, 28),  ("lc-ph", "Public Holiday") },
-                { (5, 1),   ("lc-ph", "Public Holiday") },
-                { (5, 11),  ("lc-cl", "Casual Leave") },
-                { (5, 26),  ("lc-sl", "Sick Leave") },
-                { (6, 1),   ("lc-sl", "Sick Leave") },
-                { (6, 17),  ("lc-cl", "Casual Leave") },
-                { (6, 29),  ("lc-al", "Annual Leave") },
-                { (7, 5),   ("lc-al", "Annual Leave") },
-                { (7, 13),  ("lc-ph", "Public Holiday") },
-                { (7, 22),  ("lc-cl", "Casual Leave") },
-                { (8, 5),   ("lc-sl", "Sick Leave") },
-                { (8, 14),  ("lc-ph", "Public Holiday") },
-                { (8, 26),  ("lc-al", "Annual Leave") },
-                { (9, 7),   ("lc-cl", "Casual Leave") },
-                { (9, 20),  ("lc-sl", "Sick Leave") },
-                { (10, 12), ("lc-al", "Annual Leave") },
-                { (10, 21), ("lc-ph", "Public Holiday") },
-                { (10, 29), ("lc-cl", "Casual Leave") },
-                { (11, 1),  ("lc-cl", "Casual Leave") },
-                { (11, 16), ("lc-sl", "Sick Leave") },
-                { (12, 10), ("lc-al", "Annual Leave") },
-                { (12, 25), ("lc-ph", "Public Holiday") },
-                { (12, 28), ("lc-al", "Annual Leave") },
-            };
+    {
+        { (1, 1),   ("lc-ph", "Public Holiday") },
+        { (1, 14),  ("lc-cl", "Casual Leave") },
+        { (1, 22),  ("lc-sl", "Sick Leave") },
+        { (2, 5),   ("lc-al", "Annual Leave") },
+        { (2, 17),  ("lc-ph", "Public Holiday") },
+        { (2, 24),  ("lc-cl", "Casual Leave") },
+        { (3, 3),   ("lc-sl", "Sick Leave") },
+        { (3, 18),  ("lc-ph", "Public Holiday") },
+        { (3, 27),  ("lc-al", "Annual Leave") },
+        { (4, 9),   ("lc-al", "Annual Leave") },
+        { (4, 20),  ("lc-cl", "Casual Leave") },
+        { (4, 28),  ("lc-ph", "Public Holiday") },
+        { (5, 1),   ("lc-ph", "Public Holiday") },
+        { (5, 11),  ("lc-cl", "Casual Leave") },
+        { (5, 26),  ("lc-sl", "Sick Leave") },
+        { (6, 1),   ("lc-sl", "Sick Leave") },
+        { (6, 17),  ("lc-cl", "Casual Leave") },
+        { (6, 29),  ("lc-al", "Annual Leave") },
+        { (7, 5),   ("lc-al", "Annual Leave") },
+        { (7, 13),  ("lc-ph", "Public Holiday") },
+        { (7, 22),  ("lc-cl", "Casual Leave") },
+        { (8, 5),   ("lc-sl", "Sick Leave") },
+        { (8, 14),  ("lc-ph", "Public Holiday") },
+        { (8, 26),  ("lc-al", "Annual Leave") },
+        { (9, 7),   ("lc-cl", "Casual Leave") },
+        { (9, 20),  ("lc-sl", "Sick Leave") },
+        { (10, 12), ("lc-al", "Annual Leave") },
+        { (10, 21), ("lc-ph", "Public Holiday") },
+        { (10, 29), ("lc-cl", "Casual Leave") },
+        { (11, 1),  ("lc-cl", "Casual Leave") },
+        { (11, 16), ("lc-sl", "Sick Leave") },
+        { (12, 10), ("lc-al", "Annual Leave") },
+        { (12, 25), ("lc-ph", "Public Holiday") },
+        { (12, 28), ("lc-al", "Annual Leave") },
+    };
         }
 
-        private string BuildLeaveCalendarHtml()
+        private string BuildLeaveCalendarHtml(int headerYear, int headerMonth)
         {
-            int year = 2026;
+            int year = headerYear; // FIX: was hardcoded to 2026, ignoring the Year dropdown entirely
             string[] monthShort = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+            string[] dayShort = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };
 
             var overrides = GetLeaveCalendarOverrides();
 
-            const int maxDays = 31;
+            // Every month gets up to 6 leading blank cells (max offset if the 1st falls on a Saturday)
+            // plus 31 possible days = 37 columns. Anchoring day-1 to its TRUE weekday means
+            // Saturday/Sunday always land in the same column index for every month, every row.
+            const int maxCols = 37;
 
-            // Two independent tables instead of one sticky column: the month names never
-            // scroll, and the day grid scrolls in its own pane. Both share the .leavecal-row
-            // fixed row height so the two stay lined up.
+            // ---- Frozen month name column (unchanged) ----
             var monthSb = new StringBuilder();
             monthSb.Append("<table class='leavecal-table'><thead><tr class='leavecal-row'><th>Month</th></tr></thead><tbody>");
             for (int m = 1; m <= 12; m++)
@@ -107,45 +123,76 @@ namespace HRMSApp
             }
             monthSb.Append("</tbody></table>");
 
+            // ---- Header: fixed weekday cycle (Sun..Sat repeating), NOT tied to any single month ----
+            // This is what makes every row line up: column (n % 7) is ALWAYS the same weekday.
             var daySb = new StringBuilder();
             daySb.Append("<table class='leavecal-table leavecal-daytable'><thead><tr class='leavecal-row'>");
-            for (int d = 1; d <= maxDays; d++) daySb.Append("<th>").Append(d).Append("</th>");
+            for (int col = 0; col < maxCols; col++)
+            {
+                int weekdayIndex = col % 7; // 0=Sun ... 6=Sat
+                bool isWeekendCol = weekdayIndex == 0 || weekdayIndex == 6;
+                string thClass = isWeekendCol ? " class='lc-weekend-head'" : "";
+
+                daySb.Append("<th").Append(thClass).Append(">")
+                     .Append("<div class='lc-daylabel'>").Append(dayShort[weekdayIndex]).Append("</div>")
+                     .Append("</th>");
+            }
             daySb.Append("</tr></thead><tbody>");
 
+            // ---- Body: each month anchored so day 1 sits under its true weekday column ----
             for (int m = 1; m <= 12; m++)
             {
                 int daysInMonth = DateTime.DaysInMonth(year, m);
+                DateTime firstOfMonth = new DateTime(year, m, 1);
+                int leadingBlanks = (int)firstOfMonth.DayOfWeek; // Sunday=0 ... Saturday=6
+
                 daySb.Append("<tr class='leavecal-row'>");
 
-                for (int d = 1; d <= maxDays; d++)
-                {
-                    if (d > daysInMonth)
-                    {
-                        daySb.Append("<td class='leavecal-cell lc-blank'></td>");
-                        continue;
-                    }
+                int col = 0;
 
+                // Leading blanks before day 1
+                for (; col < leadingBlanks; col++)
+                {
+                    daySb.Append("<td class='leavecal-cell lc-blank'></td>");
+                }
+
+                // Actual days of the month
+                for (int d = 1; d <= daysInMonth; d++, col++)
+                {
                     DateTime dt = new DateTime(year, m, d);
                     bool isWeekend = dt.DayOfWeek == DayOfWeek.Saturday || dt.DayOfWeek == DayOfWeek.Sunday;
 
-                    string css = "lc-normal";
-                    string label = "Working Day";
+                    string css;
+                    string label;
+                    string cellClass = "leavecal-cell";
 
-                    if (overrides.TryGetValue((m, d), out var ov))
+                    if (isWeekend)
+                    {
+                        css = "lc-weekend";
+                        label = "Weekend";
+                        cellClass += " lc-weekend-col";
+                    }
+                    else if (overrides.TryGetValue((m, d), out var ov))
                     {
                         css = ov.css;
                         label = ov.label;
                     }
-                    else if (isWeekend)
+                    else
                     {
-                        css = "lc-weekend";
-                        label = "Weekend";
+                        css = "lc-normal";
+                        label = "Working Day";
                     }
 
                     string title = dt.ToString("MMM d, yyyy", CultureInfo.InvariantCulture) + " - " + label;
-                    daySb.Append("<td class='leavecal-cell'><span class='leavecal-chip ").Append(css)
+                    daySb.Append("<td class='").Append(cellClass).Append("'><span class='leavecal-chip ").Append(css)
                          .Append("' title='").Append(title).Append("'>")
                          .Append(d).Append("</span></td>");
+                }
+
+                // Trailing blanks to keep every row the same width
+                for (; col < maxCols; col++)
+                {
+                    daySb.Append("<td class='leavecal-cell lc-blank'></td>");
                 }
 
                 daySb.Append("</tr>");
