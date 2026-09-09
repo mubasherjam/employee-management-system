@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -224,6 +224,7 @@ namespace HRMSApp
             int defaultYear = baseYear;
 
             string[] monthNames = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+            string[] monthShort = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
             string[] weekdayMini = { "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su" };
 
             var overrides = GetLeaveCalendarOverrides();
@@ -262,6 +263,19 @@ namespace HRMSApp
             }
             sb.Append("</div>");
 
+            // ---- month filter tabs ----
+            sb.Append("<div class='lcp-month-tabs' data-role='monthTabs'>");
+            sb.Append("<button type='button' class='lcp-month-tab active' data-month='0'>All</button>");
+            for (int m = 1; m <= 12; m++)
+            {
+                int monthEventCount = overrides.Keys.Count(k => k.month == m);
+                sb.Append("<button type='button' class='lcp-month-tab' data-month='" + m + "'>" + monthShort[m - 1]);
+                if (monthEventCount > 0)
+                    sb.Append("<span class='lcp-tab-dot' style='background:linear-gradient(135deg,#7c5cff,#f093fb);'></span>");
+                sb.Append("</button>");
+            }
+            sb.Append("</div>");
+
             // ---- year panels, each a 12-up grid of mini month calendars ----
             sb.Append("<div class='lcp-year-panels' data-role='panels'>");
             foreach (int y in years)
@@ -273,9 +287,9 @@ namespace HRMSApp
                 {
                     int monthEventCount = overrides.Keys.Count(k => k.month == m);
 
-                    sb.Append("<div class='lcp-month-card'>");
+                    sb.Append("<div class='lcp-month-card' data-month='" + m + "'>");
                     sb.Append("<div class='lcp-month-card-head'><span>" + monthNames[m - 1] + "</span>");
-                    if (monthEventCount > 0) sb.Append("<span class='lcp-month-badge'>" + monthEventCount + "</span>");
+                    if (monthEventCount > 0) sb.Append("<span class='lcp-month-badge'>" + monthEventCount + " event" + (monthEventCount > 1 ? "s" : "") + "</span>");
                     sb.Append("</div>");
 
                     sb.Append("<div class='lcp-mini-weekdays'>");
@@ -297,22 +311,36 @@ namespace HRMSApp
 
                         string tone = "lcp-normal";
                         string label = "Working Day";
+                        string tipClass = "tt-wd";
+                        string tipIcon = "bi-briefcase-fill";
 
                         if (overrides.TryGetValue((m, d), out var ov))
                         {
                             tone = "lcp-" + ov.css.Substring(3); // "lc-ph" -> "lcp-ph"
                             label = ov.label;
+                            switch (ov.css)
+                            {
+                                case "lc-ph": tipClass = "tt-ph"; tipIcon = "bi-flag-fill"; break;
+                                case "lc-cl": tipClass = "tt-cl"; tipIcon = "bi-cup-hot-fill"; break;
+                                case "lc-sl": tipClass = "tt-sl"; tipIcon = "bi-heart-pulse-fill"; break;
+                                case "lc-al": tipClass = "tt-al"; tipIcon = "bi-airplane-fill"; break;
+                            }
                         }
                         else if (isWeekend)
                         {
                             tone = "lcp-weekend";
                             label = "Weekend";
+                            tipClass = "tt-wd";
+                            tipIcon = "bi-moon-fill";
                         }
 
                         string classes = "lcp-day " + tone + (isToday ? " lcp-today" : "");
                         sb.Append("<div class='" + classes + "'>");
                         sb.Append("<span class='lcp-day-num'>" + d + "</span>");
-                        sb.Append("<div class='lcp-tip'><b>" + dt.ToString("MMM d, yyyy", CultureInfo.InvariantCulture) + "</b>" + label + (isToday ? " &middot; Today" : "") + "</div>");
+                        sb.Append("<div class='lcp-tip'><b>" + dt.ToString("MMM d, yyyy", CultureInfo.InvariantCulture) + "</b>");
+                        sb.Append("<span class='lcp-tip-type " + tipClass + "'><i class='bi " + tipIcon + "'></i>" + label + "</span>");
+                        if (isToday) sb.Append("<span style='font-size:0.6rem;opacity:0.7;margin-top:2px;display:block;'>&#9679; Today</span>");
+                        sb.Append("</div>");
                         sb.Append("</div>");
                     }
 
@@ -337,6 +365,15 @@ namespace HRMSApp
 
             sb.Append("</div>"); // .lcp-wrap
 
+            // ---- Fullscreen modal overlay ----
+            sb.Append("<div class='lcp-modal-overlay' id='lcpModalOverlay'>");
+            sb.Append("<div class='lcp-modal-content'>");
+            sb.Append("<button type='button' class='lcp-modal-close' id='lcpModalClose' aria-label='Close'><i class='bi bi-x-lg'></i></button>");
+            sb.Append("<div class='lcp-modal-body' id='lcpModalBody'></div>");
+            sb.Append("</div>");
+            sb.Append("</div>");
+
+            // ---- JavaScript (year switching, month filtering, modal) ----
             sb.Append(@"
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -351,7 +388,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var label = root.querySelector('[data-role=""yearLabel""]');
     var prevBtn = root.querySelector('[data-role=""prevYear""]');
     var nextBtn = root.querySelector('[data-role=""nextYear""]');
+    var monthTabs = root.querySelectorAll('.lcp-month-tab');
 
+    // ---- Year switching ----
     function showYear(y) {
         if (years.indexOf(y) === -1) return;
         current = y;
@@ -360,6 +399,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (label) label.textContent = y;
         if (prevBtn) prevBtn.disabled = (y <= years[0]);
         if (nextBtn) nextBtn.disabled = (y >= years[years.length - 1]);
+        // Re-apply active month filter
+        var activeMonthTab = root.querySelector('.lcp-month-tab.active');
+        if (activeMonthTab) filterMonth(parseInt(activeMonthTab.dataset.month, 10));
     }
 
     pills.forEach(function (p) {
@@ -367,6 +409,122 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     if (prevBtn) prevBtn.addEventListener('click', function () { showYear(current - 1); });
     if (nextBtn) nextBtn.addEventListener('click', function () { showYear(current + 1); });
+
+    // ---- Month filtering ----
+    function filterMonth(m) {
+        var activePanel = root.querySelector('.lcp-year-panel.active');
+        if (!activePanel) return;
+        var cards = activePanel.querySelectorAll('.lcp-month-card');
+        cards.forEach(function (card) {
+            var cardMonth = parseInt(card.dataset.month, 10);
+            if (m === 0) {
+                card.classList.remove('lcp-hidden');
+            } else {
+                card.classList.toggle('lcp-hidden', cardMonth !== m);
+            }
+        });
+        // Update active panel grid for single month display
+        var grid = activePanel.querySelector('.lcp-months-grid');
+        if (grid) {
+            if (m !== 0) {
+                grid.style.gridTemplateColumns = 'minmax(0, 1fr)';
+                grid.style.maxWidth = '280px';
+                grid.style.margin = '0 auto';
+            } else {
+                grid.style.gridTemplateColumns = '';
+                grid.style.maxWidth = '';
+                grid.style.margin = '';
+            }
+        }
+    }
+
+    monthTabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            monthTabs.forEach(function (t) { t.classList.remove('active'); });
+            tab.classList.add('active');
+            filterMonth(parseInt(tab.dataset.month, 10));
+        });
+    });
+
+    // ---- Fullscreen modal ----
+    var overlay = document.getElementById('lcpModalOverlay');
+    var modalBody = document.getElementById('lcpModalBody');
+    var closeBtn = document.getElementById('lcpModalClose');
+    var expandBtn = document.getElementById('btnExpandLeaveCalendar');
+
+    function openModal() {
+        if (!overlay || !modalBody) return;
+        // Clone the calendar content into the modal
+        var clone = root.cloneNode(true);
+        clone.id = 'lcpRootModal';
+        modalBody.innerHTML = '';
+        modalBody.appendChild(clone);
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        // Re-bind month tabs inside modal
+        var modalMonthTabs = clone.querySelectorAll('.lcp-month-tab');
+        var modalPanels = clone.querySelectorAll('.lcp-year-panel');
+        modalMonthTabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                modalMonthTabs.forEach(function (t) { t.classList.remove('active'); });
+                tab.classList.add('active');
+                var m = parseInt(tab.dataset.month, 10);
+                var ap = clone.querySelector('.lcp-year-panel.active');
+                if (!ap) return;
+                var cards = ap.querySelectorAll('.lcp-month-card');
+                cards.forEach(function (card) {
+                    var cm = parseInt(card.dataset.month, 10);
+                    if (m === 0) { card.classList.remove('lcp-hidden'); }
+                    else { card.classList.toggle('lcp-hidden', cm !== m); }
+                });
+                var grid = ap.querySelector('.lcp-months-grid');
+                if (grid) {
+                    if (m !== 0) { grid.style.gridTemplateColumns = 'minmax(0, 1fr)'; grid.style.maxWidth = '320px'; grid.style.margin = '0 auto'; }
+                    else { grid.style.gridTemplateColumns = ''; grid.style.maxWidth = ''; grid.style.margin = ''; }
+                }
+            });
+        });
+
+        // Re-bind year pills and nav inside modal
+        var modalPills = clone.querySelectorAll('.lcp-pill');
+        var modalLabel = clone.querySelector('[data-role=""yearLabel""]');
+        var modalPrev = clone.querySelector('[data-role=""prevYear""]');
+        var modalNext = clone.querySelector('[data-role=""nextYear""]');
+        var modalCurrent = current;
+
+        function modalShowYear(y) {
+            if (years.indexOf(y) === -1) return;
+            modalCurrent = y;
+            modalPills.forEach(function (p) { p.classList.toggle('active', parseInt(p.dataset.year, 10) === y); });
+            modalPanels.forEach(function (p) { p.classList.toggle('active', parseInt(p.dataset.year, 10) === y); });
+            if (modalLabel) modalLabel.textContent = y;
+            if (modalPrev) modalPrev.disabled = (y <= years[0]);
+            if (modalNext) modalNext.disabled = (y >= years[years.length - 1]);
+        }
+
+        modalPills.forEach(function (p) {
+            p.addEventListener('click', function () { modalShowYear(parseInt(p.dataset.year, 10)); });
+        });
+        if (modalPrev) modalPrev.addEventListener('click', function () { modalShowYear(modalCurrent - 1); });
+        if (modalNext) modalNext.addEventListener('click', function () { modalShowYear(modalCurrent + 1); });
+    }
+
+    function closeModal() {
+        if (overlay) overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    if (expandBtn) expandBtn.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (overlay) overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closeModal();
+    });
+
+    // Escape key closes modal
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay && overlay.classList.contains('active')) closeModal();
+    });
 });
 </script>");
 
