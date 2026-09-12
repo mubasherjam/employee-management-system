@@ -3433,7 +3433,7 @@
             </div>
 
             <!-- ============================= -->
-            <!-- LAST 7 DAYS + STATUS SNAPSHOT ROW -->
+            <!-- LAST 7 DAYS + STATUS SNAPSHOT -->
             <!-- ============================= -->
             <div class="row g-3 mt-4">
 
