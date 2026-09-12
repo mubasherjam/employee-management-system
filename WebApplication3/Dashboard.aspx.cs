@@ -38,16 +38,20 @@ namespace HRMSApp
         }
 
         // ---- Yearly Leave Calendar (static preview data; will be wired to sp_Leave_GetCalendar next) ----
-        private void RenderLeaveCalendar()
-        {
-            int selectedYear = 2026;
-            int selectedMonth = 1;
+       private void RenderLeaveCalendar()
+{
+    int selectedYear = 2022;
+    int selectedMonth = 1;
 
-            if (ddlLeaveCalYear.SelectedValue != null) int.TryParse(ddlLeaveCalYear.SelectedValue, out selectedYear);
-            if (ddlLeaveCalMonth.SelectedValue != null) int.TryParse(ddlLeaveCalMonth.SelectedValue, out selectedMonth);
+    if (ddlLeaveCalYear.SelectedValue != null) int.TryParse(ddlLeaveCalYear.SelectedValue, out selectedYear);
+    if (ddlLeaveCalMonth.SelectedValue != null) int.TryParse(ddlLeaveCalMonth.SelectedValue, out selectedMonth);
 
-            litLeaveCalendar.Text = BuildLeaveCalendarHtml(selectedYear, selectedMonth);
-        }
+    // TEMP: hardcoded to match the demo dataset (EmpID 13759). Once you load real
+    // multi-employee data, switch this to Session["EmpID"] or a querystring param.
+    int empId = 13759;
+
+    litLeaveCalendar.Text = BuildLeaveCalendarHtml(selectedYear, selectedMonth, empId);
+}
 
         // Fires when either Year or Month dropdown changes - just re-renders the same calendar,
         // using the new selection only to compute the day-name header row (Jan/Feb/etc. rows
@@ -56,58 +60,55 @@ namespace HRMSApp
         {
             RenderLeaveCalendar();
         }
+        // Now DB-backed. Same return shape as before, so BuildLeaveCalendarHtml needs no changes.
+        private Dictionary<(int month, int day), (string css, string label)> GetLeaveCalendarOverrides(int empId, int year)
+        {
+            var overrides = new Dictionary<(int, int), (string, string)>();
 
+            using (SqlConnection con = new SqlConnection(conStr))
+            using (SqlCommand cmd = new SqlCommand("sp_LeaveCalendar_GetOverrides", con))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@EmpID", empId);
+                cmd.Parameters.AddWithValue("@Year", year);
+                con.Open();
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        int month = Convert.ToInt32(dr["MonthNo"]);
+                        int day = Convert.ToInt32(dr["DayNo"]);
+                        string typeCode = dr["LeaveTypeCode"].ToString();
+
+                        string css, label;
+                        switch (typeCode)
+                        {
+                            case "CASLV": css = "lc-cl"; label = "Casual Leave"; break;
+                            case "SICKLV": css = "lc-sl"; label = "Sick Leave"; break;
+                            case "PRIVLV": css = "lc-al"; label = "Privilege Leave"; break;
+                            case "PUBLIC": css = "lc-ph"; label = "Public Holiday"; break;
+                            default: css = "lc-normal"; label = "Working Day"; break;
+                        }
+
+                        overrides[(month, day)] = (css, label);
+                    }
+                }
+            }
+
+            return overrides;
+        }
         // Shared static demo overlay: (month, day) -> (css class, label). Both the original
         // spreadsheet-style calendar and the redesigned month-grid calendar read from this
         // single source so the two views never drift out of sync.
-        private Dictionary<(int month, int day), (string css, string label)> GetLeaveCalendarOverrides()
-        {
-            return new Dictionary<(int month, int day), (string css, string label)>
-    {
-        { (1, 1),   ("lc-ph", "Public Holiday") },
-        { (1, 14),  ("lc-cl", "Casual Leave") },
-        { (1, 22),  ("lc-sl", "Sick Leave") },
-        { (2, 5),   ("lc-al", "Annual Leave") },
-        { (2, 17),  ("lc-ph", "Public Holiday") },
-        { (2, 24),  ("lc-cl", "Casual Leave") },
-        { (3, 3),   ("lc-sl", "Sick Leave") },
-        { (3, 18),  ("lc-ph", "Public Holiday") },
-        { (3, 27),  ("lc-al", "Annual Leave") },
-        { (4, 9),   ("lc-al", "Annual Leave") },
-        { (4, 20),  ("lc-cl", "Casual Leave") },
-        { (4, 28),  ("lc-ph", "Public Holiday") },
-        { (5, 1),   ("lc-ph", "Public Holiday") },
-        { (5, 11),  ("lc-cl", "Casual Leave") },
-        { (5, 26),  ("lc-sl", "Sick Leave") },
-        { (6, 1),   ("lc-sl", "Sick Leave") },
-        { (6, 17),  ("lc-cl", "Casual Leave") },
-        { (6, 29),  ("lc-al", "Annual Leave") },
-        { (7, 5),   ("lc-al", "Annual Leave") },
-        { (7, 13),  ("lc-ph", "Public Holiday") },
-        { (7, 22),  ("lc-cl", "Casual Leave") },
-        { (8, 5),   ("lc-sl", "Sick Leave") },
-        { (8, 14),  ("lc-ph", "Public Holiday") },
-        { (8, 26),  ("lc-al", "Annual Leave") },
-        { (9, 7),   ("lc-cl", "Casual Leave") },
-        { (9, 20),  ("lc-sl", "Sick Leave") },
-        { (10, 12), ("lc-al", "Annual Leave") },
-        { (10, 21), ("lc-ph", "Public Holiday") },
-        { (10, 29), ("lc-cl", "Casual Leave") },
-        { (11, 1),  ("lc-cl", "Casual Leave") },
-        { (11, 16), ("lc-sl", "Sick Leave") },
-        { (12, 10), ("lc-al", "Annual Leave") },
-        { (12, 25), ("lc-ph", "Public Holiday") },
-        { (12, 28), ("lc-al", "Annual Leave") },
-    };
-        }
 
-        private string BuildLeaveCalendarHtml(int headerYear, int headerMonth)
+
+        private string BuildLeaveCalendarHtml(int headerYear, int headerMonth, int empId)
         {
             int year = headerYear; // FIX: was hardcoded to 2026, ignoring the Year dropdown entirely
             string[] monthShort = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
             string[] dayShort = { "SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT" };
 
-            var overrides = GetLeaveCalendarOverrides();
+            var overrides = GetLeaveCalendarOverrides(empId, year);
 
             // Every month gets up to 6 leading blank cells (max offset if the 1st falls on a Saturday)
             // plus 31 possible days = 37 columns. Anchoring day-1 to its TRUE weekday means
@@ -226,8 +227,9 @@ namespace HRMSApp
             string[] monthNames = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
             string[] monthShort = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
             string[] weekdayMini = { "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su" };
-
-            var overrides = GetLeaveCalendarOverrides();
+            int empId=13759;
+            int year = 2022;// TEMP: hardcoded to match the demo dataset (EmpID 13759). Once you load real multi-employee data, switch this to Session["EmpID"] or a querystring param.
+            var overrides = GetLeaveCalendarOverrides(empId, year);
 
             int phCount = overrides.Values.Count(v => v.css == "lc-ph");
             int alCount = overrides.Values.Count(v => v.css == "lc-al");
