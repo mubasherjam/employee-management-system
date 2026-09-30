@@ -78,7 +78,7 @@ namespace HRMSApp
             }
         }
 
-        // ---------------- Remember Me (unchanged logic, still uses its own SHA256 token hash) ----------------
+        // ------------- Remember Me (unchanged logic, still uses its own SHA256 token hash) ----------------
         private void SetRememberMeCookie(int userId)
         {
             string rawToken = Guid.NewGuid().ToString("N") + Guid.NewGuid().ToString("N");
